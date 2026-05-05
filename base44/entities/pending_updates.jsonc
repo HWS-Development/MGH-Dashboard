@@ -1,0 +1,53 @@
+{
+  "name": "pending_updates",
+  "type": "object",
+  "properties": {
+    "property_id": {
+      "type": "string",
+      "description": "UUID of the property in mgh_properties_final"
+    },
+    "property_name": {
+      "type": "string",
+      "description": "Property name for easy reading"
+    },
+    "updated_by_email": {
+      "type": "string",
+      "description": "Email of the user who made the change"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the update was submitted"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending",
+      "description": "Status of the pending update"
+    },
+    "changes": {
+      "type": "object",
+      "description": "Object with field names as keys and {old_value, new_value} as values"
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "Email of the admin who approved/rejected"
+    },
+    "approved_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the update was approved/rejected"
+    }
+  },
+  "required": [
+    "property_id",
+    "property_name",
+    "updated_by_email",
+    "status",
+    "changes"
+  ]
+}
