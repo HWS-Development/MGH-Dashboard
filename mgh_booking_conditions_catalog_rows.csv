@@ -1,0 +1,5 @@
+id,label,created_at
+booking_without_a_credit_card,"{""en"":""Booking without a credit card"",""es"":""Reserva sin tarjeta de crédito"",""fr"":""Réservation sans carte de crédit""}",2026-01-24 19:57:11.976102+00
+card_payment_terminal,"{""en"":""Card payment (terminal)"",""es"":""Pago con tarjeta (TPV)"",""fr"":""Encaissement par TPE (cartes bancaires)""}",2026-01-24 19:57:11.976102+00
+free_cancellation_depending_on_rate_plan,"{""en"":""Free cancellation (depending on rate plan)"",""es"":""Cancelación gratuita (según el plan tarifario)"",""fr"":""Annulation sans frais (selon plan tarifaire)""}",2026-01-24 19:57:11.976102+00
+no_prepayment,"{""en"":""No prepayment"",""es"":""Sin prepago"",""fr"":""Aucun prépaiement""}",2026-01-24 19:57:11.976102+00

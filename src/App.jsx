@@ -1,9 +1,10 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import { I18nProvider } from '@/i18n';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import AppLayout from '@/components/layout/AppLayout';
 import Dashboard from '@/pages/Dashboard';
@@ -14,15 +15,19 @@ import PendingUpdates from '@/pages/PendingUpdates';
 import UsersManagement from '@/pages/UsersManagement';
 import Settings from '@/pages/Settings';
 import Members from '@/pages/Members';
-import AddRiad from '@/pages/AddRiad';
+import Experiences from '@/pages/Experiences';
+import ExperienceForm from '@/pages/ExperienceForm';
+import Destinations from '@/pages/Destinations';
+import DestinationForm from '@/pages/DestinationForm';
 import OwnerApp from '@/pages/owner/OwnerApp';
 import Portal from '@/pages/Portal';
 import DirectorWrapper from '@/pages/director/DirectorWrapper';
+import Login from '@/pages/Login';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, isAuthenticated } = useAuth();
 
-  // Show loading spinner while checking app public settings or auth
+  // Show loading spinner while checking auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
@@ -35,11 +40,17 @@ const AuthenticatedApp = () => {
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
     }
+  }
+
+  // If not authenticated, show login
+  if (!isAuthenticated) {
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
   }
 
   // Render the main app
@@ -54,11 +65,17 @@ const AuthenticatedApp = () => {
         <Route path="/users" element={<UsersManagement />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/members" element={<Members />} />
-        <Route path="/add-riad" element={<AddRiad />} />
+        <Route path="/experiences" element={<Experiences />} />
+        <Route path="/experiences/new" element={<ExperienceForm />} />
+        <Route path="/experiences/:id" element={<ExperienceForm />} />
+        <Route path="/destinations" element={<Destinations />} />
+        <Route path="/destinations/new" element={<DestinationForm />} />
+        <Route path="/destinations/:id" element={<DestinationForm />} />
       </Route>
       <Route path="/owner" element={<OwnerApp />} />
       <Route path="/portal" element={<Portal />} />
       <Route path="/director" element={<DirectorWrapper />} />
+      <Route path="/login" element={<Navigate to="/" replace />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
@@ -68,14 +85,16 @@ const AuthenticatedApp = () => {
 function App() {
 
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
+    <I18nProvider>
+      <AuthProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router>
+            <AuthenticatedApp />
+          </Router>
+          <Toaster />
+        </QueryClientProvider>
+      </AuthProvider>
+    </I18nProvider>
   )
 }
 

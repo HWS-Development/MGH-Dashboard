@@ -15,9 +15,9 @@ import { useToast } from '@/components/ui/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const roleConfig = {
-  hws_admin: { label: 'HWS Admin', color: 'bg-purple-100 text-purple-700 border-purple-200' },
-  mgh_director: { label: 'Directeur MGH', color: 'bg-blue-100 text-blue-700 border-blue-200' },
-  riad_owner: { label: 'Propriétaire', color: 'bg-amber-100 text-amber-700 border-amber-200' },
+  hws_admin: { label: 'HWS Admin', color: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
+  mgh_director: { label: 'Directeur MGH', color: 'bg-slate-500/15 text-slate-600 border-slate-500/30' },
+  riad_owner: { label: 'Propriétaire', color: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
 };
 
 export default function UsersManagement() {

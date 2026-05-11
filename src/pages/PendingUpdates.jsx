@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { updateProperty } from '@/lib/supabase';
+import { updateProperty } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,6 +12,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle
 } from '@/components/ui/dialog';
 import { format } from 'date-fns';
+import { useTranslation } from '@/i18n';
 
 export default function PendingUpdates() {
   const { toast } = useToast();
@@ -19,6 +20,7 @@ export default function PendingUpdates() {
   const queryClient = useQueryClient();
   const [viewModal, setViewModal] = useState(null);
   const [tab, setTab] = useState('pending');
+  const { t } = useTranslation();
 
   const { data: allUpdates = [], isLoading } = useQuery({
     queryKey: ['pending-updates-all'],
@@ -30,7 +32,7 @@ export default function PendingUpdates() {
 
   const approveMutation = useMutation({
     mutationFn: async (update) => {
-      // Push changes to Supabase
+      // Save changes to database
       const newValues = {};
       for (const [field, val] of Object.entries(update.changes || {})) {
         newValues[field] = val.new_value !== undefined ? val.new_value : val;
@@ -46,7 +48,7 @@ export default function PendingUpdates() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pending-updates-all'] });
       queryClient.invalidateQueries({ queryKey: ['layout-pending-count'] });
-      toast({ title: '✅ Modification approuvée et appliquée dans Supabase' });
+      toast({ title: t('pendingUpdates.approvedApplied') });
     },
   });
 
@@ -61,7 +63,7 @@ export default function PendingUpdates() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pending-updates-all'] });
       queryClient.invalidateQueries({ queryKey: ['layout-pending-count'] });
-      toast({ title: '❌ Modification rejetée' });
+      toast({ title: t('pendingUpdates.rejectedMsg') });
     },
   });
 
@@ -83,7 +85,7 @@ export default function PendingUpdates() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pending-updates-all'] });
       queryClient.invalidateQueries({ queryKey: ['layout-pending-count'] });
-      toast({ title: `✅ ${pending.length} modification(s) approuvées` });
+      toast({ title: t('pendingUpdates.allApproved', { count: pending.length }) });
     },
   });
 
@@ -97,65 +99,65 @@ export default function PendingUpdates() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Modifications en attente</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Demandes de modification soumises par les propriétaires</p>
+          <h1 className="text-2xl font-bold text-brand-heading">{t('pendingUpdates.title')}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{t('pendingUpdates.subtitle')}</p>
         </div>
         {pending.length > 0 && (
           <Button
             onClick={() => approveAllMutation.mutate()}
             disabled={approveAllMutation.isPending}
             className="flex items-center gap-2 text-white"
-            style={{ background: '#8B1A1A' }}
+            style={{ background: '#384252' }}
           >
             <CheckCheck className="w-4 h-4" />
-            Tout approuver ({pending.length})
+            {t('pendingUpdates.approveAll', { count: pending.length })}
           </Button>
         )}
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-gray-200">
+      <div className="flex gap-1 border-b border-border">
         {[
-          { key: 'pending', label: 'En attente', count: pending.length },
-          { key: 'history', label: 'Historique', count: history.length },
-        ].map(t => (
+          { key: 'pending', label: t('pendingUpdates.pendingTab'), count: pending.length },
+          { key: 'history', label: t('pendingUpdates.historyTab'), count: history.length },
+        ].map(tb => (
           <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
+            key={tb.key}
+            onClick={() => setTab(tb.key)}
             className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
-              tab === t.key
+              tab === tb.key
                 ? 'border-current text-current'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-muted-foreground hover:text-muted-foreground'
             }`}
-            style={tab === t.key ? { borderColor: '#8B1A1A', color: '#8B1A1A' } : {}}
+            style={tab === tb.key ? { borderColor: '#9F121A', color: '#9F121A' } : {}}
           >
-            {t.label}
-            {t.count > 0 && (
+            {tb.label}
+            {tb.count > 0 && (
               <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full font-semibold ${
-                t.key === 'pending' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'
-              }`}>{t.count}</span>
+                tb.key === 'pending' ? 'bg-red-500/15 text-red-400' : 'bg-muted text-muted-foreground'
+              }`}>{tb.count}</span>
             )}
           </button>
         ))}
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="card-dark border border-border rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="text-left px-4 py-3 font-semibold text-gray-600">Riad</th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-600">Modifié par</th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-600">Date</th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-600">Champs modifiés</th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-600">Statut</th>
-              <th className="text-right px-4 py-3 font-semibold text-gray-600">Actions</th>
+            <tr className="bg-muted/50 border-b border-border">
+              <th className="text-left px-4 py-3 font-semibold text-muted-foreground">{t('pendingUpdates.riad')}</th>
+              <th className="text-left px-4 py-3 font-semibold text-muted-foreground">{t('pendingUpdates.modifiedBy')}</th>
+              <th className="text-left px-4 py-3 font-semibold text-muted-foreground">{t('pendingUpdates.date')}</th>
+              <th className="text-left px-4 py-3 font-semibold text-muted-foreground">{t('pendingUpdates.modifiedFields')}</th>
+              <th className="text-left px-4 py-3 font-semibold text-muted-foreground">{t('pendingUpdates.status')}</th>
+              <th className="text-right px-4 py-3 font-semibold text-muted-foreground">{t('pendingUpdates.actions')}</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-gray-100">
+                <tr key={i} className="border-b border-border/50">
                   {Array.from({ length: 6 }).map((_, j) => (
                     <td key={j} className="px-4 py-3"><Skeleton className="h-4 w-full" /></td>
                   ))}
@@ -163,30 +165,30 @@ export default function PendingUpdates() {
               ))
             ) : displayList.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-12 text-center text-gray-400">
-                  {tab === 'pending' ? 'Aucune modification en attente' : 'Aucun historique'}
+                <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">
+                  {tab === 'pending' ? t('pendingUpdates.noPending') : t('pendingUpdates.noHistory')}
                 </td>
               </tr>
             ) : (
               displayList.map(u => (
-                <tr key={u.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-900">{u.property_name}</td>
-                  <td className="px-4 py-3 text-gray-600 text-xs">{u.updated_by_email}</td>
-                  <td className="px-4 py-3 text-gray-500 text-xs">{formatDate(u.updated_at)}</td>
+                <tr key={u.id} className="border-b border-border/50 hover:bg-muted/50">
+                  <td className="px-4 py-3 font-medium text-foreground">{u.property_name}</td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs">{u.updated_by_email}</td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs">{formatDate(u.updated_at)}</td>
                   <td className="px-4 py-3">
-                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-                      {Object.keys(u.changes || {}).length} champ(s)
+                    <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
+                      {Object.keys(u.changes || {}).length} {t('common.fields')}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    {u.status === 'pending' && <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium">En attente</span>}
-                    {u.status === 'approved' && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Approuvé</span>}
-                    {u.status === 'rejected' && <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">Rejeté</span>}
+                    {u.status === 'pending' && <span className="text-xs bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded-full font-medium">{t('pendingUpdates.pending')}</span>}
+                    {u.status === 'approved' && <span className="text-xs bg-[#9F121A]/15 text-[#9F121A] px-2 py-0.5 rounded-full font-medium">{t('pendingUpdates.approved')}</span>}
+                    {u.status === 'rejected' && <span className="text-xs bg-red-500/15 text-red-400 px-2 py-0.5 rounded-full font-medium">{t('pendingUpdates.rejected')}</span>}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1 justify-end">
                       <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => setViewModal(u)}>
-                        <Eye className="w-3 h-3 mr-1" />Voir
+                        <Eye className="w-3 h-3 mr-1" />{t('pendingUpdates.view')}
                       </Button>
                       {u.status === 'pending' && (
                         <>
@@ -197,7 +199,7 @@ export default function PendingUpdates() {
                             onClick={() => approveMutation.mutate(u)}
                             disabled={approveMutation.isPending}
                           >
-                            <CheckCircle2 className="w-3 h-3 mr-1" />Approuver
+                            <CheckCircle2 className="w-3 h-3 mr-1" />{t('pendingUpdates.approve')}
                           </Button>
                           <Button
                             size="sm"
@@ -206,7 +208,7 @@ export default function PendingUpdates() {
                             onClick={() => rejectMutation.mutate(u)}
                             disabled={rejectMutation.isPending}
                           >
-                            <XCircle className="w-3 h-3 mr-1" />Rejeter
+                            <XCircle className="w-3 h-3 mr-1" />{t('pendingUpdates.reject')}
                           </Button>
                         </>
                       )}
@@ -224,25 +226,25 @@ export default function PendingUpdates() {
         <Dialog open={!!viewModal} onOpenChange={() => setViewModal(null)}>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Modifications — {viewModal.property_name}</DialogTitle>
+              <DialogTitle>{t('pendingUpdates.modifications')} — {viewModal.property_name}</DialogTitle>
             </DialogHeader>
             <div className="space-y-3 mt-2">
-              <div className="text-xs text-gray-500 mb-3">
-                Par <strong>{viewModal.updated_by_email}</strong> le {formatDate(viewModal.updated_at)}
+              <div className="text-xs text-muted-foreground mb-3">
+                {t('pendingUpdates.byOn', { email: viewModal.updated_by_email, date: formatDate(viewModal.updated_at) })}
               </div>
-              <div className="grid grid-cols-3 gap-2 text-xs font-semibold text-gray-500 px-2 pb-1 border-b">
-                <div>Champ</div>
-                <div>Ancienne valeur</div>
-                <div>Nouvelle valeur</div>
+              <div className="grid grid-cols-3 gap-2 text-xs font-semibold text-muted-foreground px-2 pb-1 border-b">
+                <div>{t('pendingUpdates.field')}</div>
+                <div>{t('pendingUpdates.oldValue')}</div>
+                <div>{t('pendingUpdates.newValue')}</div>
               </div>
               {Object.entries(viewModal.changes || {}).map(([field, val]) => {
                 const oldV = val?.old_value !== undefined ? String(val.old_value ?? '') : '—';
                 const newV = val?.new_value !== undefined ? String(val.new_value ?? '') : String(val ?? '');
                 return (
-                  <div key={field} className="grid grid-cols-3 gap-2 text-xs px-2 py-2 rounded bg-gray-50">
-                    <div className="font-medium text-gray-700">{field}</div>
-                    <div className="text-gray-500 break-all">{oldV || '—'}</div>
-                    <div className="text-green-700 font-medium break-all">{newV || '—'}</div>
+                  <div key={field} className="grid grid-cols-3 gap-2 text-xs px-2 py-2 rounded bg-muted/50">
+                    <div className="font-medium text-muted-foreground">{field}</div>
+                    <div className="text-muted-foreground break-all">{oldV || '—'}</div>
+                    <div className="text-[#9F121A] font-medium break-all">{newV || '—'}</div>
                   </div>
                 );
               })}

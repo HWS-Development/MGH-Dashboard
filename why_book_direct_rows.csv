@@ -1,0 +1,7 @@
+id,created_at,title_key,description_key,icon_name
+1,2025-08-22 07:34:13.344042+00,Best Price Guarantee,bestPriceGuaranteeText,ShieldCheck
+2,2025-08-22 07:34:13.344042+00,Exclusive Offers,directBookingPerksText,Tag
+3,2025-08-22 07:34:13.344042+00,Secure Booking,secureBookingText,Lock
+4,2025-08-22 07:34:13.344042+00,Direct Support,supportLocalText,MessageSquare
+5,2025-08-22 07:34:13.344042+00,Certified Quality,registeredTrademark,Award
+6,2025-08-22 07:34:13.344042+00,Local Expertise,footerAboutText,Map

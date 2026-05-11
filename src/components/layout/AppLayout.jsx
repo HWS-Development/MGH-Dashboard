@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Sidebar from './Sidebar';
 import { useQuery } from '@tanstack/react-query';
-import { listProperties } from '@/lib/supabase';
+import { usePartnerHotels } from '@/lib/partnerHotelsApi';
 import { base44 } from '@/api/base44Client';
-export const LangContext = React.createContext('fr');
+import { useTranslation } from '@/i18n';
+
+const FLAG_ITEMS = [
+  { code: 'en', src: '/flags/en.svg', label: 'EN' },
+  { code: 'fr', src: '/flags/fr.svg', label: 'FR' },
+  { code: 'es', src: '/flags/es.svg', label: 'ES' },
+];
 
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
-  const [lang, setLang] = useState('fr');
+  const { lang, setLang, t } = useTranslation();
 
-  const { data: propsResult } = useQuery({
-    queryKey: ['layout-properties-count'],
-    queryFn: () => listProperties({ limit: 500 }),
-    staleTime: 60000,
-  });
+  const { data: properties = [] } = usePartnerHotels();
   const { data: pendingUpdates } = useQuery({
     queryKey: ['layout-pending-count'],
     queryFn: () => base44.entities.pending_updates.filter({ status: 'pending' }),
@@ -22,36 +25,50 @@ export default function AppLayout() {
     staleTime: 30000,
   });
 
-  const propertiesCount = propsResult?.data?.length || 0;
+  const propertiesCount = properties.length;
   const pendingCount = pendingUpdates?.length || 0;
 
   return (
-    <LangContext.Provider value={lang}>
-      <div className="min-h-screen bg-background">
-        <Sidebar
-          collapsed={collapsed}
-          onToggle={() => setCollapsed(!collapsed)}
-          propertiesCount={propertiesCount}
-          pendingCount={pendingCount}
-        />
-        <main className={`transition-all duration-300 flex flex-col min-h-screen ${collapsed ? 'ml-16' : 'ml-64'}`}>
-          {/* Top bar with lang toggle */}
-          <div className="flex items-center justify-end px-6 pt-4 pb-0">
-            <button
-              onClick={() => setLang(l => l === 'fr' ? 'en' : 'fr')}
-              className="text-xs font-medium px-3 py-1 rounded-full border border-gray-300 text-gray-500 hover:text-gray-800 hover:border-gray-400 transition-all"
-            >
-              {lang === 'fr' ? '🇬🇧 EN' : '🇫🇷 FR'}
-            </button>
+    <div className="min-h-screen bg-background">
+      <Sidebar
+        collapsed={collapsed}
+        onToggle={() => setCollapsed(!collapsed)}
+        propertiesCount={propertiesCount}
+        pendingCount={pendingCount}
+      />
+      <main className={`transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col min-h-screen ${collapsed ? 'ml-16' : 'ml-64'}`}>
+        {/* Top bar with lang toggle */}
+        <div className="flex items-center justify-end px-6 pt-4 pb-0">
+          <div className="flex items-center rounded-full border border-border overflow-hidden shadow-sm card-dark">
+            {FLAG_ITEMS.map((item) => (
+              <button
+                key={item.code}
+                onClick={() => setLang(item.code)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+                  lang === item.code
+                    ? 'bg-[#9F121A] text-[#FFFFFF]'
+                    : 'bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                }`}
+              >
+                <img src={item.src} alt={item.label} className="w-4 h-3 object-cover rounded-sm" />
+                {item.label}
+              </button>
+            ))}
           </div>
-          <div className="p-6 md:p-8 max-w-[1400px] mx-auto flex-1 w-full">
-            <Outlet />
-          </div>
-          <footer className="text-center text-xs text-gray-400 py-4 border-t border-gray-200 mt-4">
-            © 2025 Hospitality Web Services — MGH Dashboard v1.0
-          </footer>
-        </main>
-      </div>
-    </LangContext.Provider>
+        </div>
+        <motion.div
+          className="p-6 md:p-8 max-w-[1400px] mx-auto flex-1 w-full"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+          key={undefined}
+        >
+          <Outlet />
+        </motion.div>
+        <footer className="text-center text-xs text-brand-subtitle/50 py-4 border-t border-brand-subtitle/10 mt-4">
+          {t('footer.copyright')}
+        </footer>
+      </main>
+    </div>
   );
 }

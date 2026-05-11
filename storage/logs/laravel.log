@@ -1,0 +1,137 @@
+
+[2026-05-11 14:30:19] local.INFO: [PartnerHotelController] POST https://api.centra.global/api/apps/login (clientId: ORG-E02DBDC0_a80...)  
+[2026-05-11 14:30:20] local.INFO: [PartnerHotelController] Login OK — token cached for 3540s  
+[2026-05-11 14:30:21] local.INFO: [PartnerHotelController] Success — returning 215 hotels  
+[2026-05-11 14:32:16] local.INFO: [PartnerHotelController] Success — returning hotel ff85629b-d8bd-419d-a6ea-439837ce35e1  
+[2026-05-11 14:55:38] local.INFO: [PartnerHotelController] Success — returning 215 hotels  
+[2026-05-11 15:03:54] local.INFO: [PartnerHotelController] Success — returning 215 hotels  
+[2026-05-11 15:07:45] local.ERROR: PHP Parse error: Syntax error, unexpected '=' on line 1 {"exception":"[object] (Psy\\Exception\\ParseErrorException(code: 0): PHP Parse error: Syntax error, unexpected '=' on line 1 at C:/Users/adnan/MGH-Dashboard/vendor/psy/psysh/src/Exception/ParseErrorException.php:44)
+[stacktrace]
+#0 C:/Users/adnan/MGH-Dashboard/vendor/psy/psysh/src/CodeCleaner.php(657): Psy/Exception/ParseErrorException::fromParseError()
+#1 C:/Users/adnan/MGH-Dashboard/vendor/psy/psysh/src/CodeCleaner.php(273): Psy/CodeCleaner->parse()
+#2 C:/Users/adnan/MGH-Dashboard/vendor/psy/psysh/src/Shell.php(1358): Psy/CodeCleaner->clean()
+#3 C:/Users/adnan/MGH-Dashboard/vendor/psy/psysh/src/Shell.php(1465): Psy/Shell->appendCode()
+#4 C:/Users/adnan/MGH-Dashboard/vendor/psy/psysh/src/Shell.php(2173): Psy/Shell->setCode()
+#5 C:/Users/adnan/MGH-Dashboard/vendor/laravel/tinker/src/Console/TinkerCommand.php(77): Psy/Shell->execute()
+#6 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Laravel/Tinker/Console/TinkerCommand->handle()
+#7 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::{closure:Illuminate/Container/BoundMethod::call():35}()
+#8 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate/Container/Util::unwrapIfClosure()
+#9 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod()
+#10 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate/Container/BoundMethod::call()
+#11 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Console/Command.php(213): Illuminate/Container/Container->call()
+#12 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Command/Command.php(341): Illuminate/Console/Command->execute()
+#13 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Console/Command.php(182): Symfony/Component/Console/Command/Command->run()
+#14 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Application.php(1117): Illuminate/Console/Command->run()
+#15 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Application.php(356): Symfony/Component/Console/Application->doRunCommand()
+#16 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun()
+#17 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run()
+#18 C:/Users/adnan/MGH-Dashboard/artisan(9): Illuminate/Foundation/Console/Kernel->handle()
+#19 {main}
+"} 
+[2026-05-11 15:10:34] local.ERROR: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'essaouira' for key 'mgh_cities.PRIMARY' (Connection: mysql, SQL: insert into `mgh_cities` (`created_at`, `id`, `label`) values (2026-01-24 19:57:11, essaouira, {"en":"Essaouira","es":"Essaouira","fr":"Essaouira"}), (2026-01-24 19:57:11, marrakech, {"en":"Marrakech","es":"Marrakech","fr":"Marrakech"}), (2026-01-24 19:57:11, ouarzazate, {"en":"Ouarzazate","es":"Ouarzazate","fr":"Ouarzazate"})) {"exception":"[object] (Illuminate\\Database\\UniqueConstraintViolationException(code: 23000): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'essaouira' for key 'mgh_cities.PRIMARY' (Connection: mysql, SQL: insert into `mgh_cities` (`created_at`, `id`, `label`) values (2026-01-24 19:57:11, essaouira, {\"en\":\"Essaouira\",\"es\":\"Essaouira\",\"fr\":\"Essaouira\"}), (2026-01-24 19:57:11, marrakech, {\"en\":\"Marrakech\",\"es\":\"Marrakech\",\"fr\":\"Marrakech\"}), (2026-01-24 19:57:11, ouarzazate, {\"en\":\"Ouarzazate\",\"es\":\"Ouarzazate\",\"fr\":\"Ouarzazate\"})) at C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Connection.php:820)
+[stacktrace]
+#0 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Connection.php(779): Illuminate/Database/Connection->runQueryCallback()
+#1 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate/Database/Connection->run()
+#2 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3717): Illuminate/Database/MySqlConnection->insert()
+#3 C:/Users/adnan/MGH-Dashboard/database/seeders/CsvDataSeeder.php(105): Illuminate/Database/Query/Builder->insert()
+#4 C:/Users/adnan/MGH-Dashboard/database/seeders/CsvDataSeeder.php(44): Database/Seeders/CsvDataSeeder->importCsv()
+#5 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Database/Seeders/CsvDataSeeder->run()
+#6 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::{closure:Illuminate/Container/BoundMethod::call():35}()
+#7 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate/Container/Util::unwrapIfClosure()
+#8 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod()
+#9 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate/Container/BoundMethod::call()
+#10 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Seeder.php(188): Illuminate/Container/Container->call()
+#11 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Seeder.php(197): Illuminate/Database/Seeder->{closure:Illuminate/Database/Seeder::__invoke():187}()
+#12 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Console/Seeds/SeedCommand.php(70): Illuminate/Database/Seeder->__invoke()
+#13 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/GuardsAttributes.php(155): Illuminate/Database/Console/Seeds/SeedCommand->{closure:Illuminate/Database/Console/Seeds/SeedCommand::handle():69}()
+#14 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Console/Seeds/SeedCommand.php(69): Illuminate/Database/Eloquent/Model::unguarded()
+#15 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate/Database/Console/Seeds/SeedCommand->handle()
+#16 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::{closure:Illuminate/Container/BoundMethod::call():35}()
+#17 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate/Container/Util::unwrapIfClosure()
+#18 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod()
+#19 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate/Container/BoundMethod::call()
+#20 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Console/Command.php(213): Illuminate/Container/Container->call()
+#21 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Command/Command.php(341): Illuminate/Console/Command->execute()
+#22 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Console/Command.php(182): Symfony/Component/Console/Command/Command->run()
+#23 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Application.php(1117): Illuminate/Console/Command->run()
+#24 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Application.php(356): Symfony/Component/Console/Application->doRunCommand()
+#25 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun()
+#26 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run()
+#27 C:/Users/adnan/MGH-Dashboard/artisan(9): Illuminate/Foundation/Console/Kernel->handle()
+#28 {main}
+
+[previous exception] [object] (PDOException(code: 23000): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'essaouira' for key 'mgh_cities.PRIMARY' at C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:53)
+[stacktrace]
+#0 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(53): PDOStatement->execute()
+#1 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Connection.php(812): Illuminate/Database/MySqlConnection->{closure:Illuminate/Database/MySqlConnection::insert():42}()
+#2 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Connection.php(779): Illuminate/Database/Connection->runQueryCallback()
+#3 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(42): Illuminate/Database/Connection->run()
+#4 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3717): Illuminate/Database/MySqlConnection->insert()
+#5 C:/Users/adnan/MGH-Dashboard/database/seeders/CsvDataSeeder.php(105): Illuminate/Database/Query/Builder->insert()
+#6 C:/Users/adnan/MGH-Dashboard/database/seeders/CsvDataSeeder.php(44): Database/Seeders/CsvDataSeeder->importCsv()
+#7 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Database/Seeders/CsvDataSeeder->run()
+#8 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::{closure:Illuminate/Container/BoundMethod::call():35}()
+#9 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate/Container/Util::unwrapIfClosure()
+#10 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod()
+#11 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate/Container/BoundMethod::call()
+#12 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Seeder.php(188): Illuminate/Container/Container->call()
+#13 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Seeder.php(197): Illuminate/Database/Seeder->{closure:Illuminate/Database/Seeder::__invoke():187}()
+#14 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Console/Seeds/SeedCommand.php(70): Illuminate/Database/Seeder->__invoke()
+#15 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/GuardsAttributes.php(155): Illuminate/Database/Console/Seeds/SeedCommand->{closure:Illuminate/Database/Console/Seeds/SeedCommand::handle():69}()
+#16 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Database/Console/Seeds/SeedCommand.php(69): Illuminate/Database/Eloquent/Model::unguarded()
+#17 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate/Database/Console/Seeds/SeedCommand->handle()
+#18 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::{closure:Illuminate/Container/BoundMethod::call():35}()
+#19 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate/Container/Util::unwrapIfClosure()
+#20 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod()
+#21 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate/Container/BoundMethod::call()
+#22 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Console/Command.php(213): Illuminate/Container/Container->call()
+#23 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Command/Command.php(341): Illuminate/Console/Command->execute()
+#24 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Console/Command.php(182): Symfony/Component/Console/Command/Command->run()
+#25 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Application.php(1117): Illuminate/Console/Command->run()
+#26 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Application.php(356): Symfony/Component/Console/Application->doRunCommand()
+#27 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun()
+#28 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run()
+#29 C:/Users/adnan/MGH-Dashboard/artisan(9): Illuminate/Foundation/Console/Kernel->handle()
+#30 {main}
+"} 
+[2026-05-11 15:10:46] local.ERROR: PHP Parse error: Syntax error, unexpected T_NS_SEPARATOR on line 3 {"exception":"[object] (Psy\\Exception\\ParseErrorException(code: 0): PHP Parse error: Syntax error, unexpected T_NS_SEPARATOR on line 3 at C:/Users/adnan/MGH-Dashboard/vendor/psy/psysh/src/Exception/ParseErrorException.php:44)
+[stacktrace]
+#0 C:/Users/adnan/MGH-Dashboard/vendor/psy/psysh/src/CodeCleaner.php(657): Psy/Exception/ParseErrorException::fromParseError()
+#1 C:/Users/adnan/MGH-Dashboard/vendor/psy/psysh/src/CodeCleaner.php(273): Psy/CodeCleaner->parse()
+#2 C:/Users/adnan/MGH-Dashboard/vendor/psy/psysh/src/Shell.php(1358): Psy/CodeCleaner->clean()
+#3 C:/Users/adnan/MGH-Dashboard/vendor/psy/psysh/src/Shell.php(1465): Psy/Shell->appendCode()
+#4 C:/Users/adnan/MGH-Dashboard/vendor/psy/psysh/src/Shell.php(2173): Psy/Shell->setCode()
+#5 C:/Users/adnan/MGH-Dashboard/vendor/laravel/tinker/src/Console/TinkerCommand.php(77): Psy/Shell->execute()
+#6 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Laravel/Tinker/Console/TinkerCommand->handle()
+#7 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::{closure:Illuminate/Container/BoundMethod::call():35}()
+#8 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate/Container/Util::unwrapIfClosure()
+#9 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod()
+#10 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate/Container/BoundMethod::call()
+#11 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Console/Command.php(213): Illuminate/Container/Container->call()
+#12 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Command/Command.php(341): Illuminate/Console/Command->execute()
+#13 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Console/Command.php(182): Symfony/Component/Console/Command/Command->run()
+#14 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Application.php(1117): Illuminate/Console/Command->run()
+#15 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Application.php(356): Symfony/Component/Console/Application->doRunCommand()
+#16 C:/Users/adnan/MGH-Dashboard/vendor/symfony/console/Application.php(195): Symfony/Component/Console/Application->doRun()
+#17 C:/Users/adnan/MGH-Dashboard/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run()
+#18 C:/Users/adnan/MGH-Dashboard/artisan(9): Illuminate/Foundation/Console/Kernel->handle()
+#19 {main}
+"} 
+[2026-05-11 15:12:33] local.INFO: [PartnerHotelController] Success — returning 215 hotels  
+[2026-05-11 15:31:22] local.INFO: [PartnerHotelController] POST https://api.centra.global/api/apps/login (clientId: ORG-E02DBDC0_a80...)  
+[2026-05-11 15:31:23] local.INFO: [PartnerHotelController] Login OK — token cached for 3540s  
+[2026-05-11 15:31:23] local.INFO: [PartnerHotelController] Success — returning 215 hotels  
+[2026-05-11 15:38:06] local.INFO: [PartnerHotelController] Success — returning 215 hotels  
+[2026-05-11 15:49:51] local.INFO: [PartnerHotelController] Success — returning 209 hotels  
+[2026-05-11 15:55:12] local.INFO: [PartnerHotelController] Success — returning 209 hotels  
+[2026-05-11 16:02:02] local.INFO: [PartnerHotelController] Success — returning 209 hotels  
+[2026-05-11 16:07:07] local.INFO: [PartnerHotelController] Success — returning 209 hotels  
+[2026-05-11 16:13:00] local.INFO: [PartnerHotelController] Success — returning 209 hotels  
+[2026-05-11 16:19:30] local.INFO: [PartnerHotelController] Success — returning 209 hotels  
+[2026-05-11 16:24:53] local.INFO: [PartnerHotelController] Success — returning 209 hotels  
+[2026-05-11 16:31:39] local.INFO: [PartnerHotelController] POST https://api.centra.global/api/apps/login (clientId: ORG-E02DBDC0_a80...)  
+[2026-05-11 16:31:39] local.INFO: [PartnerHotelController] Login OK — token cached for 3540s  
+[2026-05-11 16:31:40] local.INFO: [PartnerHotelController] Success — returning hotel ff85629b-d8bd-419d-a6ea-439837ce35e1  
+[2026-05-11 16:36:18] local.INFO: [PartnerHotelController] Success — returning 209 hotels  
+[2026-05-11 16:47:54] local.INFO: [PartnerHotelController] Success — returning 209 hotels  
+[2026-05-11 16:53:03] local.INFO: [PartnerHotelController] Success — returning 209 hotels  

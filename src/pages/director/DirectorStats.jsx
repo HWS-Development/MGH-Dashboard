@@ -2,12 +2,12 @@ import React, { useMemo } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const COLORS = ['#16a34a', '#f97316', '#2563eb', '#9ca3af', '#8B1A1A', '#7c3aed', '#0891b2', '#d97706'];
+const COLORS = ['#16a34a', '#f97316', '#2563eb', '#9ca3af', '#384252', '#7c3aed', '#0891b2', '#d97706'];
 
 function ChartCard({ title, children, isLoading }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <h3 className="font-semibold text-gray-800 mb-4">{title}</h3>
+    <div className="card-dark rounded-xl border border-border shadow-sm p-5">
+      <h3 className="font-semibold text-foreground/80 mb-4">{title}</h3>
       {isLoading ? <Skeleton className="h-48 w-full" /> : children}
     </div>
   );
@@ -51,7 +51,7 @@ export default function DirectorStats({ properties, contacts, isLoading }) {
     const withDescFR = properties.filter(p => p.description?.fr?.trim()).length;
     const withPhotos = properties.filter(p => p.image_urls?.length > 0).length;
     const contactsMap = {};
-    contacts.forEach(c => { if (c.supabase_id) contactsMap[c.supabase_id] = c; });
+    contacts.forEach(c => { if (c.property_id) contactsMap[c.property_id] = c; });
     const withSB = contacts.filter(c => c.simplebookinglink?.trim()).length;
     const total = properties.length || 1;
     return [
@@ -64,8 +64,8 @@ export default function DirectorStats({ properties, contacts, isLoading }) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Statistiques</h1>
-        <p className="text-sm text-gray-500 mt-0.5">{properties.length} propriétés · {contacts.length} contacts</p>
+        <h1 className="text-2xl font-bold text-foreground">Statistiques</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">{properties.length} propriétés · {contacts.length} contacts</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -88,7 +88,7 @@ export default function DirectorStats({ properties, contacts, isLoading }) {
               <XAxis type="number" tick={{ fontSize: 11 }} />
               <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={60} />
               <Tooltip />
-              <Bar dataKey="value" fill="#8B1A1A" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="value" fill="#384252" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>

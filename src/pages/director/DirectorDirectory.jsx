@@ -6,10 +6,10 @@ import { Search, Download } from 'lucide-react';
 import { format } from 'date-fns';
 
 const STATUS_BADGE = {
-  active: 'bg-green-100 text-green-700',
-  suspended: 'bg-orange-100 text-orange-700',
-  pending: 'bg-blue-100 text-blue-700',
-  'ex-member': 'bg-gray-100 text-gray-500',
+  active: 'bg-[#9F121A]/15 text-[#9F121A]',
+  suspended: 'bg-orange-500/15 text-orange-400',
+  pending: 'bg-slate-500/15 text-slate-600',
+  'ex-member': 'bg-muted text-muted-foreground',
 };
 const STATUS_LABEL = {
   active: 'Actif', suspended: 'Suspendu', pending: 'En attente', 'ex-member': 'Ex-membre',
@@ -18,7 +18,7 @@ const STATUS_LABEL = {
 export default function DirectorDirectory({ properties, contacts, isLoading }) {
   const [search, setSearch] = useState('');
 
-  // JOIN: mgh_contacts.supabaseid = mgh_properties_final.id
+  // JOIN: mgh_contacts.property_id = mgh_properties_final.id
   const propsMap = useMemo(() => {
     const m = {};
     properties.forEach(p => { if (p.id) m[p.id] = p; });
@@ -29,7 +29,7 @@ export default function DirectorDirectory({ properties, contacts, isLoading }) {
     if (!search) return contacts;
     const q = search.toLowerCase();
     return contacts.filter(c => {
-      const prop = propsMap[c.supabaseid] || {};
+      const prop = propsMap[c.property_id] || {};
       const name = (prop.name?.fr || '') + (c.contactname || '');
       return name.toLowerCase().includes(q);
     });
@@ -42,7 +42,7 @@ export default function DirectorDirectory({ properties, contacts, isLoading }) {
   const exportCSV = () => {
     const headers = ['Nom riad', 'Contact', 'Email réservation', 'Téléphone propriétaire', 'Channel Manager', 'Statut', 'Membre depuis', 'Renouvellement'];
     const rows = filtered.map(c => {
-      const prop = propsMap[c.supabaseid] || {};
+      const prop = propsMap[c.property_id] || {};
       return [
         prop.name?.fr || '—',
         c.contactname || '—',
@@ -65,8 +65,8 @@ export default function DirectorDirectory({ properties, contacts, isLoading }) {
     <div className="space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Annuaire des membres</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{contacts.length} membres — lecture seule</p>
+          <h1 className="text-2xl font-bold text-foreground">Annuaire des membres</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{contacts.length} membres — lecture seule</p>
         </div>
         <Button variant="outline" className="flex items-center gap-2 text-sm" onClick={exportCSV}>
           <Download className="w-4 h-4" />Exporter CSV
@@ -74,7 +74,7 @@ export default function DirectorDirectory({ properties, contacts, isLoading }) {
       </div>
 
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="Rechercher par nom, contact…"
           value={search}
@@ -83,20 +83,20 @@ export default function DirectorDirectory({ properties, contacts, isLoading }) {
         />
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+      <div className="card-dark border border-border rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200 text-xs">
+              <tr className="bg-muted/50 border-b border-border text-xs">
                 {['Nom riad', 'Contact', 'Email réservation', 'Tél propriétaire', 'Channel Manager', 'Statut', 'Membre depuis', 'Renouvellement'].map(h => (
-                  <th key={h} className="text-left px-4 py-3 font-semibold text-gray-500">{h}</th>
+                  <th key={h} className="text-left px-4 py-3 font-semibold text-muted-foreground">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 Array.from({ length: 8 }).map((_, i) => (
-                  <tr key={i} className="border-b border-gray-100">
+                  <tr key={i} className="border-b border-border/50">
                     {Array.from({ length: 8 }).map((_, j) => (
                       <td key={j} className="px-4 py-3"><Skeleton className="h-3 w-full" /></td>
                     ))}
@@ -104,36 +104,36 @@ export default function DirectorDirectory({ properties, contacts, isLoading }) {
                 ))
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-gray-400">
+                  <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">
                     Aucun membre trouvé
                   </td>
                 </tr>
               ) : (
                 filtered.map(c => {
-                  const prop = propsMap[c.supabaseid] || {};
+                  const prop = propsMap[c.property_id] || {};
                   let propName = prop.name;
                   if (typeof propName === 'string') { try { propName = JSON.parse(propName); } catch { propName = {}; } }
                   return (
-                    <tr key={c.supabaseid} className="border-b border-gray-100 hover:bg-gray-50 text-xs">
-                      <td className="px-4 py-2.5 font-medium text-gray-900 max-w-[140px] truncate">
+                    <tr key={c.property_id} className="border-b border-border/50 hover:bg-muted/50 text-xs">
+                      <td className="px-4 py-2.5 font-medium text-foreground max-w-[140px] truncate">
                         {propName?.fr || c.riadname || '—'}
                       </td>
-                      <td className="px-4 py-2.5 text-gray-600">{c.contactname || '—'}</td>
+                      <td className="px-4 py-2.5 text-muted-foreground">{c.contactname || '—'}</td>
                       {/* mgh_properties_final.email = public reservation email */}
-                      <td className="px-4 py-2.5 text-gray-500 max-w-[140px] truncate">{prop.email || '—'}</td>
+                      <td className="px-4 py-2.5 text-muted-foreground max-w-[140px] truncate">{prop.email || '—'}</td>
                       {/* mgh_contacts.Telephone */}
-                      <td className="px-4 py-2.5 text-gray-500">{c.Telephone || '—'}</td>
+                      <td className="px-4 py-2.5 text-muted-foreground">{c.Telephone || '—'}</td>
                       {/* mgh_contacts.CM */}
-                      <td className="px-4 py-2.5 text-gray-500">{c.CM || '—'}</td>
+                      <td className="px-4 py-2.5 text-muted-foreground">{c.CM || '—'}</td>
                       <td className="px-4 py-2.5">
                         {c.membershipstatus ? (
-                          <span className={`px-2 py-0.5 rounded-full font-medium text-xs ${STATUS_BADGE[c.membershipstatus] || 'bg-gray-100 text-gray-500'}`}>
+                          <span className={`px-2 py-0.5 rounded-full font-medium text-xs ${STATUS_BADGE[c.membershipstatus] || 'card-dark/10 text-muted-foreground'}`}>
                             {STATUS_LABEL[c.membershipstatus] || c.membershipstatus}
                           </span>
                         ) : '—'}
                       </td>
-                      <td className="px-4 py-2.5 text-gray-400">{formatDate(c.Membersince)}</td>
-                      <td className="px-4 py-2.5 text-gray-400">{formatDate(c.renewaldate)}</td>
+                      <td className="px-4 py-2.5 text-muted-foreground">{formatDate(c.Membersince)}</td>
+                      <td className="px-4 py-2.5 text-muted-foreground">{formatDate(c.renewaldate)}</td>
                     </tr>
                   );
                 })

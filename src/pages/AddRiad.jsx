@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 
-import { insertProperty, insertContact } from '@/lib/supabase';
+import { insertProperty, insertContact } from '@/lib/api';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { AlertTriangle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { useTranslation } from '@/i18n';
 
 const CITIES = [
   { id: "essaouira", label: "Essaouira" },
@@ -51,6 +52,7 @@ const PROPERTY_TYPES = [
 export default function AddRiad() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     // mgh_properties_final fields
     name_fr: '',
@@ -96,7 +98,7 @@ export default function AddRiad() {
       };
       // mgh_contacts — exact column names
       const contactData = {
-        supabaseid: id,             // FK to mgh_properties_final.id
+        property_id: id,             // FK to mgh_properties_final.id
         contactname: form.contactname,
         email: form.access_email,  // platform access email (private)
         CM: form.CM,
@@ -108,7 +110,7 @@ export default function AddRiad() {
       return id;
     },
     onSuccess: (id) => {
-      toast({ title: '✅ Riad ajouté avec succès' });
+      toast({ title: t('addRiad.riadAdded') });
       navigate(`/properties/${id}`);
     },
     onError: (err) => {
@@ -119,11 +121,11 @@ export default function AddRiad() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.name_fr) {
-      toast({ title: 'Le nom FR est requis', variant: 'destructive' });
+      toast({ title: t('addRiad.nameRequired'), variant: 'destructive' });
       return;
     }
     if (lngWarning) {
-      toast({ title: 'La longitude doit être négative pour le Maroc', variant: 'destructive' });
+      toast({ title: t('addRiad.longitudeNegative'), variant: 'destructive' });
       return;
     }
     mutation.mutate();
@@ -132,54 +134,54 @@ export default function AddRiad() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Ajouter un riad</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Créer une nouvelle propriété dans mgh_properties_final et mgh_contacts</p>
+        <h1 className="text-2xl font-bold text-foreground">{t('addRiad.title')}</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">{t('addRiad.subtitle')}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Infos propriété — mgh_properties_final */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
-          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-100 pb-2">
-            Informations propriété <span className="text-gray-400 normal-case font-normal">(mgh_properties_final)</span>
+        <div className="card-dark border border-border rounded-lg p-6 space-y-4">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide border-b border-border/50 pb-2">
+            {t('addRiad.propertyInfo')} <span className="text-muted-foreground normal-case font-normal">{t('addRiad.propertyInfoTable')}</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Nom FR (name.fr) <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.nameFr')} <span className="text-red-500">*</span></label>
               <Input value={form.name_fr} onChange={e => setField('name_fr', e.target.value)} placeholder="Ex: Riad Zitoun" required />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Type de propriété (property_type_id)</label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.propertyType')}</label>
               <Select value={form.property_type_id} onValueChange={v => setField('property_type_id', v)}>
-                <SelectTrigger><SelectValue placeholder="Sélectionner…" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t('addRiad.selectPlaceholder')} /></SelectTrigger>
                 <SelectContent>
-                  {PROPERTY_TYPES.map(t => <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>)}
+                  {PROPERTY_TYPES.map(pt => <SelectItem key={pt.id} value={pt.id}>{pt.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Ville (city_id)</label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.city')}</label>
               <Select value={form.city_id} onValueChange={v => { setField('city_id', v); setField('neighborhood_id', ''); }}>
-                <SelectTrigger><SelectValue placeholder="Sélectionner…" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t('addRiad.selectPlaceholder')} /></SelectTrigger>
                 <SelectContent>
                   {CITIES.map(c => <SelectItem key={c.id} value={c.id}>{c.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Quartier (neighborhood_id)</label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.neighborhood')}</label>
               <Select value={form.neighborhood_id} onValueChange={v => setField('neighborhood_id', v)} disabled={!form.city_id}>
-                <SelectTrigger><SelectValue placeholder={form.city_id ? 'Sélectionner…' : 'Choisir une ville d\'abord'} /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={form.city_id ? t('addRiad.selectPlaceholder') : t('addRiad.cityFirst')} /></SelectTrigger>
                 <SelectContent>
                   {NEIGHBORHOODS.map(n => <SelectItem key={n.id} value={n.id}>{n.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-gray-700 block mb-1">Adresse FR (address.fr)</label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.addressFr')}</label>
               <Input value={form.address_fr} onChange={e => setField('address_fr', e.target.value)} placeholder="Ex: 5 Derb Zitoun El Kebir, Medina" />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">GPS Longitude (longitude — négatif)</label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.longitude')}</label>
               <Input
                 type="number"
                 step="any"
@@ -190,58 +192,58 @@ export default function AddRiad() {
               />
               {lngWarning && (
                 <p className="text-red-600 text-xs mt-1 flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3" /> La longitude doit être négative pour le Maroc
+                  <AlertTriangle className="w-3 h-3" /> {t('addRiad.longitudeNegative')}
                 </p>
               )}
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">GPS Latitude (latitude)</label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.latitude')}</label>
               <Input type="number" step="any" value={form.latitude} onChange={e => setField('latitude', e.target.value)} placeholder="31.634" />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Website (website)</label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.website')}</label>
               <Input value={form.website} onChange={e => setField('website', e.target.value)} placeholder="https://…" />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Téléphone de réservation (phone — visible sur le site)</label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.reservationPhone')}</label>
               <Input value={form.phone} onChange={e => setField('phone', e.target.value)} placeholder="+212 …" />
             </div>
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-gray-700 block mb-1">Email de réservation (email — visible sur le site)</label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.reservationEmail')}</label>
               <Input type="email" value={form.email} onChange={e => setField('email', e.target.value)} placeholder="reservations@riad.ma" />
-              <p className="text-xs text-gray-400 mt-1">Cet email est public — visible sur centraledesriads.com</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('addRiad.reservationEmailHint')}</p>
             </div>
           </div>
         </div>
 
         {/* Contact & accès — mgh_contacts */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
-          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-100 pb-2">
-            Contact & Accès plateforme <span className="text-gray-400 normal-case font-normal">(mgh_contacts)</span>
+        <div className="card-dark border border-border rounded-lg p-6 space-y-4">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide border-b border-border/50 pb-2">
+            {t('addRiad.contactAccess')} <span className="text-muted-foreground normal-case font-normal">{t('addRiad.contactAccessTable')}</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Nom du contact (contactname)</label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.contactName')}</label>
               <Input value={form.contactname} onChange={e => setField('contactname', e.target.value)} placeholder="Prénom Nom" />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">
-                Email d'accès plateforme (mgh_contacts.email — privé, HWS uniquement)
+              <label className="text-sm font-medium text-muted-foreground block mb-1">
+                {t('addRiad.accessEmail')}
               </label>
               <Input type="email" value={form.access_email} onChange={e => setField('access_email', e.target.value)} placeholder="owner@email.com" />
-              <p className="text-xs text-amber-600 mt-1">⚠ Cet email est l'identifiant de connexion — jamais visible par le propriétaire</p>
+              <p className="text-xs text-amber-600 mt-1">{t('addRiad.accessEmailHint')}</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Channel Manager (CM)</label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.cm')}</label>
               <Input value={form.CM} onChange={e => setField('CM', e.target.value)} placeholder="Ex: Beds24, Cloudbeds…" />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Statut adhésion (membershipstatus)</label>
+              <label className="text-sm font-medium text-muted-foreground block mb-1">{t('addRiad.membershipStatus')}</label>
               <Select value={String(form.membershipstatus)} onValueChange={v => setField('membershipstatus', v === 'true')}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="true">Actif</SelectItem>
-                  <SelectItem value="false">Inactif</SelectItem>
+                  <SelectItem value="true">{t('addRiad.activeStatus')}</SelectItem>
+                  <SelectItem value="false">{t('addRiad.inactiveStatus')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -249,10 +251,10 @@ export default function AddRiad() {
         </div>
 
         <div className="flex gap-3">
-          <Button type="submit" disabled={mutation.isPending} className="text-white px-8" style={{ background: '#8B1A1A' }}>
-            {mutation.isPending ? 'Enregistrement…' : '✅ Ajouter le riad'}
+          <Button type="submit" disabled={mutation.isPending} className="text-white px-8" style={{ background: '#384252' }}>
+            {mutation.isPending ? t('addRiad.saving') : t('addRiad.addRiadBtn')}
           </Button>
-          <Button type="button" variant="outline" onClick={() => navigate('/properties')}>Annuler</Button>
+          <Button type="button" variant="outline" onClick={() => navigate('/properties')}>{t('common.cancel')}</Button>
         </div>
       </form>
     </div>

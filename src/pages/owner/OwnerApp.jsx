@@ -33,8 +33,8 @@ export default function OwnerApp() {
 
   if (!checked || !session) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#f9f6f3' }}>
-        <div className="w-8 h-8 border-4 border-gray-200 rounded-full animate-spin" style={{ borderTopColor: '#8B1A1A' }} />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#F5F5F5' }}>
+        <div className="w-8 h-8 border-4 border-gray-200 rounded-full animate-spin" style={{ borderTopColor: '#9F121A' }} />
       </div>
     );
   }
@@ -42,7 +42,7 @@ export default function OwnerApp() {
   const handleLogout = () => { setSession(null); navigate('/portal'); };
 
   const handlePropertySelect = (contact) => {
-    const updated = { ...session, propertyId: contact.supabaseid, contactName: contact.contactname };
+    const updated = { ...session, propertyId: contact.property_id, contactName: contact.contactname };
     setSession(updated);
     localStorage.setItem('mgh_owner_session', JSON.stringify(updated));
   };

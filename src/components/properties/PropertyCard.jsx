@@ -6,12 +6,12 @@ import { Link } from 'react-router-dom';
 
 export default function PropertyCard({ property }) {
   const name = property.name?.fr || property.name?.en || 'Sans nom';
-  const city = property.city_id?.replace(/_/g, ' ') || '—';
+  const city = property.city_id?.replace(/_/g, ' ') || '\u2014';
   const imageUrl = property.image_urls?.[0];
 
   return (
     <Link to={`/properties/${property.id}`}>
-      <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-transparent hover:border-accent/20">
+      <Card className="group overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border-brand-subtitle/8 hover:border-brand-action/30">
         <div className="relative h-44 bg-muted overflow-hidden">
           {imageUrl ? (
             <img 
@@ -25,33 +25,33 @@ export default function PropertyCard({ property }) {
             </div>
           )}
           {property.property_type_id && (
-            <Badge className="absolute top-3 left-3 bg-black/60 text-white border-0 text-xs capitalize backdrop-blur-sm">
+            <Badge className="absolute top-3 left-3 bg-brand-btn/80 text-white border-0 text-xs capitalize backdrop-blur-sm">
               {property.property_type_id}
             </Badge>
           )}
           {property.rating_avg > 0 && (
-            <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1 backdrop-blur-sm">
-              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+            <div className="absolute top-3 right-3 bg-brand-btn/80 text-white text-xs px-2 py-1 rounded-md flex items-center gap-1 backdrop-blur-sm">
+              <Star className="w-3 h-3 fill-brand-action text-brand-action" />
               {property.rating_avg?.toFixed(1)}
             </div>
           )}
         </div>
         <CardContent className="p-4">
-          <h3 className="font-semibold text-base truncate group-hover:text-accent transition-colors">{name}</h3>
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
-            <MapPin className="w-3.5 h-3.5" />
+          <h3 className="font-semibold text-base text-brand-heading truncate group-hover:text-brand-action transition-colors duration-200">{name}</h3>
+          <div className="flex items-center gap-1.5 text-sm text-brand-subtitle mt-1">
+            <MapPin className="w-3.5 h-3.5 text-brand-action" />
             <span className="capitalize">{city}</span>
           </div>
-          <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
+          <div className="flex items-center gap-3 mt-3 text-xs text-brand-subtitle/60">
             {property.website && (
               <div className="flex items-center gap-1">
-                <Globe className="w-3 h-3" />
+                <Globe className="w-3 h-3 text-brand-action/60" />
                 <span>Web</span>
               </div>
             )}
             {property.phone && (
               <div className="flex items-center gap-1">
-                <Phone className="w-3 h-3" />
+                <Phone className="w-3 h-3 text-brand-action/60" />
                 <span>{property.phone}</span>
               </div>
             )}

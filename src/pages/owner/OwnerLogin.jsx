@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { listContacts } from '@/lib/supabase';
+import { listContacts } from '@/lib/api';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -74,7 +74,7 @@ export default function OwnerLogin({ onLogin }) {
       expiresAt: Date.now() + 8 * 60 * 60 * 1000, // 8h session
       // Single property: set propertyId directly. Multiple: leave it unset for selector screen.
       ...(allMatches.length === 1
-        ? { propertyId: allMatches[0].supabase_id }
+        ? { propertyId: allMatches[0].property_id }
         : { multipleProperties: true }
       ),
     };
@@ -83,28 +83,28 @@ export default function OwnerLogin({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8" style={{ background: '#f9f6f3' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8" style={{ background: '#02162A' }}>
       {/* Logo area */}
       <div className="mb-8 text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl text-white font-bold text-xl mb-4" style={{ background: '#8B1A1A' }}>
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl text-white font-bold text-xl mb-4" style={{ background: '#384252' }}>
           MGH
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">Espace Propriétaire</h1>
-        <p className="text-sm text-gray-500 mt-1">Maisons & Riads au Maroc</p>
+        <h1 className="text-2xl font-bold text-white">Espace Propriétaire</h1>
+        <p className="text-sm text-white/50 mt-1">Maisons & Riads au Maroc</p>
       </div>
 
-      <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <div className="w-full max-w-sm card-dark rounded-2xl shadow-sm border border-white/10 p-6">
         {step === 'email' ? (
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             <div className="text-center mb-5">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-50 mb-2">
-                <Mail className="w-5 h-5" style={{ color: '#8B1A1A' }} />
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-500/10 mb-2">
+                <Mail className="w-5 h-5" style={{ color: '#9F121A' }} />
               </div>
-              <h2 className="font-semibold text-gray-800 text-lg">Connexion propriétaire</h2>
-              <p className="text-xs text-gray-400 mt-1">Entrez l'email fourni à HWS lors de votre adhésion</p>
+              <h2 className="font-semibold text-white/80 text-lg">Connexion propriétaire</h2>
+              <p className="text-xs text-white/40 mt-1">Entrez l'email fourni à HWS lors de votre adhésion</p>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Email de connexion</label>
+              <label className="text-sm font-medium text-white/70 block mb-1">Email de connexion</label>
               <Input
                 type="email"
                 value={email}
@@ -116,7 +116,7 @@ export default function OwnerLogin({ onLogin }) {
               />
             </div>
             {error && (
-              <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-700">
+              <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-700">
                 <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
@@ -125,7 +125,7 @@ export default function OwnerLogin({ onLogin }) {
               type="submit"
               disabled={loading || !email}
               className="w-full text-white h-11 text-base"
-              style={{ background: '#8B1A1A' }}
+              style={{ background: '#384252' }}
             >
               {loading ? 'Vérification…' : 'Continuer →'}
             </Button>
@@ -133,19 +133,19 @@ export default function OwnerLogin({ onLogin }) {
         ) : (
           <form onSubmit={handleOtpSubmit} className="space-y-4">
             <div className="text-center mb-5">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-50 mb-2">
-                <KeyRound className="w-5 h-5 text-green-600" />
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#9F121A]/10 mb-2">
+                <KeyRound className="w-5 h-5 text-[#9F121A]" />
               </div>
-              <h2 className="font-semibold text-gray-800 text-lg">Code de vérification</h2>
-              <p className="text-xs text-gray-500 mt-1">Entrez le code reçu par email</p>
+              <h2 className="font-semibold text-white/80 text-lg">Code de vérification</h2>
+              <p className="text-xs text-white/50 mt-1">Entrez le code reçu par email</p>
             </div>
 
-            <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 text-center">
-              <p className="text-xs text-blue-700">Un code a été envoyé à <strong>{email}</strong>.<br/>Vérifiez votre boîte mail (et vos spams).</p>
+            <div className="bg-slate-500/10 border border-slate-500/20 rounded-lg px-4 py-3 text-center">
+              <p className="text-xs text-slate-700">Un code a été envoyé à <strong>{email}</strong>.<br/>Vérifiez votre boîte mail (et vos spams).</p>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Code à 6 chiffres</label>
+              <label className="text-sm font-medium text-white/70 block mb-1">Code à 6 chiffres</label>
               <Input
                 type="text"
                 inputMode="numeric"
@@ -160,7 +160,7 @@ export default function OwnerLogin({ onLogin }) {
               />
             </div>
             {error && (
-              <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-700">
+              <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-700">
                 <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
@@ -169,14 +169,14 @@ export default function OwnerLogin({ onLogin }) {
               type="submit"
               disabled={otp.length !== 6}
               className="w-full text-white h-11 text-base"
-              style={{ background: '#8B1A1A' }}
+              style={{ background: '#384252' }}
             >
               Accéder à mon espace →
             </Button>
             <button
               type="button"
               onClick={() => { setStep('email'); setOtp(''); setError(''); }}
-              className="w-full text-center text-sm text-gray-400 hover:text-gray-600 underline"
+              className="w-full text-center text-sm text-white/40 hover:text-white/60 underline"
             >
               ← Utiliser un autre email
             </button>
@@ -184,9 +184,9 @@ export default function OwnerLogin({ onLogin }) {
         )}
       </div>
 
-      <p className="text-xs text-gray-400 mt-6 text-center">
+      <p className="text-xs text-white/40 mt-6 text-center">
         Problème de connexion ?{' '}
-        <a href="mailto:info@hospitalitywebservices.com" className="underline" style={{ color: '#8B1A1A' }}>
+        <a href="mailto:info@hospitalitywebservices.com" className="underline text-white/70 hover:text-white">
           Contactez HWS
         </a>
       </p>

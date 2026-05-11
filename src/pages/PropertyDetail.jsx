@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  getProperty, updateProperty, getContact, updateContact,
+  updateProperty, getContact, updateContact,
   listCities, listPropertyTypes, listNeighborhoods,
   listAmenities, listServices, listBookingConditions
-} from '@/lib/supabase';
+} from '@/lib/api';
+import { usePartnerHotelById } from '@/lib/partnerHotelsApi';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
@@ -27,9 +28,9 @@ const DEFAULT_AMENITIES = [
 function FieldRow({ label, children, note }) {
   return (
     <div>
-      <label className="text-sm font-medium text-gray-700 block mb-1">{label}</label>
+      <label className="text-sm font-medium text-muted-foreground block mb-1">{label}</label>
       {children}
-      {note && <p className="text-xs text-gray-400 mt-1">{note}</p>}
+      {note && <p className="text-xs text-muted-foreground mt-1">{note}</p>}
     </div>
   );
 }
@@ -61,7 +62,7 @@ function CheckList({ items, selected = [], onChange }) {
             onChange={() => toggle(item.id)}
             className="rounded"
           />
-          <span className="text-sm text-gray-700">{item.name || item.label?.fr || item.id}</span>
+          <span className="text-sm text-muted-foreground">{item.name || item.label?.fr || item.id}</span>
         </label>
       ))}
     </div>
@@ -79,11 +80,7 @@ export default function PropertyDetail() {
   const [contact, setContact] = useState(null);
   const [translating, setTranslating] = useState(false);
 
-  const { data: property, isLoading } = useQuery({
-    queryKey: ['property', propertyId],
-    queryFn: () => getProperty(propertyId),
-    enabled: !!propertyId,
-  });
+  const { data: property, isLoading } = usePartnerHotelById(propertyId);
 
   const { data: contactData } = useQuery({
     queryKey: ['contact', propertyId],
@@ -149,9 +146,9 @@ export default function PropertyDetail() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['property', propertyId] });
+      queryClient.invalidateQueries({ queryKey: ['partner-hotel', propertyId] });
       queryClient.invalidateQueries({ queryKey: ['contact', propertyId] });
-      toast({ title: '✅ Sauvegardé dans Supabase' });
+      toast({ title: '✅ Saved to database' });
     },
     onError: (err) => toast({ title: `Erreur: ${err.message}`, variant: 'destructive' }),
   });
@@ -236,19 +233,19 @@ ${frText}`,
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/properties')} className="text-gray-500">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/properties')} className="text-muted-foreground">
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">{form.name?.fr || form.name || 'Propriété'}</h1>
-            <p className="text-xs text-gray-400 mt-0.5">ID: {propertyId}</p>
+            <h1 className="text-xl font-bold text-brand-heading">{form.name?.fr || form.name || 'Propriété'}</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">ID: {propertyId}</p>
           </div>
         </div>
         <Button
           onClick={() => saveMutation.mutate()}
           disabled={saveMutation.isPending}
           className="text-white flex items-center gap-2"
-          style={{ background: '#8B1A1A' }}
+          style={{ background: '#384252' }}
         >
           <Save className="w-4 h-4" />
           {saveMutation.isPending ? 'Sauvegarde…' : 'Sauvegarder'}
@@ -256,7 +253,7 @@ ${frText}`,
       </div>
 
       <Tabs defaultValue="general">
-        <TabsList className="bg-gray-100 flex flex-wrap gap-0 h-auto p-1">
+        <TabsList className="bg-muted flex flex-wrap gap-0 h-auto p-1">
           {[
             { value: 'general', label: 'Général' },
             { value: 'descriptions', label: 'Descriptifs' },
@@ -265,14 +262,14 @@ ${frText}`,
             { value: 'contact', label: 'Contact & Accès' },
             { value: 'membership', label: 'Adhésion MGH' },
           ].map(t => (
-            <TabsTrigger key={t.value} value={t.value} className="text-xs px-3 py-1.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsTrigger key={t.value} value={t.value} className="text-xs px-3 py-1.5 data-[state=active]:bg-[#9F121A]/15 data-[state=active]:shadow-sm">
               {t.label}
             </TabsTrigger>
           ))}
         </TabsList>
 
         {/* TAB 1 — Général */}
-        <TabsContent value="general" className="bg-white border border-gray-200 rounded-lg p-6 space-y-5 mt-3">
+        <TabsContent value="general" className="card-dark border border-border rounded-lg p-6 space-y-5 mt-3">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FieldRow label="Nom FR">
               <Input value={form.name?.fr || ''} onChange={e => setF('name.fr', e.target.value)} />
@@ -364,7 +361,7 @@ ${frText}`,
         </TabsContent>
 
         {/* TAB 2 — Descriptifs */}
-        <TabsContent value="descriptions" className="bg-white border border-gray-200 rounded-lg p-6 space-y-5 mt-3">
+        <TabsContent value="descriptions" className="card-dark border border-border rounded-lg p-6 space-y-5 mt-3">
           <div className="flex justify-end">
             <Button
               type="button"
@@ -400,9 +397,9 @@ ${frText}`,
         </TabsContent>
 
         {/* TAB 3 — Équipements */}
-        <TabsContent value="amenities" className="bg-white border border-gray-200 rounded-lg p-6 space-y-6 mt-3">
+        <TabsContent value="amenities" className="card-dark border border-border rounded-lg p-6 space-y-6 mt-3">
           <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Équipements</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">Équipements</h3>
             <CheckList
               items={amenities}
               selected={form.amenity_ids || []}
@@ -411,7 +408,7 @@ ${frText}`,
           </div>
           {services.length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Services</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">Services</h3>
               <CheckList
                 items={services}
                 selected={form.service_ids || []}
@@ -421,7 +418,7 @@ ${frText}`,
           )}
           {bookingConds.length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Conditions de réservation</h3>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">Conditions de réservation</h3>
               <CheckList
                 items={bookingConds}
                 selected={form.booking_condition_ids || []}
@@ -432,16 +429,16 @@ ${frText}`,
         </TabsContent>
 
         {/* TAB 4 — Photos */}
-        <TabsContent value="photos" className="bg-white border border-gray-200 rounded-lg p-6 space-y-5 mt-3">
+        <TabsContent value="photos" className="card-dark border border-border rounded-lg p-6 space-y-5 mt-3">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-gray-700">Photos ({(form.image_urls || []).length}/20)</h3>
-              <p className="text-xs text-gray-400 mt-0.5">Max 20 photos, 800KB par photo. La 1ère = principale. Réordonnez avec ↑↓</p>
+              <h3 className="text-sm font-semibold text-muted-foreground">Photos ({(form.image_urls || []).length}/20)</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Max 20 photos, 800KB par photo. La 1ère = principale. Réordonnez avec ↑↓</p>
             </div>
             <label className="cursor-pointer">
               <input type="file" multiple accept="image/*" className="hidden" onChange={handlePhotoUpload} />
               <span className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white rounded-md cursor-pointer"
-                style={{ background: '#8B1A1A' }} style={{background: (form.image_urls || []).length >= 20 ? '#ccc' : '#8B1A1A'}}
+                style={{background: (form.image_urls || []).length >= 20 ? '#ccc' : '#384252'}}
                 disabled={(form.image_urls || []).length >= 20}>
                 <Plus className="w-4 h-4" />
                 Ajouter photos
@@ -449,32 +446,32 @@ ${frText}`,
             </label>
           </div>
           {(form.image_urls || []).length === 0 ? (
-            <div className="border-2 border-dashed border-gray-200 rounded-lg p-12 text-center text-gray-400 text-sm">
+            <div className="border-2 border-dashed border-border rounded-lg p-12 text-center text-muted-foreground text-sm">
               Aucune photo — cliquez sur "Ajouter photos"
             </div>
           ) : (
             <div className="space-y-2">
               {(form.image_urls || []).map((url, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg group hover:bg-gray-100 transition-colors">
+                <div key={idx} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg group hover:bg-muted transition-colors">
                   <img src={url} alt={`photo ${idx + 1}`} className="w-16 h-16 object-cover rounded" />
                   <div className="flex-1 text-sm">
-                    <p className="text-gray-700 font-medium">Photo {idx + 1}</p>
+                    <p className="text-muted-foreground font-medium">Photo {idx + 1}</p>
                     {idx === 0 && <p className="text-xs text-amber-600">★ Principale</p>}
                   </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {idx > 0 && (
-                      <button onClick={() => movePhoto(idx, 'up')} className="p-1.5 hover:bg-gray-200 rounded" title="Monter">
-                        <ChevronUp className="w-4 h-4 text-gray-600" />
+                      <button onClick={() => movePhoto(idx, 'up')} className="p-1.5 hover:bg-muted rounded" title="Monter">
+                        <ChevronUp className="w-4 h-4 text-muted-foreground" />
                       </button>
                     )}
                     {idx < (form.image_urls || []).length - 1 && (
-                      <button onClick={() => movePhoto(idx, 'down')} className="p-1.5 hover:bg-gray-200 rounded" title="Descendre">
-                        <ChevronDown className="w-4 h-4 text-gray-600" />
+                      <button onClick={() => movePhoto(idx, 'down')} className="p-1.5 hover:bg-muted rounded" title="Descendre">
+                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
                       </button>
                     )}
                     <button
                       onClick={() => removePhoto(idx)}
-                      className="p-1.5 hover:bg-red-100 rounded text-red-600"
+                      className="p-1.5 hover:bg-red-500/15 rounded text-red-600"
                       title="Supprimer"
                     >
                       <X className="w-4 h-4" />
@@ -487,7 +484,7 @@ ${frText}`,
         </TabsContent>
 
         {/* TAB 5 — Contact & Accès */}
-        <TabsContent value="contact" className="bg-white border border-gray-200 rounded-lg p-6 space-y-5 mt-3">
+        <TabsContent value="contact" className="card-dark border border-border rounded-lg p-6 space-y-5 mt-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FieldRow label="Nom du contact (contactname)">
               <Input value={contact?.contactname || ''} onChange={e => setC('contactname', e.target.value)} />
@@ -497,7 +494,7 @@ ${frText}`,
                 value={contact?.email || ''}
                 readOnly
                 disabled
-                className="bg-gray-50 text-gray-500 cursor-not-allowed"
+                className="bg-muted/50 text-muted-foreground cursor-not-allowed"
               />
               <p className="text-xs text-amber-600 mt-1">⚠ Non modifiable ici. Utilisez la page Membres MGH pour changer cet email.</p>
             </FieldRow>
@@ -511,7 +508,7 @@ ${frText}`,
         </TabsContent>
 
         {/* TAB 6 — Adhésion MGH */}
-        <TabsContent value="membership" className="bg-white border border-gray-200 rounded-lg p-6 space-y-5 mt-3">
+        <TabsContent value="membership" className="card-dark border border-border rounded-lg p-6 space-y-5 mt-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FieldRow label="Membre depuis (Membersince)">
               <Input type="date" value={contact?.Membersince || ''} onChange={e => setC('Membersince', e.target.value)} />

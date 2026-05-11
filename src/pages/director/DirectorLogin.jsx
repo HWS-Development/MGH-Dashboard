@@ -65,17 +65,17 @@ export default function DirectorLogin({ onLogin }) {
     return (
       <form onSubmit={handleSendCode} className="space-y-4">
         <div>
-          <label className="text-sm font-medium text-gray-700 block mb-1">Email Direction MGH</label>
+          <label className="text-sm font-medium text-white/70 block mb-1">Email Direction MGH</label>
           <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoFocus placeholder="direction@mgh.com" />
-          <p className="text-xs text-gray-400 mt-1">Un code à 6 chiffres vous sera envoyé par email</p>
+          <p className="text-xs text-white/40 mt-1">Un code à 6 chiffres vous sera envoyé par email</p>
         </div>
         {error && (
-          <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-700">
+          <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-700">
             <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
-        <Button type="submit" disabled={loading || !email} className="w-full h-10 text-white" style={{ background: '#8B1A1A' }}>
+        <Button type="submit" disabled={loading || !email} className="w-full h-10 text-white" style={{ background: '#384252' }}>
           {loading ? 'Vérification…' : '📨 Recevoir mon code →'}
         </Button>
       </form>
@@ -84,12 +84,12 @@ export default function DirectorLogin({ onLogin }) {
 
   return (
     <form onSubmit={handleVerifyOtp} className="space-y-4">
-      <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-center">
-        <p className="text-sm text-green-700">📨 Code envoyé à <strong>{email}</strong></p>
-        <p className="text-xs text-gray-400 mt-1">Vérifiez votre boîte mail — valide 10 minutes</p>
+      <div className="bg-[#9F121A]/10 border border-[#9F121A]/20 rounded-lg px-4 py-3 text-center">
+        <p className="text-sm text-[#9F121A]">📨 Code envoyé à <strong>{email}</strong></p>
+        <p className="text-xs text-white/40 mt-1">Vérifiez votre boîte mail — valide 10 minutes</p>
       </div>
       <div>
-        <label className="text-sm font-medium text-gray-700 block mb-1">Code à 6 chiffres</label>
+        <label className="text-sm font-medium text-white/70 block mb-1">Code à 6 chiffres</label>
         <Input
           type="text" inputMode="numeric" maxLength={6}
           value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
@@ -98,16 +98,16 @@ export default function DirectorLogin({ onLogin }) {
         />
       </div>
       {error && (
-        <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-xs text-red-700">
+        <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-700">
           <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
       )}
-      <Button type="submit" disabled={otp.length !== 6} className="w-full h-10 text-white" style={{ background: '#8B1A1A' }}>
+      <Button type="submit" disabled={otp.length !== 6} className="w-full h-10 text-white" style={{ background: '#384252' }}>
         Accéder au dashboard Direction →
       </Button>
       <button type="button" onClick={() => { setStep('email'); setOtp(''); setError(''); }}
-        className="w-full text-center text-xs text-gray-400 hover:text-gray-600 underline">
+        className="w-full text-center text-xs text-white/40 hover:text-white/60 underline">
         ← Utiliser un autre email
       </button>
     </form>

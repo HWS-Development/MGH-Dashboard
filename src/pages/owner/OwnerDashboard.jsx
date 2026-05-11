@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getProperty, getContact, listAmenities, listServices, listBookingConditions } from '@/lib/supabase';
+import { getProperty, getContact, listAmenities, listServices, listBookingConditions } from '@/lib/api';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,7 +34,7 @@ const BOOKING_CONDITIONS_DEFAULT = [
 ];
 
 function FieldLabel({ children }) {
-  return <label className="text-sm font-medium text-gray-700 block mb-1">{children}</label>;
+  return <label className="text-sm font-medium text-white/70 block mb-1">{children}</label>;
 }
 
 function TextArea({ value, onChange, rows = 5, placeholder, disabled }) {
@@ -45,8 +45,8 @@ function TextArea({ value, onChange, rows = 5, placeholder, disabled }) {
       rows={rows}
       placeholder={placeholder}
       disabled={disabled}
-      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-y focus:outline-none focus:ring-2 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-400"
-      style={{ '--tw-ring-color': '#8B1A1A' }}
+      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-y focus:outline-none focus:ring-2 focus:border-transparent disabled:bg-white/5 disabled:text-white/30"
+      style={{ '--tw-ring-color': '#9F121A' }}
     />
   );
 }
@@ -59,14 +59,14 @@ function CheckList({ items, selected = [], onChange }) {
   return (
     <div className="grid grid-cols-2 gap-2">
       {items.map(item => (
-        <label key={item.id} className="flex items-center gap-2.5 cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors">
+        <label key={item.id} className="flex items-center gap-2.5 cursor-pointer p-2 rounded-lg hover:bg-white/5 transition-colors">
           <input
             type="checkbox"
             checked={selected.includes(item.id)}
             onChange={() => toggle(item.id)}
             className="rounded w-4 h-4 accent-red-800"
           />
-          <span className="text-sm text-gray-700">{item.name || item.label?.fr || item.id}</span>
+          <span className="text-sm text-white/70">{item.name || item.label?.fr || item.id}</span>
         </label>
       ))}
     </div>
@@ -75,9 +75,9 @@ function CheckList({ items, selected = [], onChange }) {
 
 function SectionCard({ id, title, children }) {
   return (
-    <div id={id} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-100" style={{ background: '#fdf9f9' }}>
-        <h2 className="font-semibold text-gray-800" style={{ color: '#8B1A1A' }}>{title}</h2>
+    <div id={id} className="card-dark rounded-2xl border border-white/10 shadow-sm overflow-hidden">
+      <div className="px-5 py-4 border-b border-white/5" style={{ background: '#02162A' }}>
+        <h2 className="font-semibold text-white/80" style={{ color: '#9F121A' }}>{title}</h2>
       </div>
       <div className="p-5 space-y-4">{children}</div>
     </div>
@@ -218,7 +218,7 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
 
   if (loadingProp || !form) {
     return (
-      <div className="min-h-screen p-4 space-y-4" style={{ background: '#f9f6f3' }}>
+      <div className="min-h-screen p-4 space-y-4" style={{ background: '#02162A' }}>
         <Skeleton className="h-20 w-full rounded-2xl" />
         <Skeleton className="h-40 w-full rounded-2xl" />
         <Skeleton className="h-64 w-full rounded-2xl" />
@@ -227,9 +227,9 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
   }
 
   return (
-    <div className="min-h-screen pb-8" style={{ background: '#f9f6f3' }}>
+    <div className="min-h-screen pb-8" style={{ background: '#02162A' }}>
       {/* Header */}
-      <div className="sticky top-0 z-40 shadow-sm border-b border-white/20" style={{ background: '#8B1A1A' }}>
+      <div className="sticky top-0 z-40 shadow-sm border-b border-white/20" style={{ background: '#384252' }}>
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {onBackToProperties ? (
@@ -259,31 +259,31 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
 
       <div className="max-w-2xl mx-auto px-4 pt-5 space-y-4">
         {/* Welcome + completion */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+        <div className="card-dark rounded-2xl border border-white/10 shadow-sm p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h1 className="font-bold text-gray-900 text-lg leading-tight">
+              <h1 className="font-bold text-white text-lg leading-tight">
                 Bienvenue, {contactName || email}
               </h1>
-              <p className="text-sm text-gray-500 mt-0.5">{propertyName}</p>
+              <p className="text-sm text-white/50 mt-0.5">{propertyName}</p>
             </div>
             <div className="text-right flex-shrink-0">
-              <div className="text-2xl font-bold" style={{ color: completion >= 80 ? '#16a34a' : '#8B1A1A' }}>{completion}%</div>
-              <div className="text-xs text-gray-400">complet</div>
+              <div className="text-2xl font-bold" style={{ color: completion >= 80 ? '#16a34a' : '#9F121A' }}>{completion}%</div>
+              <div className="text-xs text-white/40">complet</div>
             </div>
           </div>
           <div className="mt-3">
-            <div className="flex items-center justify-between text-xs text-gray-500 mb-1.5">
+            <div className="flex items-center justify-between text-xs text-white/50 mb-1.5">
               <span>Votre fiche est complétée à {completion}%</span>
             </div>
-            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${completion}%`, background: completion >= 80 ? '#16a34a' : '#8B1A1A' }}
+                style={{ width: `${completion}%`, background: completion >= 80 ? '#16a34a' : '#9F121A' }}
               />
             </div>
             {completion < 100 && (
-              <p className="text-xs text-gray-400 mt-1.5">
+              <p className="text-xs text-white/40 mt-1.5">
                 Complétez votre fiche pour améliorer votre visibilité sur centraledesriads.com
               </p>
             )}
@@ -292,7 +292,7 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
 
         {/* Pending notice */}
         {hasPending && (
-          <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+          <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3">
             <Clock className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-medium text-amber-800">Modifications en attente de validation HWS</p>
@@ -309,9 +309,9 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
             <a
               key={s.id}
               href={`#${s.id}`}
-              className="flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-full border border-gray-200 bg-white text-gray-600 hover:text-white hover:border-transparent transition-all"
+              className="flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-full border border-white/10 card-dark text-white/60 hover:text-white hover:border-transparent transition-all"
               style={{}}
-              onMouseEnter={e => { e.currentTarget.style.background = '#8B1A1A'; e.currentTarget.style.color = '#fff'; }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#9F121A'; e.currentTarget.style.color = '#fff'; }}
               onMouseLeave={e => { e.currentTarget.style.background = ''; e.currentTarget.style.color = ''; }}
             >
               {s.label}
@@ -346,16 +346,16 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
               placeholder="https://www.monriad.ma"
             />
           </div>
-          <div className="bg-gray-50 rounded-lg px-4 py-3 border border-gray-100">
-            <p className="text-xs font-medium text-gray-600 mb-0.5">Votre email de connexion</p>
-            <p className="text-sm text-gray-800 font-mono">{contact?.email || email}</p>
-            <p className="text-xs text-gray-400 mt-1">Pour modifier cet email, contactez HWS.</p>
+          <div className="bg-white/5 rounded-lg px-4 py-3 border border-white/10">
+            <p className="text-xs font-medium text-white/60 mb-0.5">Votre email de connexion</p>
+            <p className="text-sm text-white/80 font-mono">{contact?.email || email}</p>
+            <p className="text-xs text-white/40 mt-1">Pour modifier cet email, contactez HWS.</p>
           </div>
         </SectionCard>
 
         {/* SECTION 2 — Descriptifs */}
         <SectionCard id="descriptions" title="Descriptifs de votre propriété">
-          <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-2.5 text-xs text-blue-700">
+          <div className="bg-slate-500/10 border border-slate-500/20 rounded-lg px-4 py-2.5 text-xs text-slate-600">
             Décrivez votre propriété en français. HWS s'occupera de la traduction en anglais et espagnol lors de la validation.
           </div>
           <div>
@@ -372,23 +372,23 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
         {/* SECTION 3 — Équipements */}
         <SectionCard id="equipements" title="Équipements & Services">
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Équipements</p>
+            <p className="text-xs font-semibold text-white/50 uppercase tracking-wide mb-2">Équipements</p>
             <CheckList
               items={amenities}
               selected={form.amenity_ids || []}
               onChange={v => setF('amenity_ids', v)}
             />
           </div>
-          <div className="border-t border-gray-100 pt-4">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Services</p>
+          <div className="border-t border-white/5 pt-4">
+            <p className="text-xs font-semibold text-white/50 uppercase tracking-wide mb-2">Services</p>
             <CheckList
               items={services}
               selected={form.service_ids || []}
               onChange={v => setF('service_ids', v)}
             />
           </div>
-          <div className="border-t border-gray-100 pt-4">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Conditions de réservation</p>
+          <div className="border-t border-white/5 pt-4">
+            <p className="text-xs font-semibold text-white/50 uppercase tracking-wide mb-2">Conditions de réservation</p>
             <CheckList
               items={bookingConds}
               selected={form.booking_condition_ids || []}
@@ -399,24 +399,24 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
 
         {/* SECTION 4 — Photos */}
         <SectionCard id="photos" title="Photos de votre propriété">
-          <div className="bg-amber-50 border border-amber-100 rounded-lg px-4 py-2.5 text-xs text-amber-700">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-2.5 text-xs text-amber-300">
             Vos photos seront vérifiées par HWS avant publication sur le site.
           </div>
           <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600">{(form.image_urls || []).length} photo(s)</p>
+            <p className="text-sm text-white/60">{(form.image_urls || []).length} photo(s)</p>
             <label className="cursor-pointer">
               <input type="file" multiple accept="image/*" className="hidden" onChange={handlePhotoUpload} />
               <span className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white rounded-lg cursor-pointer"
-                style={{ background: '#8B1A1A' }}>
+                style={{ background: '#384252' }}>
                 <Plus className="w-4 h-4" />
                 Envoyer des photos
               </span>
             </label>
           </div>
           {(form.image_urls || []).length === 0 ? (
-            <div className="border-2 border-dashed border-gray-200 rounded-xl p-10 text-center">
-              <Image className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-              <p className="text-sm text-gray-400">Aucune photo — ajoutez des photos pour compléter votre fiche</p>
+            <div className="border-2 border-dashed border-white/20 rounded-xl p-10 text-center">
+              <Image className="w-8 h-8 text-white/30 mx-auto mb-2" />
+              <p className="text-sm text-white/40">Aucune photo — ajoutez des photos pour compléter votre fiche</p>
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-2">
@@ -424,7 +424,7 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
                 <div key={idx} className="relative group rounded-xl overflow-hidden aspect-square">
                   <img src={url} alt={`photo ${idx + 1}`} className="w-full h-full object-cover" />
                   {idx === 0 && (
-                    <span className="absolute bottom-1 left-1 text-[10px] bg-white/90 text-gray-700 px-1.5 py-0.5 rounded font-medium">
+                    <span className="absolute bottom-1 left-1 text-[10px] bg-[#02162A]/90 text-white/70 px-1.5 py-0.5 rounded font-medium">
                       Principale
                     </span>
                   )}
@@ -442,13 +442,13 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
 
         {/* Save button */}
         <div className="sticky bottom-4">
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-4">
+          <div className="card-dark rounded-2xl border border-white/10 shadow-lg p-4">
             {saved ? (
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-[#9F121A] flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-green-700">Modifications transmises à HWS !</p>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-sm font-semibold text-[#9F121A]">Modifications transmises à HWS !</p>
+                  <p className="text-xs text-white/50 mt-0.5">
                     Elles apparaîtront sur le site centraledesriads.com sous 48h.
                   </p>
                 </div>
@@ -458,7 +458,7 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
                 onClick={() => saveMutation.mutate()}
                 disabled={saveMutation.isPending}
                 className="w-full h-11 text-base font-semibold text-white"
-                style={{ background: '#8B1A1A' }}
+                style={{ background: '#384252' }}
               >
                 {saveMutation.isPending ? 'Envoi en cours…' : '💾 Enregistrer mes modifications'}
               </Button>

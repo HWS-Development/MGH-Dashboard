@@ -6,15 +6,15 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Contact as ContactIcon, Search, User, Mail, Phone, Calendar, Building2 } from 'lucide-react';
-import { listContacts } from '@/lib/supabase';
+import { listContacts } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from 'react-router-dom';
 
 const statusColors = {
-  active: 'bg-green-100 text-green-700 border-green-200',
-  suspended: 'bg-red-100 text-red-700 border-red-200',
-  pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-  'ex-member': 'bg-gray-100 text-gray-600 border-gray-200',
+  active: 'bg-[#9F121A]/15 text-[#9F121A] border-[#9F121A]/30',
+  suspended: 'bg-red-500/15 text-red-400 border-red-500/30',
+  pending: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  'ex-member': 'bg-muted text-muted-foreground border-border',
 };
 
 export default function Contacts() {
@@ -23,14 +23,14 @@ export default function Contacts() {
 
   const { data: result, isLoading } = useQuery({
     queryKey: ['contacts'],
-    queryFn: () => listContacts({ order: 'supabase_name.asc' }),
+    queryFn: () => listContacts({ order: 'property_name.asc' }),
   });
 
   const contacts = result?.data || [];
 
   const filtered = contacts.filter(c => {
     const matchesSearch = !search || 
-      (c.supabase_name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (c.property_name || '').toLowerCase().includes(search.toLowerCase()) ||
       (c.contact_name || '').toLowerCase().includes(search.toLowerCase()) ||
       (c.login_email || '').toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || c.membership_status === statusFilter;
@@ -97,11 +97,11 @@ export default function Contacts() {
                 </TableRow>
               ) : (
                 filtered.map(contact => (
-                  <TableRow key={contact.supabase_id} className="hover:bg-muted/30 cursor-pointer">
+                  <TableRow key={contact.property_id} className="hover:bg-muted/30 cursor-pointer">
                     <TableCell>
-                      <Link to={`/properties/${contact.supabase_id}`} className="flex items-center gap-2 text-sm font-medium hover:text-accent">
+                      <Link to={`/properties/${contact.property_id}`} className="flex items-center gap-2 text-sm font-medium hover:text-accent">
                         <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
-                        {contact.supabase_name || '—'}
+                        {contact.property_name || '—'}
                       </Link>
                     </TableCell>
                     <TableCell>

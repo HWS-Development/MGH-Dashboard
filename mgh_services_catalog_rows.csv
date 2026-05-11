@@ -1,0 +1,41 @@
+id,label,created_at
+24_hour_reception,"{""en"":""24-hour reception"",""es"":""Recepción 24 horas"",""fr"":""Réception 24h/24""}",2026-01-24 19:57:11.976102+00
+airport_shuttle,"{""en"":""Airport shuttle"",""es"":""Traslado al aeropuerto"",""fr"":""Navette aéroport""}",2026-01-24 19:57:11.976102+00
+babysitting,"{""en"":""Babysitting"",""es"":""Canguro"",""fr"":""Baby-sitting""}",2026-01-24 19:57:11.976102+00
+bookings_golf,"{""en"":""Bookings (golf)"",""es"":""Reservas (golf)"",""fr"":""Réservations (golf)""}",2026-01-24 19:57:11.976102+00
+breakfast_included,"{""en"":""Breakfast included"",""es"":""Desayuno incluido"",""fr"":""Petit-déjeuner inclus""}",2026-01-24 19:57:11.976102+00
+business_services_meeting_reception_room,"{""en"":""Business services (meeting/reception room)"",""es"":""Servicios de negocios (sala de reuniones/recepción)"",""fr"":""Services d’affaires (salle de réunion/réception)""}",2026-01-24 19:57:11.976102+00
+cleaning_service,"{""en"":""Cleaning service"",""es"":""Servicio de limpieza"",""fr"":""Service de nettoyage""}",2026-01-24 19:57:11.976102+00
+cooking_class,"{""en"":""Cooking class"",""es"":""Clase de cocina"",""fr"":""Cours de cuisine""}",2026-01-24 19:57:11.976102+00
+currency_exchange,"{""en"":""Currency exchange"",""es"":""Cambio de divisas"",""fr"":""Service de change (devises)""}",2026-01-24 19:57:11.976102+00
+dinner,"{""en"":""Dinner"",""es"":""Cena"",""fr"":""Dîner""}",2026-01-24 19:57:11.976102+00
+excursions_desk,"{""en"":""Excursions desk"",""es"":""Mostrador de excursiones"",""fr"":""Bureau d’excursions""}",2026-01-24 19:57:11.976102+00
+hammam,"{""en"":""Hammam"",""es"":""Hammam"",""fr"":""Hammam""}",2026-01-24 19:57:11.976102+00
+hammam_and_treatments,"{""en"":""Hammam and treatments"",""es"":""Hammam y tratamientos"",""fr"":""Hammam et soins""}",2026-01-24 19:57:11.976102+00
+hammam_massages_craft_workshops,"{""en"":""Hammam, massages, craft workshops"",""es"":""Hammam, masajes, talleres artesanales"",""fr"":""Hammam, massages, ateliers artisanaux""}",2026-01-24 19:57:11.976102+00
+ironing_service,"{""en"":""Ironing service"",""es"":""Servicio de planchado"",""fr"":""Service de repassage""}",2026-01-24 19:57:11.976102+00
+luggage_storage,"{""en"":""Luggage storage"",""es"":""Consigna de equipaje"",""fr"":""Bagagerie""}",2026-01-24 19:57:11.976102+00
+lunch,"{""en"":""Lunch"",""es"":""Almuerzo"",""fr"":""Déjeuner""}",2026-01-24 19:57:11.976102+00
+manicure,"{""en"":""Manicure"",""es"":""Manicura"",""fr"":""Manucure""}",2026-01-24 19:57:11.976102+00
+massage,"{""en"":""Massage"",""es"":""Masaje"",""fr"":""Massage""}",2026-01-24 19:57:11.976102+00
+massages,"{""en"":""Massages"",""es"":""Masajes"",""fr"":""Massages""}",2026-01-24 19:57:11.976102+00
+non_smoking_rooms,"{""en"":""Non-smoking rooms"",""es"":""Habitaciones para no fumadores"",""fr"":""Chambres non-fumeur""}",2026-01-24 19:57:11.976102+00
+on_site_activities,"{""en"":""On-site activities"",""es"":""Actividades en el alojamiento"",""fr"":""Animations / activités sur place""}",2026-01-24 19:57:11.976102+00
+on_site_massages_and_treatments,"{""en"":""On-site massages and treatments"",""es"":""Masajes y tratamientos en el alojamiento"",""fr"":""Massages et soins sur place""}",2026-01-24 19:57:11.976102+00
+on_site_or_nearby_parking,"{""en"":""On-site or nearby parking"",""es"":""Aparcamiento en el alojamiento o cercano"",""fr"":""Parking sur place ou à proximité""}",2026-01-24 19:57:11.976102+00
+parking_a_proximite,"{""en"":""Parking  à proximité"",""es"":""Parking  à proximité"",""fr"":""Parking  à proximité""}",2026-01-24 19:57:11.976102+00
+pedicure,"{""en"":""Pedicure"",""es"":""Pedicura"",""fr"":""Pédicure""}",2026-01-24 19:57:11.976102+00
+pets_allowed,"{""en"":""Pets allowed"",""es"":""Se admiten mascotas"",""fr"":""Animaux domestiques acceptés""}",2026-01-24 19:57:11.976102+00
+piscine_chauffee,"{""en"":""Piscine chauffée"",""es"":""Piscine chauffée"",""fr"":""Piscine chauffée""}",2026-01-24 19:57:11.976102+00
+private_hammam_scrubs_massages,"{""en"":""Private hammam (scrubs, massages)"",""es"":""Hammam privado (exfoliación, masajes)"",""fr"":""Hammam privé (gommages, massages)""}",2026-01-24 19:57:11.976102+00
+prm_accessibility,"{""en"":""PRM accessibility"",""es"":""Accesibilidad PMR"",""fr"":""Accessibilité PMR""}",2026-01-24 19:57:11.976102+00
+reiki,"{""en"":""Reiki"",""es"":""Reiki"",""fr"":""Reiki""}",2026-01-24 19:57:11.976102+00
+restaurant,"{""en"":""Restaurant"",""es"":""Restaurante"",""fr"":""Restaurant""}",2026-01-24 19:57:11.976102+00
+riad_for_exclusive_use,"{""en"":""Riad for exclusive use"",""es"":""Riad en exclusiva"",""fr"":""Riad en exclusivité""}",2026-01-24 19:57:11.976102+00
+room_service,"{""en"":""Room service"",""es"":""Servicio de habitaciones"",""fr"":""Room service""}",2026-01-24 19:57:11.976102+00
+spa,"{""en"":""Spa"",""es"":""Spa"",""fr"":""Spa""}",2026-01-24 19:57:11.976102+00
+spa_hammam_and_massage,"{""en"":""Spa: hammam and massage"",""es"":""Spa: hammam y masaje"",""fr"":""Spa : hammam et massage""}",2026-01-24 19:57:11.976102+00
+special_menus_gluten_free_vegan_etc,"{""en"":""Special menus (gluten-free, vegan, etc.)"",""es"":""Menús especiales (sin gluten, vegano, etc.)"",""fr"":""Menus spéciaux (sans gluten, vegan, etc.)""}",2026-01-24 19:57:11.976102+00
+wi_fi_gratuit_haut_debit_rooftop_terrasse_diners_et_dejeuner_a_la_demande_massages_bien_etre_sur_demande_organisation_d_excursions_privees,"{""en"":""Wi-Fi gratuit haut débit  Rooftop / terrasse  Dîners et déjeuner à la demande  Massages & bien-être sur demande  Organisation d’excursions privées"",""es"":""Wi-Fi gratuit haut débit  Rooftop / terrasse  Dîners et déjeuner à la demande  Massages & bien-être sur demande  Organisation d’excursions privées"",""fr"":""Wi-Fi gratuit haut débit  Rooftop / terrasse  Dîners et déjeuner à la demande  Massages & bien-être sur demande  Organisation d’excursions privées""}",2026-01-24 19:57:11.976102+00
+wifi,"{""en"":""Free Wi‑Fi"",""es"":""Wi‑Fi gratis"",""fr"":""Wi‑Fi gratuit""}",2026-01-24 19:57:11.976102+00
+yoga_area,"{""en"":""Yoga area"",""es"":""Zona de yoga"",""fr"":""Espace yoga""}",2026-01-24 19:57:11.976102+00

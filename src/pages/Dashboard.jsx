@@ -1,49 +1,70 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Users, Mail, Clock, BookOpen, BarChart3, CheckCircle, Image, FileText } from 'lucide-react';
-import { listProperties, listContacts } from '@/lib/supabase';
+import { Building2, Mail, Clock, BookOpen, BarChart3, CheckCircle } from 'lucide-react';
+import { listContacts } from '@/lib/api';
+import { usePartnerHotels } from '@/lib/partnerHotelsApi';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from '@/i18n';
 
-function KpiCard({ title, value, icon: Icon, sub, color = '#8B1A1A' }) {
-  return (
-    <Card className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
-      <CardContent className="p-5">
-        <div className="flex items-center justify-between mb-3">
-          <div className="p-2 rounded-lg" style={{ background: '#fdf2f2' }}>
-            <Icon className="w-5 h-5" style={{ color }} />
-          </div>
-        </div>
-        <div className="text-3xl font-bold text-gray-900 mb-1">{value}</div>
-        <div className="text-sm font-medium text-gray-700">{title}</div>
-        {sub && <div className="text-xs text-gray-400 mt-0.5">{sub}</div>}
-      </CardContent>
-    </Card>
-  );
+/* ── Animated counter hook ── */
+function useCountUp(end, duration = 800) {
+  const [count, setCount] = useState(0);
+  const prevEnd = useRef(0);
+  useEffect(() => {
+    if (end === '...' || end === undefined) return;
+    const target = typeof end === 'number' ? end : parseInt(end, 10);
+    if (isNaN(target)) return;
+    const start = prevEnd.current;
+    prevEnd.current = target;
+    const startTime = Date.now();
+    const tick = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      setCount(Math.round(start + (target - start) * eased));
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [end, duration]);
+  return count;
 }
 
-function CompletionBar({ label, pct }) {
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.08, duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+  }),
+};
+
+function KpiCard({ title, value, icon: Icon, sub, color = '#9F121A', index = 0 }) {
+  const displayValue = useCountUp(value);
   return (
-    <div className="flex items-center gap-4">
-      <span className="text-sm text-gray-600 w-64 flex-shrink-0">{label}</span>
-      <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all"
-          style={{ width: `${pct}%`, background: '#8B1A1A' }}
-        />
-      </div>
-      <span className="text-sm font-semibold text-gray-700 w-12 text-right">{pct}%</span>
-    </div>
+    <motion.div custom={index} variants={cardVariants} initial="hidden" animate="visible">
+      <Card className="card-dark border border-[#9F121A]/10 hover:shadow-lg hover:shadow-[#9F121A]/5 hover:-translate-y-0.5 transition-all duration-300 group">
+        <CardContent className="p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2.5 rounded-xl bg-[#9F121A]/10 group-hover:scale-110 transition-transform duration-300">
+              <Icon className="w-5 h-5" style={{ color }} />
+            </div>
+          </div>
+          <div className="text-3xl font-bold text-brand-heading mb-1 tabular-nums">
+            {value === '...' ? '...' : displayValue}
+          </div>
+          <div className="text-sm font-medium text-brand-subtitle">{title}</div>
+          {sub && <div className="text-xs text-brand-subtitle/50 mt-0.5">{sub}</div>}
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 
 export default function Dashboard() {
-  const { data: propsResult, isLoading: loadingProps } = useQuery({
-    queryKey: ['dashboard-properties'],
-    queryFn: () => listProperties({ limit: 500 }),
-  });
+  const { t } = useTranslation();
+  const { data: properties = [], isLoading: loadingProps } = usePartnerHotels();
   const { data: contactsResult, isLoading: loadingContacts } = useQuery({
     queryKey: ['dashboard-contacts'],
     queryFn: () => listContacts({ limit: 500 }),
@@ -54,7 +75,6 @@ export default function Dashboard() {
     initialData: [],
   });
 
-  const properties = propsResult?.data || [];
   const contacts = contactsResult?.data || [];
   const isLoading = loadingProps || loadingContacts || loadingPending;
 
@@ -63,87 +83,78 @@ export default function Dashboard() {
   const avecSimpleBooking = contacts.filter(c => c.simple_booking_link && c.simple_booking_link.trim() !== '').length;
   const avecChannelManager = contacts.filter(c => c.channel_manager && c.channel_manager.trim() !== '').length;
 
-  // Completion stats
-  const pctDescFR = properties.length
-    ? Math.round(properties.filter(p => p.description?.fr && p.description.fr.trim() !== '').length / properties.length * 100)
-    : 0;
-  const pctPhotos = properties.length
-    ? Math.round(properties.filter(p => p.image_urls && p.image_urls.length > 0).length / properties.length * 100)
-    : 0;
-  const pctEmailAcces = contacts.length
-    ? Math.round(contacts.filter(c => c.login_email && c.login_email.trim() !== '').length / contacts.length * 100)
-    : 0;
-
   const kpis = [
-    { title: 'Total propriétés', value: isLoading ? '…' : properties.length, icon: Building2, sub: 'mgh_properties_final' },
-    { title: 'Membres actifs', value: isLoading ? '…' : activeMembers, icon: CheckCircle, sub: `sur ${contacts.length} contacts`, color: '#16a34a' },
-    { title: 'Sans email d\'accès', value: isLoading ? '…' : sansEmail, icon: Mail, sub: 'login_email vide', color: '#dc2626' },
-    { title: 'En attente validation', value: isLoading ? '…' : pendingUpdates.length, icon: Clock, sub: 'pending_updates', color: '#d97706' },
-    { title: 'Avec Simple Booking', value: isLoading ? '…' : avecSimpleBooking, icon: BookOpen, sub: 'simple_booking_link renseigné', color: '#2563eb' },
-    { title: 'Avec channel manager', value: isLoading ? '…' : avecChannelManager, icon: BarChart3, sub: 'channel_manager renseigné', color: '#7c3aed' },
+    { title: t('dashboard.totalProperties'), value: isLoading ? '...' : properties.length, icon: Building2, sub: 'mgh_properties_final', color: '#9F121A' },
+    { title: t('dashboard.activeMembers'), value: isLoading ? '...' : activeMembers, icon: CheckCircle, sub: t('dashboard.outOfContacts', { count: contacts.length }), color: '#4ade80' },
+    { title: t('dashboard.noAccessEmail'), value: isLoading ? '...' : sansEmail, icon: Mail, sub: t('dashboard.emptyLoginEmail'), color: '#f87171' },
+    { title: t('dashboard.pendingValidation'), value: isLoading ? '...' : pendingUpdates.length, icon: Clock, sub: 'pending_updates', color: '#fbbf24' },
+    { title: t('dashboard.withSimpleBooking'), value: isLoading ? '...' : avecSimpleBooking, icon: BookOpen, sub: t('dashboard.simpleBookingFilled'), color: '#7B94B0' },
+    { title: t('dashboard.withChannelManager'), value: isLoading ? '...' : avecChannelManager, icon: BarChart3, sub: t('dashboard.channelManagerFilled'), color: '#a78bfa' },
   ];
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Tableau de bord</h1>
-        <p className="text-gray-500 mt-1 text-sm">Vue d'ensemble de l'association MGH</p>
-      </div>
+    <motion.div
+      className="space-y-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <h1 className="text-2xl font-bold text-brand-heading">{t('dashboard.title')}</h1>
+        <p className="text-brand-subtitle mt-1 text-sm">{t('dashboard.subtitle')}</p>
+      </motion.div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {kpis.map((k) => (
-          <KpiCard key={k.title} {...k} />
+        {kpis.map((k, i) => (
+          <KpiCard key={k.title} {...k} index={i} />
         ))}
       </div>
 
       {/* Completion stats */}
-      <Card className="bg-white border border-gray-200">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold text-gray-800">Taux de complétion des fiches</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {isLoading ? (
-            <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-5 w-full" />)}</div>
-          ) : (
-            <>
-              <CompletionBar label="Fiches avec description FR remplie" pct={pctDescFR} />
-              <CompletionBar label="Fiches avec photos" pct={pctPhotos} />
-              <CompletionBar label="Membres avec email d'accès" pct={pctEmailAcces} />
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Recent pending */}
-      {pendingUpdates.length > 0 && (
-        <Card className="bg-white border border-gray-200">
-          <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-base font-semibold text-gray-800 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-red-600" />
-              Modifications en attente
-            </CardTitle>
-            <Link to="/pending-updates" className="text-sm font-medium hover:underline" style={{ color: '#8B1A1A' }}>
-              Voir tout →
-            </Link>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {pendingUpdates.slice(0, 5).map(u => (
-                <div key={u.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                  <div>
-                    <span className="text-sm font-medium text-gray-800">{u.property_name}</span>
-                    <span className="text-xs text-gray-400 ml-2">par {u.updated_by_email}</span>
-                  </div>
-                  <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium">
-                    {Object.keys(u.changes || {}).length} champ(s)
-                  </span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.4 }}
+      >
+          <Card className="card-dark border border-[#9F121A]/10">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-base font-semibold text-brand-heading flex items-center gap-2">
+                <Clock className="w-4 h-4 text-red-400" />
+                {t('dashboard.pendingChanges')}
+              </CardTitle>
+              <Link to="/pending-updates" className="text-sm font-medium text-brand-action hover:text-brand-action/80 transition-colors">
+                {t('common.viewAll')} →
+              </Link>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {pendingUpdates.slice(0, 5).map((u, i) => (
+                  <motion.div
+                    key={u.id}
+                    className="flex items-center justify-between py-2.5 border-b border-border/50 last:border-0 hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-colors duration-200"
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.8 + i * 0.05, duration: 0.3 }}
+                  >
+                    <div>
+                      <span className="text-sm font-medium text-brand-heading">{u.property_name}</span>
+                      <span className="text-xs text-brand-subtitle/50 ml-2">{t('common.by')} {u.updated_by_email}</span>
+                    </div>
+                    <span className="text-xs bg-[#9F121A]/15 text-[#9F121A] px-2 py-0.5 rounded-full font-semibold">
+                      {Object.keys(u.changes || {}).length} {t('common.fields')}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      
+    </motion.div>
   );
 }
