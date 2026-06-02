@@ -2,7 +2,7 @@ import axios from 'axios';
 
 /**
  * Laravel API client configured for Sanctum SPA authentication.
- * Replaces the Base44 SDK client.
+ * Pure HTTP-based auth — no WebSocket or real-time dependencies.
  */
 const api = axios.create({
   baseURL: '/api',
@@ -16,23 +16,57 @@ const api = axios.create({
 });
 
 /**
- * Response interceptor for handling CSRF token expiration.
+ * Response interceptor:
+ * - 419: CSRF token expired → refresh token and retry once
+ * - 401: Unauthenticated → reject (handled by AuthContext)
  */
+let isRefreshingCsrf = false;
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 419) {
-      window.location.reload();
+  async (error) => {
+    const originalRequest = error.config;
+
+    // CSRF token mismatch — refresh and retry once
+    if (error.response?.status === 419 && !originalRequest._retried) {
+      originalRequest._retried = true;
+      if (!isRefreshingCsrf) {
+        isRefreshingCsrf = true;
+        try {
+          await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
+        } finally {
+          isRefreshingCsrf = false;
+        }
+      }
+      return api(originalRequest);
     }
+
     return Promise.reject(error);
   }
 );
 
 /**
  * Get CSRF cookie from Sanctum before making state-changing requests.
+ * Retries once on transient network errors.
  */
 export async function getCsrfCookie() {
-  await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
+  try {
+    await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
+  } catch (error) {
+    if (error.response?.status === 500 || error.code === 'ERR_NETWORK') {
+      // Single retry after a brief delay for transient failures
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      try {
+        await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
+        return;
+      } catch (retryError) {
+        throw new Error(
+          'Backend server is not reachable. Ensure Laravel is running on port 8000.'
+        );
+      }
+    }
+    throw error;
+  }
 }
 
 /**

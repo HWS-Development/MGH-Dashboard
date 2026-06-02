@@ -12,6 +12,7 @@ use App\Http\Controllers\DestinationOrderController;
 use App\Http\Controllers\ExperienceImageController;
 use App\Http\Controllers\ExperienceOrderController;
 use App\Http\Controllers\PartnerHotelController;
+use App\Http\Controllers\PublicDataController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,23 @@ Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
 
 Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->name('password.store');
+
+// ─── Public Read-Only API (consumed by AMH-Website) ─────────────────────────
+// No authentication required. Only exposes published content from whitelisted
+// tables (experiences, destinations, etc.).
+Route::prefix('public')->group(function () {
+    Route::get('/experiences', [PublicDataController::class, 'listExperiences'])
+        ->name('public.experiences.index');
+    Route::get('/experiences/by-slugs', [PublicDataController::class, 'experiencesBySlugs'])
+        ->name('public.experiences.bySlugs');
+    Route::get('/experiences/{slug}', [PublicDataController::class, 'showExperience'])
+        ->name('public.experiences.show');
+
+    Route::get('/destinations', [PublicDataController::class, 'listDestinations'])
+        ->name('public.destinations.index');
+    Route::get('/destinations/{slug}', [PublicDataController::class, 'showDestination'])
+        ->name('public.destinations.show');
+});
 
 // ─── Authenticated Routes ────────────────────────────────────────────────────
 

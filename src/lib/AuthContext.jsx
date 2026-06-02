@@ -39,6 +39,11 @@ export const AuthProvider = ({ children }) => {
           type: 'auth_required',
           message: 'Authentication required'
         });
+      } else if (error.code === 'ERR_NETWORK' || error.response?.status >= 500) {
+        setAuthError({
+          type: 'server_unavailable',
+          message: 'Server is not reachable'
+        });
       }
     } finally {
       setIsLoadingAuth(false);
