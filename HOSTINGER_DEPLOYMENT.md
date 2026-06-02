@@ -67,7 +67,7 @@ MAIL_PORT=587
 MAIL_USERNAME=YOUR_SMTP_USERNAME
 MAIL_PASSWORD=YOUR_SMTP_PASSWORD
 MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS="admin@hospitalitywebservices.com"
+MAIL_FROM_ADDRESS="mgh-dashboard@hospitalitywebservices.com"
 MAIL_FROM_NAME="${APP_NAME}"
 ```
 
