@@ -93,12 +93,12 @@ export default function OwnerLogin({ onLogin }) {
         <p className="text-sm text-white/50 mt-1">Maisons & Riads au Maroc</p>
       </div>
 
-      <div className="w-full max-w-sm card-dark rounded-2xl shadow-sm border border-white/10 p-6">
+      <div className="w-full max-w-sm bg-card rounded-2xl shadow-sm border border-white/10 p-6">
         {step === 'email' ? (
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             <div className="text-center mb-5">
               <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-500/10 mb-2">
-                <Mail className="w-5 h-5" style={{ color: '#9F121A' }} />
+                <Mail className="w-5 h-5 text-primary" />
               </div>
               <h2 className="font-semibold text-white/80 text-lg">Connexion propriétaire</h2>
               <p className="text-xs text-white/40 mt-1">Entrez l'email fourni à HWS lors de votre adhésion</p>
@@ -133,8 +133,8 @@ export default function OwnerLogin({ onLogin }) {
         ) : (
           <form onSubmit={handleOtpSubmit} className="space-y-4">
             <div className="text-center mb-5">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#9F121A]/10 mb-2">
-                <KeyRound className="w-5 h-5 text-[#9F121A]" />
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 mb-2">
+                <KeyRound className="w-5 h-5 text-primary" />
               </div>
               <h2 className="font-semibold text-white/80 text-lg">Code de vérification</h2>
               <p className="text-xs text-white/50 mt-1">Entrez le code reçu par email</p>

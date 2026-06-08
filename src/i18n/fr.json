@@ -82,7 +82,8 @@
     "withFrDescription": "Fiches avec description FR remplie",
     "withPhotos": "Fiches avec photos",
     "membersWithEmail": "Membres avec email d'acces",
-    "pendingChanges": "Modifications en attente"
+    "pendingChanges": "Modifications en attente",
+    "noPendingChanges": "Aucune modification en attente"
   },
   "experiences": {
     "title": "Experiences",
@@ -188,7 +189,9 @@
       "seoDescription": "Description SEO",
       "seoDescriptionHelp": "Resume affiche dans les resultats de recherche (~155 caracteres).",
       "seoKeywords": "Mots-cles SEO",
-      "seoKeywordsHelp": "Mots-cles separes par des virgules."
+      "seoKeywordsHelp": "Mots-cles separes par des virgules.",
+      "associatedProperty": "Propriete associee (hotel)",
+      "selectProperty": "Selectionnez une propriete..."
     },
     "validation": {
       "slugRequired": "Le slug est requis (min. 2 caracteres).",
@@ -227,7 +230,14 @@
     "langCompleteness": "{filled}/3 langues",
     "positionOf": "Position {pos} sur {total}",
     "sortOrderAutoHint": "Automatiquement assigne a la prochaine position disponible",
-    "sortOrderEditHint": "Choisissez une nouvelle position pour reordonner cette experience parmi les autres."
+    "sortOrderEditHint": "Choisissez une nouvelle position pour reordonner cette experience parmi les autres.",
+    "contentSettings": "Parametres de contenu",
+    "centraContent": "Centra — Equipements & services hoteliers",
+    "propertyHint": "Selectionnez la propriete associee a cette experience pour voir ses equipements et services depuis Centra.",
+    "amenities": "Equipements",
+    "services": "Services",
+    "facilities": "Installations",
+    "none": "Aucun disponible"
   },
   "destinations": {
     "title": "Destinations",
@@ -338,7 +348,9 @@
       "seoDescription": "Description SEO",
       "seoDescriptionHelp": "Resume affiche dans les resultats de recherche (~155 caracteres).",
       "seoKeywords": "Mots-cles SEO",
-      "seoKeywordsHelp": "Mots-cles separes par des virgules."
+      "seoKeywordsHelp": "Mots-cles separes par des virgules.",
+      "associatedProperty": "Propriete associee (hotel)",
+      "selectProperty": "Selectionnez une propriete..."
     },
     "validation": {
       "slugRequired": "Le slug est requis (min. 2 caracteres).",
@@ -398,7 +410,14 @@
     "langCompleteness": "{filled}/3 langues",
     "positionOf": "Position {pos} sur {total}",
     "sortOrderAutoHint": "Automatiquement assigne a la prochaine position disponible",
-    "sortOrderEditHint": "Choisissez une nouvelle position pour reordonner cette destination parmi les autres."
+    "sortOrderEditHint": "Choisissez une nouvelle position pour reordonner cette destination parmi les autres.",
+    "contentSettings": "Parametres de contenu",
+    "centraContent": "Centra — Equipements & services hoteliers",
+    "propertyHint": "Selectionnez la propriete associee a cette destination pour voir ses equipements et services depuis Centra.",
+    "amenities": "Equipements",
+    "services": "Services",
+    "facilities": "Installations",
+    "none": "Aucun disponible"
   },
   "pageNotFound": {
     "title": "Page introuvable",

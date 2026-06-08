@@ -82,7 +82,8 @@
     "withFrDescription": "Fichas con descripcion FR completada",
     "withPhotos": "Fichas con fotos",
     "membersWithEmail": "Miembros con correo de acceso",
-    "pendingChanges": "Cambios pendientes"
+    "pendingChanges": "Cambios pendientes",
+    "noPendingChanges": "Sin cambios pendientes"
   },
   "experiences": {
     "title": "Experiencias",
@@ -188,7 +189,9 @@
       "seoDescription": "Descripcion SEO",
       "seoDescriptionHelp": "Resumen mostrado en los resultados de busqueda (~155 caracteres).",
       "seoKeywords": "Palabras clave SEO",
-      "seoKeywordsHelp": "Palabras clave separadas por comas."
+      "seoKeywordsHelp": "Palabras clave separadas por comas.",
+      "associatedProperty": "Propiedad asociada (hotel)",
+      "selectProperty": "Seleccione una propiedad..."
     },
     "validation": {
       "slugRequired": "El slug es obligatorio (min. 2 caracteres).",
@@ -227,7 +230,14 @@
     "langCompleteness": "{filled}/3 idiomas",
     "positionOf": "Posicion {pos} de {total}",
     "sortOrderAutoHint": "Asignada automaticamente a la siguiente posicion disponible",
-    "sortOrderEditHint": "Elija una nueva posicion para reordenar esta experiencia entre las demas."
+    "sortOrderEditHint": "Elija una nueva posicion para reordenar esta experiencia entre las demas.",
+    "contentSettings": "Configuracion de contenido",
+    "centraContent": "Centra — Servicios e instalaciones del hotel",
+    "propertyHint": "Seleccione la propiedad asociada a esta experiencia para ver sus servicios e instalaciones desde Centra.",
+    "amenities": "Servicios",
+    "services": "Servicios adicionales",
+    "facilities": "Instalaciones",
+    "none": "Ninguno disponible"
   },
   "destinations": {
     "title": "Destinos",
@@ -338,7 +348,9 @@
       "seoDescription": "Descripcion SEO",
       "seoDescriptionHelp": "Resumen mostrado en los resultados de busqueda (~155 caracteres).",
       "seoKeywords": "Palabras clave SEO",
-      "seoKeywordsHelp": "Palabras clave separadas por comas."
+      "seoKeywordsHelp": "Palabras clave separadas por comas.",
+      "associatedProperty": "Propiedad asociada (hotel)",
+      "selectProperty": "Seleccione una propiedad..."
     },
     "validation": {
       "slugRequired": "El slug es obligatorio (min. 2 caracteres).",
@@ -398,7 +410,14 @@
     "langCompleteness": "{filled}/3 idiomas",
     "positionOf": "Posicion {pos} de {total}",
     "sortOrderAutoHint": "Asignada automaticamente a la siguiente posicion disponible",
-    "sortOrderEditHint": "Elija una nueva posicion para reordenar este destino entre los demas."
+    "sortOrderEditHint": "Elija una nueva posicion para reordenar esta destino entre las demas.",
+    "contentSettings": "Configuracion de contenido",
+    "centraContent": "Centra — Servicios e instalaciones del hotel",
+    "propertyHint": "Seleccione la propiedad asociada a este destino para ver sus servicios e instalaciones desde Centra.",
+    "amenities": "Servicios",
+    "services": "Servicios adicionales",
+    "facilities": "Instalaciones",
+    "none": "Ninguno disponible"
   },
   "pageNotFound": {
     "title": "Pagina no encontrada",

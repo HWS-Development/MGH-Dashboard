@@ -46,7 +46,7 @@ function TextArea({ value, onChange, rows = 5, placeholder, disabled }) {
       placeholder={placeholder}
       disabled={disabled}
       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-y focus:outline-none focus:ring-2 focus:border-transparent disabled:bg-white/5 disabled:text-white/30"
-      style={{ '--tw-ring-color': '#9F121A' }}
+      style={{ '--tw-ring-color': 'hsl(var(--primary))' }}
     />
   );
 }
@@ -75,9 +75,9 @@ function CheckList({ items, selected = [], onChange }) {
 
 function SectionCard({ id, title, children }) {
   return (
-    <div id={id} className="card-dark rounded-2xl border border-white/10 shadow-sm overflow-hidden">
+    <div id={id} className="bg-card rounded-2xl border border-white/10 shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-white/5" style={{ background: '#02162A' }}>
-        <h2 className="font-semibold text-white/80" style={{ color: '#9F121A' }}>{title}</h2>
+          <h2 className="font-semibold text-primary">{title}</h2>
       </div>
       <div className="p-5 space-y-4">{children}</div>
     </div>
@@ -259,7 +259,7 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
 
       <div className="max-w-2xl mx-auto px-4 pt-5 space-y-4">
         {/* Welcome + completion */}
-        <div className="card-dark rounded-2xl border border-white/10 shadow-sm p-5">
+        <div className="bg-card rounded-2xl border border-white/10 shadow-sm p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h1 className="font-bold text-white text-lg leading-tight">
@@ -268,7 +268,7 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
               <p className="text-sm text-white/50 mt-0.5">{propertyName}</p>
             </div>
             <div className="text-right flex-shrink-0">
-              <div className="text-2xl font-bold" style={{ color: completion >= 80 ? '#16a34a' : '#9F121A' }}>{completion}%</div>
+              <div className="text-2xl font-bold" style={{ color: completion >= 80 ? '#16a34a' : 'hsl(var(--primary))' }}>{completion}%</div>
               <div className="text-xs text-white/40">complet</div>
             </div>
           </div>
@@ -279,7 +279,7 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
             <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${completion}%`, background: completion >= 80 ? '#16a34a' : '#9F121A' }}
+                style={{ width: `${completion}%`, background: completion >= 80 ? '#16a34a' : 'hsl(var(--primary))' }}
               />
             </div>
             {completion < 100 && (
@@ -309,9 +309,9 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
             <a
               key={s.id}
               href={`#${s.id}`}
-              className="flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-full border border-white/10 card-dark text-white/60 hover:text-white hover:border-transparent transition-all"
+              className="flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-full border border-white/10 bg-card text-white/60 hover:text-white hover:border-transparent transition-all"
               style={{}}
-              onMouseEnter={e => { e.currentTarget.style.background = '#9F121A'; e.currentTarget.style.color = '#fff'; }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'hsl(var(--primary))'; e.currentTarget.style.color = '#fff'; }}
               onMouseLeave={e => { e.currentTarget.style.background = ''; e.currentTarget.style.color = ''; }}
             >
               {s.label}
@@ -442,12 +442,12 @@ export default function OwnerDashboard({ session, onLogout, onBackToProperties }
 
         {/* Save button */}
         <div className="sticky bottom-4">
-          <div className="card-dark rounded-2xl border border-white/10 shadow-lg p-4">
+          <div className="bg-card rounded-2xl border border-white/10 shadow-lg p-4">
             {saved ? (
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-[#9F121A] flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-[#9F121A]">Modifications transmises à HWS !</p>
+                  <p className="text-sm font-semibold text-primary">Modifications transmises à HWS !</p>
                   <p className="text-xs text-white/50 mt-0.5">
                     Elles apparaîtront sur le site centraledesriads.com sous 48h.
                   </p>

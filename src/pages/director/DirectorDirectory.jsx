@@ -6,7 +6,7 @@ import { Search, Download } from 'lucide-react';
 import { format } from 'date-fns';
 
 const STATUS_BADGE = {
-  active: 'bg-[#9F121A]/15 text-[#9F121A]',
+  active: 'bg-primary/15 text-primary',
   suspended: 'bg-orange-500/15 text-orange-400',
   pending: 'bg-slate-500/15 text-slate-600',
   'ex-member': 'bg-muted text-muted-foreground',
@@ -83,7 +83,7 @@ export default function DirectorDirectory({ properties, contacts, isLoading }) {
         />
       </div>
 
-      <div className="card-dark border border-border rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -127,7 +127,7 @@ export default function DirectorDirectory({ properties, contacts, isLoading }) {
                       <td className="px-4 py-2.5 text-muted-foreground">{c.CM || '—'}</td>
                       <td className="px-4 py-2.5">
                         {c.membershipstatus ? (
-                          <span className={`px-2 py-0.5 rounded-full font-medium text-xs ${STATUS_BADGE[c.membershipstatus] || 'card-dark/10 text-muted-foreground'}`}>
+                          <span className={`px-2 py-0.5 rounded-full font-medium text-xs ${STATUS_BADGE[c.membershipstatus] || 'bg-card/10 text-muted-foreground'}`}>
                             {STATUS_LABEL[c.membershipstatus] || c.membershipstatus}
                           </span>
                         ) : '—'}

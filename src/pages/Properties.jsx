@@ -6,16 +6,17 @@ import { usePartnerHotels } from '@/lib/partnerHotelsApi';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Pencil, CheckCircle2, AlertTriangle, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Search, Pencil, CheckCircle2, AlertTriangle, XCircle, ChevronLeft, ChevronRight, Filter, Building2 } from 'lucide-react';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
 
 const STATUS_BADGE = {
-  active: 'bg-[#9F121A]/15 text-[#9F121A]',
-  suspended: 'bg-orange-500/15 text-orange-400',
-  pending: 'bg-slate-500/15 text-slate-600',
-  'ex-member': 'bg-muted text-muted-foreground',
+  active: 'bg-emerald-500/10 text-emerald-600 border-emerald-200',
+  suspended: 'bg-amber-500/10 text-amber-600 border-amber-200',
+  pending: 'bg-slate-500/10 text-slate-600 border-slate-200',
+  'ex-member': 'bg-muted text-muted-foreground border-border',
 };
 const STATUS_LABEL = {
   active: 'Actif',
@@ -32,6 +33,7 @@ export default function Properties() {
   const [filterNoEmail, setFilterNoEmail] = useState(false);
   const [filterNoDesc, setFilterNoDesc] = useState(false);
   const [filterNoPhotos, setFilterNoPhotos] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 6;
 
@@ -54,14 +56,12 @@ export default function Properties() {
   const contacts = contactsResult?.data || [];
   const cities = citiesResult?.data || [];
 
-  // Build contacts map: mgh_contacts.property_id = mgh_properties_final.id
   const contactsMap = useMemo(() => {
     const m = {};
     contacts.forEach(c => { if (c.property_id) m[c.property_id] = c; });
     return m;
   }, [contacts]);
 
-  // Build cities map for display
   const citiesMap = useMemo(() => {
     const m = {};
     cities.forEach(c => { m[c.id] = c.label?.fr || c.name || c.id; });
@@ -82,7 +82,6 @@ export default function Properties() {
     });
   }, [properties, contactsMap, search, filterCity, filterStatus, filterNoEmail, filterNoDesc, filterNoPhotos]);
 
-  // Reset page when filters/search change
   useEffect(() => {
     setCurrentPage(1);
   }, [search, filterCity, filterStatus, filterNoEmail, filterNoDesc, filterNoPhotos]);
@@ -94,78 +93,95 @@ export default function Properties() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-brand-heading">Propriétés</h1>
-          <p className="text-sm text-brand-subtitle mt-0.5">{properties.length} propriétés enregistrées</p>
+          <h1 className="page-title flex items-center gap-2">
+            <Building2 className="w-6 h-6 text-primary" />
+            Propriétés
+          </h1>
+          <p className="page-subtitle mt-0.5">{properties.length} propriétés enregistrées</p>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="card-dark border border-[#9F121A]/10 rounded-lg p-4 space-y-3">
-        <div className="flex flex-wrap gap-3">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Rechercher par nom…"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          <Select value={filterCity} onValueChange={setFilterCity}>
-            <SelectTrigger className="w-44">
-              <SelectValue placeholder="Toutes les villes" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes les villes</SelectItem>
-              {cities.map(c => (
-                <SelectItem key={c.id} value={String(c.id)}>{c.label?.fr || c.name || c.id}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-44">
-              <SelectValue placeholder="Tous les statuts" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous les statuts</SelectItem>
-              <SelectItem value="active">Actif</SelectItem>
-              <SelectItem value="suspended">Suspendu</SelectItem>
-              <SelectItem value="pending">En attente</SelectItem>
-              <SelectItem value="ex-member">Ex-membre</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {[
-            { key: 'noEmail', label: 'Sans email', state: filterNoEmail, set: setFilterNoEmail },
-            { key: 'noDesc', label: 'Sans description', state: filterNoDesc, set: setFilterNoDesc },
-            { key: 'noPhotos', label: 'Sans photos', state: filterNoPhotos, set: setFilterNoPhotos },
-          ].map(f => (
-            <button
-              key={f.key}
-              onClick={() => f.set(!f.state)}
-              className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
-                f.state
-                  ? 'text-white border-transparent'
-                  : 'text-muted-foreground bg-transparent border-border hover:border-border'
-              }`}
-              style={f.state ? { background: '#9F121A', borderColor: '#9F121A' } : {}}
+      {/* Search + Filters */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher par nom…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Select value={filterCity} onValueChange={(v) => { setFilterCity(v); setCurrentPage(1); }}>
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder="Toutes les villes" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes les villes</SelectItem>
+                {cities.map(c => (
+                  <SelectItem key={c.id} value={String(c.id)}>{c.label?.fr || c.name || c.id}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filterStatus} onValueChange={(v) => { setFilterStatus(v); setCurrentPage(1); }}>
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder="Tous les statuts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="active">Actif</SelectItem>
+                <SelectItem value="suspended">Suspendu</SelectItem>
+                <SelectItem value="pending">En attente</SelectItem>
+                <SelectItem value="ex-member">Ex-membre</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+              className={showFilters ? 'border-primary text-primary' : ''}
             >
-              {f.label}
-            </button>
-          ))}
-          <span className="text-xs text-muted-foreground self-center ml-2">{filtered.length} résultat(s)</span>
-        </div>
-      </div>
+              <Filter className="w-4 h-4 mr-1" />
+              Filtres
+            </Button>
+          </div>
+
+          {showFilters && (
+            <div className="flex flex-wrap gap-2 pt-1">
+              {[
+                { key: 'noEmail', label: 'Sans email', state: filterNoEmail, set: setFilterNoEmail },
+                { key: 'noDesc', label: 'Sans description', state: filterNoDesc, set: setFilterNoDesc },
+                { key: 'noPhotos', label: 'Sans photos', state: filterNoPhotos, set: setFilterNoPhotos },
+              ].map(f => (
+                <button
+                  key={f.key}
+                  onClick={() => f.set(!f.state)}
+                  className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
+                    f.state
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'text-muted-foreground bg-transparent border-border hover:border-primary/30'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+              <span className="text-xs text-muted-foreground self-center ml-auto">{filtered.length} résultat(s)</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Table */}
-      <div className="card-dark border border-[#9F121A]/10 rounded-lg overflow-hidden">
+      <Card>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-muted/50 border-b border-border">
+              <tr className="border-b border-border bg-muted/30">
                 <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Nom</th>
                 <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Ville</th>
                 <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Contact</th>
@@ -203,42 +219,42 @@ export default function Properties() {
                   return (
                     <tr
                       key={p.id}
-                      className="border-b border-border/50 hover:bg-muted/50 transition-colors"
+                      className="border-b border-border/50 hover:bg-muted/30 transition-colors"
                     >
                       <td className="px-4 py-3 font-medium text-foreground max-w-[160px] truncate">{nameFr}</td>
                       <td className="px-4 py-3 text-muted-foreground capitalize">{citiesMap[p.city_id] || p.city_id || '—'}</td>
                       <td className="px-4 py-3 text-muted-foreground max-w-[120px] truncate">{c.contactname || '—'}</td>
                       <td className="px-4 py-3 text-center">
                         {hasEmail
-                          ? <CheckCircle2 className="w-4 h-4 text-[#9F121A] mx-auto" />
+                          ? <CheckCircle2 className="w-4 h-4 text-emerald-500 mx-auto" />
                           : <AlertTriangle className="w-4 h-4 text-amber-400 mx-auto" />
                         }
                       </td>
                       <td className="px-4 py-3 text-muted-foreground max-w-[100px] truncate">{c.CM || '—'}</td>
                       <td className="px-4 py-3 text-center">
                         {status ? (
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_BADGE[status] || 'bg-muted text-muted-foreground'}`}>
+                          <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${STATUS_BADGE[status] || 'bg-muted text-muted-foreground border-border'}`}>
                             {STATUS_LABEL[status] || status}
                           </span>
                         ) : <span className="text-muted-foreground/60 text-xs">—</span>}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {hasPhotos
-                          ? <CheckCircle2 className="w-4 h-4 text-[#9F121A] mx-auto" />
-                          : <XCircle className="w-4 h-4 text-red-400 mx-auto" />
+                          ? <CheckCircle2 className="w-4 h-4 text-emerald-500 mx-auto" />
+                          : <XCircle className="w-4 h-4 text-muted-foreground/40 mx-auto" />
                         }
                       </td>
                       <td className="px-4 py-3 text-center">
                         {hasDesc
-                          ? <CheckCircle2 className="w-4 h-4 text-[#9F121A] mx-auto" />
-                          : <XCircle className="w-4 h-4 text-red-400 mx-auto" />
+                          ? <CheckCircle2 className="w-4 h-4 text-emerald-500 mx-auto" />
+                          : <XCircle className="w-4 h-4 text-muted-foreground/40 mx-auto" />
                         }
                       </td>
                       <td className="px-4 py-3 text-center">
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-7 px-3 text-xs border-border hover:border-[#9F121A]/30 text-muted-foreground hover:text-[#9F121A]"
+                          className="h-7 px-3 text-xs"
                           onClick={() => navigate(`/properties/${p.id}`)}
                         >
                           <Pencil className="w-3 h-3 mr-1" />
@@ -296,7 +312,7 @@ export default function Properties() {
                       key={page}
                       variant={page === currentPage ? 'default' : 'outline'}
                       size="sm"
-                      className={`h-7 w-7 p-0 text-xs ${page === currentPage ? 'bg-[#9F121A] text-white hover:bg-[#7A0E14]' : ''}`}
+                      className={`h-7 w-7 p-0 text-xs`}
                       onClick={() => setCurrentPage(page)}
                     >
                       {page}
@@ -316,7 +332,7 @@ export default function Properties() {
             </div>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

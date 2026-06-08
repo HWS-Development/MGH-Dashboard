@@ -39,7 +39,7 @@ export default function DirectorApp({ session, onLogout }) {
   return (
     <div className="min-h-screen" style={{ background: '#F5F5F5' }}>
       {/* Top nav */}
-      <div className="sticky top-0 z-40 border-b border-border card-dark shadow-sm">
+      <div className="sticky top-0 z-40 border-b border-border bg-card shadow-sm">
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2.5">
@@ -47,7 +47,7 @@ export default function DirectorApp({ session, onLogout }) {
                 MGH
               </div>
               <div>
-                <div className="font-bold text-sm leading-tight" style={{ color: '#9F121A' }}>HWS</div>
+                <div className="font-bold text-sm leading-tight text-primary">HWS</div>
                 <div className="text-[10px] text-muted-foreground leading-tight">MGH Dashboard</div>
               </div>
             </div>

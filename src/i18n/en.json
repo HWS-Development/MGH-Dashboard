@@ -82,7 +82,8 @@
     "withFrDescription": "Records with FR description filled",
     "withPhotos": "Records with photos",
     "membersWithEmail": "Members with access email",
-    "pendingChanges": "Pending changes"
+    "pendingChanges": "Pending changes",
+    "noPendingChanges": "No pending changes"
   },
   "experiences": {
     "title": "Experiences",
@@ -188,7 +189,9 @@
       "seoDescription": "SEO Description",
       "seoDescriptionHelp": "Summary displayed in search results (~155 characters).",
       "seoKeywords": "SEO Keywords",
-      "seoKeywordsHelp": "Keywords separated by commas."
+      "seoKeywordsHelp": "Keywords separated by commas.",
+      "associatedProperty": "Associated property (hotel)",
+      "selectProperty": "Select a property..."
     },
     "validation": {
       "slugRequired": "Slug is required (min. 2 characters).",
@@ -227,7 +230,14 @@
     "langCompleteness": "{filled}/3 languages",
     "positionOf": "Position {pos} of {total}",
     "sortOrderAutoHint": "Automatically assigned to the next available position",
-    "sortOrderEditHint": "Choose a new position to reorder this experience among others."
+    "sortOrderEditHint": "Choose a new position to reorder this experience among others.",
+    "contentSettings": "Content settings",
+    "centraContent": "Centra — Hotel amenities & services",
+    "propertyHint": "Select the property associated with this experience to view its amenities and services from Centra.",
+    "amenities": "Amenities",
+    "services": "Services",
+    "facilities": "Facilities",
+    "none": "None available"
   },
   "destinations": {
     "title": "Destinations",
@@ -338,7 +348,9 @@
       "seoDescription": "SEO Description",
       "seoDescriptionHelp": "Summary displayed in search results (~155 characters).",
       "seoKeywords": "SEO Keywords",
-      "seoKeywordsHelp": "Keywords separated by commas."
+      "seoKeywordsHelp": "Keywords separated by commas.",
+      "associatedProperty": "Associated property (hotel)",
+      "selectProperty": "Select a property..."
     },
     "validation": {
       "slugRequired": "Slug is required (min. 2 characters).",
@@ -398,7 +410,14 @@
     "langCompleteness": "{filled}/3 languages",
     "positionOf": "Position {pos} of {total}",
     "sortOrderAutoHint": "Automatically assigned to the next available position",
-    "sortOrderEditHint": "Choose a new position to reorder this destination among others."
+    "sortOrderEditHint": "Choose a new position to reorder this destination among others.",
+    "contentSettings": "Content settings",
+    "centraContent": "Centra — Hotel amenities & services",
+    "propertyHint": "Select the property associated with this destination to view its amenities and services from Centra.",
+    "amenities": "Amenities",
+    "services": "Services",
+    "facilities": "Facilities",
+    "none": "None available"
   },
   "pageNotFound": {
     "title": "Page Not Found",

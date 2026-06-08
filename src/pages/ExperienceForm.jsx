@@ -19,6 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/components/ui/use-toast';
 import { getExperience, insertExperience, updateExperience, uploadExperienceImage, deleteExperienceImage, getNextExperienceOrder, reorderExperience, listExperiences } from '@/lib/api';
+import { usePartnerHotels, usePartnerHotelContent } from '@/lib/partnerHotelsApi';
 import { useTranslation } from '@/i18n';
 import { Upload } from 'lucide-react';
 
@@ -211,7 +212,7 @@ function MultiLangInput({ label, field, form, setForm, type = 'input', required 
                     : hasErr
                     ? 'bg-destructive/10 text-destructive hover:bg-destructive/20'
                     : currentVal[lang.code]?.trim()
-                    ? 'bg-[#9F121A]/15 text-[#9F121A] hover:bg-[#9F121A]/25'
+                    ? 'bg-primary/15 text-primary hover:bg-primary/25'
                     : 'bg-background text-muted-foreground hover:bg-muted'
                   }`}
               >
@@ -237,7 +238,7 @@ function MultiLangInput({ label, field, form, setForm, type = 'input', required 
             className={`transition-all duration-200 ${
               errors[`${field}.${activeLang}`]
                 ? 'border-destructive ring-1 ring-destructive/30'
-                : 'focus-visible:ring-[#9F121A]/30'
+                : 'focus-visible:ring-primary/30'
             } ${type === 'textarea' ? 'min-h-[120px] resize-y' : ''}`}
           />
           {errors[`${field}.${activeLang}`] && (
@@ -256,7 +257,7 @@ function MultiLangInput({ label, field, form, setForm, type = 'input', required 
           <div
             key={lang.code}
             className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
-              currentVal[lang.code]?.trim() ? 'bg-[#9F121A]' : 'bg-border'
+              currentVal[lang.code]?.trim() ? 'bg-primary' : 'bg-border'
             }`}
           />
         ))}
@@ -326,7 +327,7 @@ function MultiLangArrayEditor({
                   ${activeLang === lang.code
                     ? 'bg-[#384252] text-white'
                     : langData.length > 0
-                    ? 'bg-[#9F121A]/15 text-[#9F121A] hover:bg-[#9F121A]/25'
+                    ? 'bg-primary/15 text-primary hover:bg-primary/25'
                     : 'bg-background text-muted-foreground hover:bg-muted'
                   }`}
               >
@@ -362,7 +363,7 @@ function MultiLangArrayEditor({
             >
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 mt-2">
-                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-[#9F121A]/10 text-[#9F121A] text-xs font-bold">
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-primary/10 text-primary text-xs font-bold">
                     {idx + 1}
                   </span>
                 </div>
@@ -411,7 +412,7 @@ function MultiLangArrayEditor({
             type="button"
             variant="outline"
             onClick={addItem}
-            className="w-full h-11 rounded-xl border-dashed border-2 text-muted-foreground hover:text-[#9F121A] hover:border-[#9F121A]/30 transition-all gap-2"
+            className="w-full h-11 rounded-xl border-dashed border-2 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all gap-2"
           >
             <Plus className="w-4 h-4" />
             {t('common.add') + ' (' + LANGUAGES.find((l) => l.code === activeLang)?.label + ')'}
@@ -459,8 +460,8 @@ function ImageDropzone({ onUpload, uploading, label, className = '' }) {
       onClick={() => !uploading && inputRef.current?.click()}
       className={`relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200
         ${dragOver
-          ? 'border-[#9F121A] bg-[#9F121A]/5'
-          : 'border-border/50 hover:border-[#9F121A]/30 hover:bg-muted/30'
+          ? 'border-primary bg-primary/5'
+          : 'border-border/50 hover:border-primary/30 hover:bg-muted/30'
         }
         ${uploading ? 'opacity-60 cursor-wait' : ''}
         ${className}`}
@@ -478,7 +479,7 @@ function ImageDropzone({ onUpload, uploading, label, className = '' }) {
       />
       {uploading ? (
         <div className="flex flex-col items-center gap-2">
-          <Loader2 className="w-8 h-8 text-[#9F121A] animate-spin" />
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
           <span className="text-sm text-muted-foreground">{t('experienceForm.media.uploading')}</span>
         </div>
       ) : (
@@ -585,7 +586,7 @@ function GalleryUploadEditor({ urls, setUrls, errors = {} }) {
 
 // ─── Step Content Renderers ────────────────────────────────────────────────────
 
-function StepIdentity({ form, setForm, errors, isEditing, nextOrder, totalExperiences }) {
+function StepIdentity({ form, setForm, errors, isEditing, nextOrder, totalExperiences, selectedHotelId, onHotelChange }) {
   const { t } = useTranslation();
   const autoSlug = () => {
     if (form.title_tr?.fr) {
@@ -597,6 +598,18 @@ function StepIdentity({ form, setForm, errors, isEditing, nextOrder, totalExperi
     <div className="space-y-8">
       {/* Title */}
       <MultiLangInput label={t('experienceForm.fields.title')} field="title_tr" form={form} setForm={setForm} required errors={errors} />
+
+      {/* Hotel Selector */}
+      <HotelSelector selectedHotelId={selectedHotelId} onHotelChange={onHotelChange} />
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-coral-500/10" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-card px-3 text-[10px] text-coral-500/40 uppercase tracking-[0.15em]">{t('experienceForm.contentSettings')}</span>
+        </div>
+      </div>
 
       {/* Slug */}
       <div className="space-y-2">
@@ -657,7 +670,7 @@ function StepIdentity({ form, setForm, errors, isEditing, nextOrder, totalExperi
             <>
               {/* Create mode: auto-assigned, read-only */}
               <div className="flex items-center gap-3 h-9">
-                <div className="inline-flex items-center justify-center px-4 h-9 rounded-md bg-[#9F121A]/5 border border-[#9F121A]/20 text-[#9F121A] font-bold text-lg min-w-[60px] text-center">
+                <div className="inline-flex items-center justify-center px-4 h-9 rounded-md bg-primary/5 border border-primary/20 text-primary font-bold text-lg min-w-[60px] text-center">
                   {nextOrder ?? '...'}
                 </div>
                 <span className="text-sm text-muted-foreground">
@@ -678,7 +691,7 @@ function StepIdentity({ form, setForm, errors, isEditing, nextOrder, totalExperi
             <Badge
               variant={form.is_published ? 'default' : 'secondary'}
               className={form.is_published
-                ? 'bg-[#9F121A]/15 text-[#9F121A] border-[#9F121A]/30'
+                ? 'bg-primary/15 text-primary border-primary/30'
                 : 'bg-amber-500/15 text-amber-400 border-amber-500/30'
               }
             >
@@ -947,7 +960,7 @@ function StepSEO({ form, setForm, errors }) {
   const { t } = useTranslation();
   return (
     <div className="space-y-8">
-      <div className="rounded-xl bg-[#9F121A]/10 border border-[#9F121A]/20 p-4">
+      <div className="rounded-xl bg-primary/10 border border-primary/20 p-4">
         <p className="text-sm text-emerald-700">
           {t('experienceForm.notices.seoNotice')}
         </p>
@@ -962,6 +975,113 @@ function StepSEO({ form, setForm, errors }) {
       <MultiLangInput label={t('experienceForm.fields.seoKeywords')} field="seo_keywords_tr" form={form} setForm={setForm} errors={errors}
         helpText={t('experienceForm.fields.seoKeywordsHelp')}
       />
+    </div>
+  );
+}
+
+// ─── Hotel Selector + Centra Content Panel ────────────────────────────────────
+
+function HotelSelector({ selectedHotelId, onHotelChange }) {
+  const { t, lang } = useTranslation();
+  const { data: hotels, isLoading } = usePartnerHotels();
+  const { data: hotelContent, isLoading: contentLoading } = usePartnerHotelContent(selectedHotelId);
+
+  const amenities = hotelContent?.amenities ?? [];
+  const services = hotelContent?.services ?? [];
+  const facilities = hotelContent?.facilities ?? [];
+
+  const hotelName = (hotel) => {
+    const name = hotel.name || hotel.hotel_name;
+    if (name && typeof name === 'object') return name[lang] || name.en || name.fr || hotel.id;
+    return name || hotel.id;
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+          <MapPin className="w-3.5 h-3.5 text-coral-500" />
+          {t('experienceForm.fields.associatedProperty')}
+        </Label>
+        <select
+          value={selectedHotelId || ''}
+          onChange={(e) => onHotelChange(e.target.value || null)}
+          className="flex h-11 w-full rounded-xl border border-border/40 bg-card px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-coral-500/40"
+        >
+          <option value="">{isLoading ? t('common.loading') : t('experienceForm.fields.selectProperty')}</option>
+          {Array.isArray(hotels) && hotels.map((hotel) => (
+            <option key={hotel.id} value={hotel.id}>
+              {hotelName(hotel)}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-muted-foreground">{t('experienceForm.propertyHint')}</p>
+      </div>
+
+      {contentLoading && (
+        <div className="rounded-xl border border-coral-500/10 bg-coral-50/5 p-6 text-center">
+          <Loader2 className="w-5 h-5 text-coral-400 animate-spin mx-auto" />
+          <p className="text-xs text-muted-foreground mt-2">{t('common.loading')}</p>
+        </div>
+      )}
+
+      {!contentLoading && selectedHotelId && (
+        <div className="rounded-xl border border-coral-500/20 bg-gradient-to-br from-coral-50/5 to-transparent p-5 space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-coral-500" />
+            <span className="text-xs font-semibold text-coral-600 uppercase tracking-[0.1em]">
+              {t('experienceForm.centraContent')}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{t('experienceForm.amenities')}</p>
+              {amenities.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {amenities.map((a, i) => (
+                    <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md bg-coral-500/5 border border-coral-500/10 text-xs text-coral-700">
+                      {a.name || a.label || a}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground italic">{t('experienceForm.none')}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{t('experienceForm.services')}</p>
+              {services.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {services.map((s, i) => (
+                    <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md bg-emerald-500/5 border border-emerald-500/10 text-xs text-emerald-700">
+                      {s.name || s.label || s}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground italic">{t('experienceForm.none')}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.1em]">{t('experienceForm.facilities')}</p>
+              {facilities.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {facilities.map((f, i) => (
+                    <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-md bg-sky-500/5 border border-sky-500/10 text-xs text-sky-700">
+                      {f.name || f.label || f}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground italic">{t('experienceForm.none')}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -985,6 +1105,7 @@ export default function ExperienceForm() {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState(new Set());
   const [originalSortOrder, setOriginalSortOrder] = useState(null);
+  const [selectedHotelId, setSelectedHotelId] = useState(null);
   const formRef = useRef(null);
 
   // ── Fetch next sort order for new experiences ────────────────────────────
@@ -1184,7 +1305,7 @@ export default function ExperienceForm() {
             variant="ghost"
             size="icon"
             onClick={() => navigate('/experiences')}
-            className="h-10 w-10 rounded-xl hover:bg-muted"
+            className="h-10 w-10 rounded-xl hover:bg-coral-500/10 text-coral-500/60 hover:text-coral-500 transition-all"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -1200,7 +1321,7 @@ export default function ExperienceForm() {
         <Button
           onClick={handleSave}
           disabled={saveMut.isPending}
-          className="bg-[#384252] hover:bg-[#2D3748] text-white gap-2 h-11 px-6 rounded-xl shadow-lg shadow-[#384252]/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          className="bg-coral-500 hover:bg-coral-600 text-white gap-2 h-11 px-6 rounded-xl shadow-lg shadow-coral-500/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
         >
           {saveMut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {isEditing ? t('experienceForm.save') : t('experienceForm.create')}
@@ -1209,10 +1330,9 @@ export default function ExperienceForm() {
 
       {/* ── Step indicator ──────────────────────────────────────────────────── */}
       <div className="relative">
-        {/* Progress bar */}
-        <div className="absolute top-[22px] left-0 right-0 h-0.5 bg-border/50 z-0 hidden lg:block" />
+        <div className="absolute top-[22px] left-0 right-0 h-0.5 bg-border/40 z-0 hidden lg:block" />
         <motion.div
-          className="absolute top-[22px] left-0 h-0.5 bg-[#384252] z-[1] hidden lg:block"
+          className="absolute top-[22px] left-0 h-0.5 bg-coral-500 z-[1] hidden lg:block"
           initial={false}
           animate={{ width: `${(currentStep / (STEPS.length - 1)) * 100}%` }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -1231,18 +1351,18 @@ export default function ExperienceForm() {
                 onClick={() => goToStep(idx)}
                 className={`group flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300 ${
                   isActive
-                    ? 'bg-[#9F121A]/5 border-2 border-[#9F121A]/30 shadow-sm'
-                    : 'bg-card border border-border/30 hover:border-border hover:shadow-sm'
+                    ? 'bg-coral-500/5 border-2 border-coral-500/30 shadow-sm shadow-coral-500/10'
+                    : 'bg-card border border-border/30 hover:border-coral-500/20 hover:shadow-sm'
                 }`}
               >
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 ${
                   isActive
-                    ? 'bg-[#384252] text-white shadow-md shadow-[#384252]/30'
+                    ? 'bg-coral-500 text-white shadow-md shadow-coral-500/30'
                     : status === 'complete'
-                    ? 'bg-[#9F121A] text-[#FFFFFF]'
+                    ? 'bg-coral-500 text-white'
                     : status === 'error'
                     ? 'bg-destructive text-white'
-                    : 'bg-muted text-muted-foreground group-hover:bg-muted/80'
+                    : 'bg-muted text-muted-foreground group-hover:bg-coral-500/10 group-hover:text-coral-500'
                 }`}>
                   {status === 'complete' && !isActive ? (
                     <Check className="w-5 h-5" />
@@ -1250,8 +1370,8 @@ export default function ExperienceForm() {
                     <StepIcon className="w-5 h-5" />
                   )}
                 </div>
-                <span className={`text-[11px] font-medium leading-tight text-center transition-colors ${
-                  isActive ? 'text-[#9F121A]' : 'text-muted-foreground'
+                <span className={`text-[11px] font-display font-medium leading-tight text-center transition-colors ${
+                  isActive ? 'text-coral-600 font-semibold' : 'text-muted-foreground'
                 }`}>
                   {t(step.labelKey)}
                 </span>
@@ -1262,11 +1382,13 @@ export default function ExperienceForm() {
       </div>
 
       {/* ── Step content ────────────────────────────────────────────────────── */}
-      <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
-        <div className="p-2 bg-muted/30 border-b border-border/30">
+      <div className="bg-card rounded-2xl border border-coral-500/10 shadow-sm overflow-hidden">
+        <div className="p-2 bg-gradient-to-r from-coral-50/5 to-transparent border-b border-coral-500/10">
           <div className="flex items-center gap-2 px-4 py-2">
-            {React.createElement(STEPS[currentStep].icon, { className: 'w-4 h-4 text-[#9F121A]' })}
-            <span className="text-sm font-semibold text-foreground">{t(STEPS[currentStep].labelKey)}</span>
+            <div className="w-8 h-8 rounded-lg bg-coral-500/10 flex items-center justify-center">
+              {React.createElement(STEPS[currentStep].icon, { className: 'w-4 h-4 text-coral-500' })}
+            </div>
+            <span className="text-sm font-display font-semibold text-foreground">{t(STEPS[currentStep].labelKey)}</span>
             <span className="text-xs text-muted-foreground ml-1">— {t(STEPS[currentStep].descKey)}</span>
           </div>
         </div>
@@ -1284,7 +1406,7 @@ export default function ExperienceForm() {
               form={form}
               setForm={setForm}
               errors={errors}
-              {...(currentStep === 0 ? { isEditing, nextOrder, totalExperiences } : {})}
+              {...(currentStep === 0 ? { isEditing, nextOrder, totalExperiences, selectedHotelId, onHotelChange: setSelectedHotelId } : {})}
             />
           </motion.div>
         </AnimatePresence>
@@ -1296,7 +1418,7 @@ export default function ExperienceForm() {
           variant="outline"
           onClick={goPrev}
           disabled={currentStep === 0}
-          className="gap-2 h-11 rounded-xl px-6"
+          className="gap-2 h-11 rounded-xl px-6 border-coral-500/20 text-coral-600 hover:text-coral-700 hover:bg-coral-50/5 hover:border-coral-500/30"
         >
           <ArrowLeft className="w-4 h-4" />
           {t('common.previous')}
@@ -1310,12 +1432,12 @@ export default function ExperienceForm() {
               onClick={() => goToStep(idx)}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
                 idx === currentStep
-                  ? 'w-6 bg-[#9F121A]'
+                  ? 'w-6 bg-coral-500'
                   : getStepStatus(idx) === 'complete'
-                  ? 'bg-[#9F121A]'
+                  ? 'bg-coral-500'
                   : getStepStatus(idx) === 'error'
                   ? 'bg-destructive'
-                  : 'bg-border hover:bg-muted-foreground/30'
+                  : 'bg-border hover:bg-coral-500/30'
               }`}
             />
           ))}
@@ -1324,7 +1446,7 @@ export default function ExperienceForm() {
         {currentStep < STEPS.length - 1 ? (
           <Button
             onClick={goNext}
-            className="bg-[#384252] hover:bg-[#2D3748] text-white gap-2 h-11 rounded-xl px-6 shadow-md shadow-[#384252]/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            className="bg-coral-500 hover:bg-coral-600 text-white gap-2 h-11 rounded-xl px-6 shadow-md shadow-coral-500/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
             {t('common.next')}
             <ArrowRight className="w-4 h-4" />
@@ -1333,7 +1455,7 @@ export default function ExperienceForm() {
           <Button
             onClick={handleSave}
             disabled={saveMut.isPending}
-            className="bg-[#9F121A] hover:bg-[#7A0E14] text-white gap-2 h-11 rounded-xl px-6 shadow-md shadow-[#9F121A]/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            className="bg-coral-500 hover:bg-coral-600 text-white gap-2 h-11 rounded-xl px-6 shadow-md shadow-coral-500/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
             {saveMut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
             {isEditing ? t('experienceForm.save') : t('experienceForm.createExperience')}

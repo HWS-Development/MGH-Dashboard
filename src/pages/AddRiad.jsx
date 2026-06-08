@@ -140,7 +140,7 @@ export default function AddRiad() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Infos propriété — mgh_properties_final */}
-        <div className="card-dark border border-border rounded-lg p-6 space-y-4">
+        <div className="bg-card border border-border rounded-lg p-6 space-y-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide border-b border-border/50 pb-2">
             {t('addRiad.propertyInfo')} <span className="text-muted-foreground normal-case font-normal">{t('addRiad.propertyInfoTable')}</span>
           </h2>
@@ -217,7 +217,7 @@ export default function AddRiad() {
         </div>
 
         {/* Contact & accès — mgh_contacts */}
-        <div className="card-dark border border-border rounded-lg p-6 space-y-4">
+        <div className="bg-card border border-border rounded-lg p-6 space-y-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide border-b border-border/50 pb-2">
             {t('addRiad.contactAccess')} <span className="text-muted-foreground normal-case font-normal">{t('addRiad.contactAccessTable')}</span>
           </h2>

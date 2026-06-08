@@ -36,63 +36,31 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Animated background */}
-      <div
-        className="absolute inset-0 animate-gradient-shift opacity-40"
-        style={{
-          background: 'linear-gradient(-45deg, #9F121A, #D4A853, #1a365d, #9F121A)',
-          backgroundSize: '400% 400%',
-        }}
-      />
-      <div className="absolute inset-0 bg-background/60 backdrop-blur-[100px]" />
-
-      {/* Decorative elements */}
-      <div
-        className="absolute top-20 left-20 w-64 h-64 rounded-full opacity-[0.03]"
-        style={{ background: 'radial-gradient(circle, #D4A853 0%, transparent 70%)' }}
-      />
-      <div
-        className="absolute bottom-20 right-20 w-96 h-96 rounded-full opacity-[0.03]"
-        style={{ background: 'radial-gradient(circle, #9F121A 0%, transparent 70%)' }}
-      />
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-background">
+      {/* Subtle grid background */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
 
       <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.96 }}
+        initial={{ opacity: 0, y: 16, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
         className="w-full max-w-md relative"
       >
-        <Card className="relative overflow-hidden border border-border/60 shadow-xl bg-card/80 backdrop-blur-xl">
-          {/* Gold accent top */}
-          <div
-            className="absolute top-0 left-0 w-full h-[2px]"
-            style={{ background: 'linear-gradient(90deg, transparent, #D4A853, transparent)' }}
-          />
-
-          {/* Corner glows */}
-          <div
-            className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-20"
-            style={{ background: 'radial-gradient(circle, rgba(212,168,83,0.3) 0%, transparent 70%)' }}
-          />
-
-          <CardHeader className="text-center pt-8 pb-4 relative">
+        <Card className="relative border-border/60 shadow-xl bg-card">
+          <CardHeader className="text-center pt-8 pb-4">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 15 }}
-              className="w-16 h-16 mx-auto mb-3 rounded-2xl flex items-center justify-center"
-              style={{
-                background: 'linear-gradient(135deg, rgba(212,168,83,0.15) 0%, rgba(212,168,83,0.05) 100%)',
-              }}
+              className="w-14 h-14 mx-auto mb-3 rounded-xl bg-primary/10 flex items-center justify-center"
             >
               <img
                 src="https://media.base44.com/images/public/69f10e36f5d3972acca5a916/87a1cfef6_Artboard47x-8.png"
                 alt="HWS Logo"
-                className="w-10 h-10 object-contain"
+                className="w-8 h-8 object-contain"
               />
             </motion.div>
-            <CardTitle className="text-xl font-display font-semibold tracking-tight">
+            <CardTitle className="text-xl font-bold tracking-tight">
               {t('login.title')}
             </CardTitle>
             <CardDescription className="text-sm">
@@ -100,7 +68,7 @@ export default function Login() {
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="pb-8 relative">
+          <CardContent className="pb-8">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">{t('login.email')}</Label>
@@ -113,7 +81,7 @@ export default function Login() {
                   required
                   autoFocus
                   autoComplete="email"
-                  className="h-10 bg-background/50 backdrop-blur-sm border-border/60 focus:border-[#D4A853]/50 transition-all duration-200"
+                  className="h-10"
                 />
                 {errors.email && (
                   <motion.p
@@ -137,7 +105,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="h-10 bg-background/50 backdrop-blur-sm border-border/60 focus:border-[#D4A853]/50 transition-all duration-200"
+                  className="h-10"
                 />
                 {errors.password && (
                   <motion.p
@@ -158,9 +126,9 @@ export default function Login() {
                     id="remember"
                     checked={remember}
                     onChange={(e) => setRemember(e.target.checked)}
-                    className="rounded border-border/60 text-[#9F121A] focus:ring-[#D4A853]/30 focus:ring-offset-0 transition-colors duration-200"
+                    className="rounded border-border text-primary focus:ring-primary/30 focus:ring-offset-0 transition-colors"
                   />
-                  <Label htmlFor="remember" className="text-sm font-normal cursor-pointer select-none group-hover:text-foreground transition-colors duration-200">
+                  <Label htmlFor="remember" className="text-sm font-normal cursor-pointer select-none group-hover:text-foreground transition-colors">
                     {t('login.rememberMe')}
                   </Label>
                 </label>
@@ -168,7 +136,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="w-full h-10 text-sm font-medium transition-all duration-200 active:scale-[0.98]"
+                className="w-full h-10 text-sm font-medium"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (

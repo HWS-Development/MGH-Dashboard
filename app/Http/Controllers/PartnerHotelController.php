@@ -205,6 +205,42 @@ class PartnerHotelController extends Controller
     }
 
     /**
+     * GET /api/partner/hotels/{id}/content
+     * Returns structured amenities, services, and facilities from Centra.
+     */
+    public function content(string $id): JsonResponse
+    {
+        try {
+            $hotel = $this->fetchHotelByIdFromCentra($id);
+
+            $amenities  = $hotel['amenities']  ?? [];
+            $services   = $hotel['services']   ?? [];
+            $facilities = $hotel['facilities']  ?? [];
+            $content    = $hotel['content']     ?? $hotel;
+
+            return response()->json([
+                'success' => true,
+                'data'    => [
+                    'hotel_id'   => $id,
+                    'hotel_name' => $hotel['name'] ?? ($content['name'] ?? ''),
+                    'amenities'  => $amenities,
+                    'services'   => $services,
+                    'facilities' => $facilities,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error("[PartnerHotelController] content({$id}) error: " . $e->getMessage());
+
+            $status = str_contains($e->getMessage(), '404') ? 404 : 502;
+
+            return response()->json([
+                'success' => false,
+                'error'   => $e->getMessage(),
+            ], $status);
+        }
+    }
+
+    /**
      * Fetch a single partner hotel by ID from the Centra API.
      * Handles token acquisition and single retry on 401.
      */

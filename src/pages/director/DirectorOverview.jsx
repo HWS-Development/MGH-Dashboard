@@ -14,7 +14,7 @@ const STATUS_COLOR = {
 
 function KpiCard({ label, value, color, isLoading }) {
   return (
-    <div className="card-dark rounded-xl border border-border p-5 text-center shadow-sm">
+    <div className="bg-card rounded-xl border border-border p-5 text-center shadow-sm">
       {isLoading ? (
         <Skeleton className="h-10 w-16 mx-auto mb-2" />
       ) : (
@@ -88,7 +88,7 @@ export default function DirectorOverview({ properties, contacts, pendingUpdates,
       </div>
 
       {/* Map */}
-      <div className="card-dark rounded-xl border border-border shadow-sm overflow-hidden">
+      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-border/50">
           <h2 className="font-semibold text-foreground/80">Carte des propriétés ({mappableProps.length} géolocalisées)</h2>
           <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
@@ -149,9 +149,9 @@ export default function DirectorOverview({ properties, contacts, pendingUpdates,
       </div>
 
       {/* Recent activity */}
-      <div className="card-dark rounded-xl border border-border shadow-sm">
+      <div className="bg-card rounded-xl border border-border shadow-sm">
         <div className="px-5 py-4 border-b border-border/50 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-[#9F121A]" />
+          <CheckCircle2 className="w-4 h-4 text-primary" />
           <h2 className="font-semibold text-foreground/80">Activité récente (10 dernières modifications approuvées)</h2>
         </div>
         <div className="divide-y divide-gray-100">

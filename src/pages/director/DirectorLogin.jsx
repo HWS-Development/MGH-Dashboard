@@ -84,8 +84,8 @@ export default function DirectorLogin({ onLogin }) {
 
   return (
     <form onSubmit={handleVerifyOtp} className="space-y-4">
-      <div className="bg-[#9F121A]/10 border border-[#9F121A]/20 rounded-lg px-4 py-3 text-center">
-        <p className="text-sm text-[#9F121A]">📨 Code envoyé à <strong>{email}</strong></p>
+      <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-3 text-center">
+        <p className="text-sm text-primary">📨 Code envoyé à <strong>{email}</strong></p>
         <p className="text-xs text-white/40 mt-1">Vérifiez votre boîte mail — valide 10 minutes</p>
       </div>
       <div>

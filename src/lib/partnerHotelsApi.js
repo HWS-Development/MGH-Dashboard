@@ -36,6 +36,20 @@ async function fetchHotelById(id) {
   return res.data.data;
 }
 
+// ── Raw fetch: hotel content (amenities / services / facilities) ─────
+
+async function fetchContentByHotelId(id) {
+  const res = await api.get(`/partner/hotels/${encodeURIComponent(id)}/content`);
+
+  if (!res.data?.success) {
+    throw new Error(
+      res.data?.error || res.data?.message || `Unknown error fetching content for hotel ${id}`
+    );
+  }
+
+  return res.data.data;
+}
+
 // ── Legacy wrappers (return { data, error } for backward compat) ────
 
 export async function fetchPartnerHotels() {
@@ -87,6 +101,23 @@ export function usePartnerHotelById(id) {
   return useQuery({
     queryKey: ['partner-hotel', id],
     queryFn: () => fetchHotelById(id),
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+}
+
+/**
+ * Hook to fetch a hotel's content (amenities / services / facilities)
+ * from the Centra API via our backend proxy.
+ *
+ * - enabled: only fires when `id` is truthy
+ * - staleTime: 5 min
+ */
+export function usePartnerHotelContent(id) {
+  return useQuery({
+    queryKey: ['partner-hotel-content', id],
+    queryFn: () => fetchContentByHotelId(id),
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

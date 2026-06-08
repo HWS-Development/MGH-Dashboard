@@ -163,9 +163,17 @@ class ExperienceImageController extends Controller
 
     /**
      * Compress and save an image with specified quality.
+     * Falls back to plain copy when GD is not available.
      */
     private function compressAndSave(string $sourcePath, string $destPath, string $ext, int $quality): void
     {
+        $gdAvailable = function_exists('imagecreatefromjpeg');
+
+        if (!$gdAvailable) {
+            copy($sourcePath, $destPath);
+            return;
+        }
+
         switch ($ext) {
             case 'jpg':
                 $img = @imagecreatefromjpeg($sourcePath);
@@ -192,19 +200,18 @@ class ExperienceImageController extends Controller
                 break;
 
             case 'webp':
-                $img = @imagecreatefromwebp($sourcePath);
-                if ($img) {
-                    imagewebp($img, $destPath, $quality);
-                    imagedestroy($img);
-                } else {
-                    copy($sourcePath, $destPath);
+                if (function_exists('imagecreatefromwebp')) {
+                    $img = @imagecreatefromwebp($sourcePath);
+                    if ($img) {
+                        imagewebp($img, $destPath, $quality);
+                        imagedestroy($img);
+                        break;
+                    }
                 }
-                break;
-
-            case 'gif':
                 copy($sourcePath, $destPath);
                 break;
 
+            case 'gif':
             default:
                 copy($sourcePath, $destPath);
                 break;

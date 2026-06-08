@@ -99,7 +99,7 @@ export default function PendingUpdates() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-brand-heading">{t('pendingUpdates.title')}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('pendingUpdates.title')}</h1>
           <p className="text-sm text-muted-foreground mt-0.5">{t('pendingUpdates.subtitle')}</p>
         </div>
         {pending.length > 0 && (
@@ -126,10 +126,9 @@ export default function PendingUpdates() {
             onClick={() => setTab(tb.key)}
             className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
               tab === tb.key
-                ? 'border-current text-current'
+                ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-muted-foreground'
             }`}
-            style={tab === tb.key ? { borderColor: '#9F121A', color: '#9F121A' } : {}}
           >
             {tb.label}
             {tb.count > 0 && (
@@ -142,7 +141,7 @@ export default function PendingUpdates() {
       </div>
 
       {/* Table */}
-      <div className="card-dark border border-border rounded-lg overflow-hidden">
+      <div className="bg-card border border-border rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-muted/50 border-b border-border">
@@ -182,7 +181,7 @@ export default function PendingUpdates() {
                   </td>
                   <td className="px-4 py-3">
                     {u.status === 'pending' && <span className="text-xs bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded-full font-medium">{t('pendingUpdates.pending')}</span>}
-                    {u.status === 'approved' && <span className="text-xs bg-[#9F121A]/15 text-[#9F121A] px-2 py-0.5 rounded-full font-medium">{t('pendingUpdates.approved')}</span>}
+                    {u.status === 'approved' && <span className="text-xs bg-primary/15 text-primary px-2 py-0.5 rounded-full font-medium">{t('pendingUpdates.approved')}</span>}
                     {u.status === 'rejected' && <span className="text-xs bg-red-500/15 text-red-400 px-2 py-0.5 rounded-full font-medium">{t('pendingUpdates.rejected')}</span>}
                   </td>
                   <td className="px-4 py-3">
@@ -244,7 +243,7 @@ export default function PendingUpdates() {
                   <div key={field} className="grid grid-cols-3 gap-2 text-xs px-2 py-2 rounded bg-muted/50">
                     <div className="font-medium text-muted-foreground">{field}</div>
                     <div className="text-muted-foreground break-all">{oldV || '—'}</div>
-                    <div className="text-[#9F121A] font-medium break-all">{newV || '—'}</div>
+                    <div className="text-primary font-medium break-all">{newV || '—'}</div>
                   </div>
                 );
               })}

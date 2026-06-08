@@ -14,7 +14,7 @@ import { format } from 'date-fns';
 import { useTranslation } from '@/i18n';
 
 const STATUS_BADGE = {
-  active: 'bg-[#9F121A]/15 text-[#9F121A]',
+  active: 'bg-primary/15 text-primary',
   suspended: 'bg-orange-500/15 text-orange-400',
   pending: 'bg-slate-500/15 text-slate-600',
   'ex-member': 'bg-muted text-muted-foreground',
@@ -194,7 +194,7 @@ export default function Members() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-brand-heading">{t('members.title')}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('members.title')}</h1>
           <p className="text-sm text-muted-foreground mt-0.5">{t('members.memberCount', { count: contacts.length })}</p>
         </div>
         <Button variant="outline" className="flex items-center gap-2 text-sm" onClick={exportCSV}>
@@ -204,7 +204,7 @@ export default function Members() {
       </div>
 
       {/* Filters */}
-      <div className="card-dark border border-[#9F121A]/10 rounded-lg p-4 flex flex-wrap gap-3 items-center">
+      <div className="bg-card border border-primary/10 rounded-lg p-4 flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input placeholder={t('members.searchPlaceholder')} value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
@@ -233,7 +233,7 @@ export default function Members() {
           className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
             filterNoEmail ? 'text-white border-transparent' : 'text-muted-foreground bg-transparent border-border'
           }`}
-          style={filterNoEmail ? { background: '#9F121A' } : {}}
+          style={filterNoEmail ? { background: 'hsl(var(--primary))' } : {}}
         >
           {t('members.noEmailAccess')}
         </button>
@@ -241,7 +241,7 @@ export default function Members() {
       </div>
 
       {/* Table */}
-      <div className="card-dark border border-[#9F121A]/10 rounded-lg overflow-hidden">
+      <div className="bg-card border border-primary/10 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -370,7 +370,7 @@ export default function Members() {
                   onClick={handleEmailChange}
                   disabled={saveMutation.isPending}
                   className="text-white"
-                  style={{ background: '#9F121A' }}
+                  style={{ background: 'hsl(var(--primary))' }}
                 >
                   {t('common.save')}
                 </Button>

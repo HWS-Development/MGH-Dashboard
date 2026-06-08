@@ -237,7 +237,7 @@ ${frText}`,
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div>
-            <h1 className="text-xl font-bold text-brand-heading">{form.name?.fr || form.name || 'Propriété'}</h1>
+            <h1 className="text-xl font-bold text-foreground">{form.name?.fr || form.name || 'Propriété'}</h1>
             <p className="text-xs text-muted-foreground mt-0.5">ID: {propertyId}</p>
           </div>
         </div>
@@ -262,14 +262,14 @@ ${frText}`,
             { value: 'contact', label: 'Contact & Accès' },
             { value: 'membership', label: 'Adhésion MGH' },
           ].map(t => (
-            <TabsTrigger key={t.value} value={t.value} className="text-xs px-3 py-1.5 data-[state=active]:bg-[#9F121A]/15 data-[state=active]:shadow-sm">
+            <TabsTrigger key={t.value} value={t.value} className="text-xs px-3 py-1.5 data-[state=active]:bg-primary/15 data-[state=active]:shadow-sm">
               {t.label}
             </TabsTrigger>
           ))}
         </TabsList>
 
         {/* TAB 1 — Général */}
-        <TabsContent value="general" className="card-dark border border-border rounded-lg p-6 space-y-5 mt-3">
+        <TabsContent value="general" className="bg-card border border-border rounded-lg p-6 space-y-5 mt-3">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FieldRow label="Nom FR">
               <Input value={form.name?.fr || ''} onChange={e => setF('name.fr', e.target.value)} />
@@ -361,7 +361,7 @@ ${frText}`,
         </TabsContent>
 
         {/* TAB 2 — Descriptifs */}
-        <TabsContent value="descriptions" className="card-dark border border-border rounded-lg p-6 space-y-5 mt-3">
+        <TabsContent value="descriptions" className="bg-card border border-border rounded-lg p-6 space-y-5 mt-3">
           <div className="flex justify-end">
             <Button
               type="button"
@@ -397,7 +397,7 @@ ${frText}`,
         </TabsContent>
 
         {/* TAB 3 — Équipements */}
-        <TabsContent value="amenities" className="card-dark border border-border rounded-lg p-6 space-y-6 mt-3">
+        <TabsContent value="amenities" className="bg-card border border-border rounded-lg p-6 space-y-6 mt-3">
           <div>
             <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">Équipements</h3>
             <CheckList
@@ -429,7 +429,7 @@ ${frText}`,
         </TabsContent>
 
         {/* TAB 4 — Photos */}
-        <TabsContent value="photos" className="card-dark border border-border rounded-lg p-6 space-y-5 mt-3">
+        <TabsContent value="photos" className="bg-card border border-border rounded-lg p-6 space-y-5 mt-3">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-semibold text-muted-foreground">Photos ({(form.image_urls || []).length}/20)</h3>
@@ -484,7 +484,7 @@ ${frText}`,
         </TabsContent>
 
         {/* TAB 5 — Contact & Accès */}
-        <TabsContent value="contact" className="card-dark border border-border rounded-lg p-6 space-y-5 mt-3">
+        <TabsContent value="contact" className="bg-card border border-border rounded-lg p-6 space-y-5 mt-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FieldRow label="Nom du contact (contactname)">
               <Input value={contact?.contactname || ''} onChange={e => setC('contactname', e.target.value)} />
@@ -508,7 +508,7 @@ ${frText}`,
         </TabsContent>
 
         {/* TAB 6 — Adhésion MGH */}
-        <TabsContent value="membership" className="card-dark border border-border rounded-lg p-6 space-y-5 mt-3">
+        <TabsContent value="membership" className="bg-card border border-border rounded-lg p-6 space-y-5 mt-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FieldRow label="Membre depuis (Membersince)">
               <Input type="date" value={contact?.Membersince || ''} onChange={e => setC('Membersince', e.target.value)} />

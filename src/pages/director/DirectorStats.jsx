@@ -6,7 +6,7 @@ const COLORS = ['#16a34a', '#f97316', '#2563eb', '#9ca3af', '#384252', '#7c3aed'
 
 function ChartCard({ title, children, isLoading }) {
   return (
-    <div className="card-dark rounded-xl border border-border shadow-sm p-5">
+    <div className="bg-card rounded-xl border border-border shadow-sm p-5">
       <h3 className="font-semibold text-foreground/80 mb-4">{title}</h3>
       {isLoading ? <Skeleton className="h-48 w-full" /> : children}
     </div>

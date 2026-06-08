@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,96 +6,79 @@
 
 @layer base {
   :root {
-    --font-sans: 'Inter', sans-serif;
-    --font-display: 'Playfair Display', serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
 
-    --background: 0 0% 100%;
-    --foreground: 215 14% 22%;
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 215 14% 22%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 215 14% 22%;
-    --primary: 357 80% 35%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 239 84% 67%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 40 40% 96%;
-    --secondary-foreground: 215 14% 22%;
-    --muted: 40 30% 96%;
-    --muted-foreground: 215 10% 50%;
-    --accent: 40 40% 94%;
-    --accent-foreground: 215 14% 22%;
-    --destructive: 356 89% 35%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 239 84% 67%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 40 20% 88%;
-    --input: 40 20% 88%;
-    --ring: 40 60% 55%;
-    --chart-1: 357 80% 35%;
-    --chart-2: 210 30% 55%;
-    --chart-3: 40 60% 55%;
-    --chart-4: 160 60% 40%;
-    --chart-5: 280 60% 50%;
-    --radius: 0.625rem;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 239 84% 67%;
+    --chart-1: 239 84% 67%;
+    --chart-2: 217 91% 60%;
+    --chart-3: 160 84% 45%;
+    --chart-4: 35 92% 55%;
+    --chart-5: 280 87% 65%;
+    --radius: 0.75rem;
 
-    --sidebar-background: 213 75% 9%;
-    --sidebar-foreground: 210 15% 85%;
-    --sidebar-primary: 357 80% 35%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 239 84% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 213 60% 14%;
-    --sidebar-accent-foreground: 210 15% 93%;
-    --sidebar-border: 213 50% 16%;
-    --sidebar-ring: 357 80% 35%;
-
-    --brand-btn: 357 80% 35%;
-    --brand-btn-hover: 357 80% 28%;
-    --brand-action: 357 80% 35%;
-    --brand-action-light: 357 80% 95%;
-    --brand-gold: 40 60% 55%;
-    --brand-gold-light: 40 60% 90%;
-    --brand-heading: 215 14% 22%;
-    --brand-subtitle: 215 10% 50%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 239 84% 67%;
   }
 
   .dark {
-    --background: 213 55% 9%;
-    --foreground: 210 15% 93%;
-    --card: 213 45% 12%;
-    --card-foreground: 210 15% 93%;
-    --popover: 213 45% 12%;
-    --popover-foreground: 210 15% 93%;
-    --primary: 357 80% 45%;
+    --background: 222 47% 7%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 239 84% 67%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 213 30% 16%;
-    --secondary-foreground: 210 15% 90%;
-    --muted: 213 30% 16%;
-    --muted-foreground: 210 10% 55%;
-    --accent: 213 35% 14%;
-    --accent-foreground: 210 15% 90%;
-    --destructive: 0 62.8% 30.6%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 239 84% 67%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
-    --border: 213 25% 20%;
-    --input: 213 25% 20%;
-    --ring: 40 60% 55%;
-    --chart-1: 357 80% 45%;
-    --chart-2: 210 25% 50%;
-    --chart-3: 40 50% 50%;
-    --chart-4: 160 50% 40%;
-    --chart-5: 30 40% 50%;
-    --sidebar-background: 213 65% 6%;
-    --sidebar-foreground: 210 15% 85%;
-    --sidebar-primary: 357 80% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 213 45% 12%;
-    --sidebar-accent-foreground: 210 15% 90%;
-    --sidebar-border: 213 45% 12%;
-    --sidebar-ring: 357 80% 45%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 239 84% 67%;
+    --chart-1: 239 84% 67%;
+    --chart-2: 217 91% 60%;
+    --chart-3: 160 84% 45%;
+    --chart-4: 35 92% 55%;
+    --chart-5: 280 87% 65%;
+    --radius: 0.75rem;
 
-    --brand-btn: 357 80% 45%;
-    --brand-btn-hover: 357 80% 35%;
-    --brand-action: 357 80% 45%;
-    --brand-action-light: 357 80% 15%;
-    --brand-gold: 40 60% 55%;
-    --brand-gold-light: 40 30% 18%;
-    --brand-heading: 210 15% 95%;
-    --brand-subtitle: 210 15% 75%;
+    --sidebar-background: 222 47% 7%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 239 84% 67%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 239 84% 67%;
   }
 }
 
@@ -104,114 +87,46 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);
   }
 }
 
 @layer components {
-  .card-dark {
-    background: white;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
-  }
-  .card-dark-subtle {
-    background: hsl(220 9% 98%);
-  }
-
-  .glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  .dark .glass {
-    background: rgba(10, 20, 35, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .gold-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #D4A853, transparent);
-    border: none;
-  }
-
-  .gold-divider-thick {
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #D4A853 20%, #C89B3C 50%, #D4A853 80%, transparent);
-    border: none;
-    border-radius: 2px;
-  }
-
-  .gold-divider-vertical {
-    width: 1px;
-    background: linear-gradient(180deg, transparent, #D4A853, transparent);
-    border: none;
-  }
-
-  .text-gradient-gold {
-    background: linear-gradient(135deg, #D4A853, #F5E7C8, #C89B3C);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .text-gradient-brand {
-    background: linear-gradient(135deg, #9F121A, #D43F43);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .icon-glow {
-    filter: drop-shadow(0 0 6px rgba(212, 168, 83, 0.4));
-  }
-
-  .premium-shadow {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-  }
-
-  .premium-shadow-hover {
+  .card-hover {
     transition: box-shadow 0.3s ease, transform 0.3s ease;
   }
-  .premium-shadow-hover:hover {
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+  .card-hover:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
     transform: translateY(-2px);
   }
 
-  .sidebar-gradient {
-    background: linear-gradient(135deg, rgb(2, 22, 42) 0%, rgb(4, 42, 74) 50%, rgb(2, 22, 42) 100%);
+  .stat-value {
+    @apply text-3xl font-bold tracking-tight tabular-nums;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold tracking-tight;
+  }
+
+  .page-subtitle {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .section-title {
+    @apply text-base font-semibold flex items-center gap-2;
   }
 }
 
 @layer utilities {
   .animate-fade-in {
-    animation: fadeIn 0.5s ease-out both;
+    animation: fadeIn 0.4s ease-out both;
   }
   .animate-slide-up {
-    animation: slideUp 0.5s ease-out both;
+    animation: slideUp 0.4s ease-out both;
   }
   .animate-scale-in {
-    animation: scaleIn 0.3s ease-out both;
-  }
-  .animate-shimmer {
-    animation: shimmer 2s infinite linear;
-    background-size: 200% 100%;
-  }
-  .animate-count-up {
-    animation: countUp 0.8s ease-out both;
-  }
-  .animate-progress {
-    animation: progressFill 1s ease-out both;
-  }
-  .animate-gold-glow {
-    animation: goldGlow 2s ease-in-out infinite;
-  }
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-  .animate-gradient-shift {
-    animation: gradientShift 4s ease infinite;
-    background-size: 200% 200%;
+    animation: scaleIn 0.2s ease-out both;
   }
 }
 
@@ -220,51 +135,14 @@
   to { opacity: 1; }
 }
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-@keyframes countUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes progressFill {
-  from { width: 0%; }
-}
-@keyframes goldGlow {
-  0%, 100% { box-shadow: 0 0 5px rgba(212,168,83,0.3); }
-  50% { box-shadow: 0 0 15px rgba(212,168,83,0.5); }
-}
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-@keyframes slideLeft {
-  from { opacity: 0; transform: translateX(8px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-@keyframes rotateIn {
-  from { opacity: 0; transform: rotate(-6deg) scale(0.95); }
-  to { opacity: 1; transform: rotate(0) scale(1); }
-}
-@keyframes badgePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
 
-/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -273,15 +151,15 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(40 20% 80%);
+  background: hsl(214 32% 86%);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(40 20% 70%);
+  background: hsl(214 32% 76%);
 }
 .dark ::-webkit-scrollbar-thumb {
-  background: hsl(213 25% 25%);
+  background: hsl(217 33% 25%);
 }
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: hsl(213 25% 35%);
+  background: hsl(217 33% 35%);
 }

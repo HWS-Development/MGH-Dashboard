@@ -32,17 +32,17 @@ export default function Settings() {
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
-        <h1 className="text-3xl font-display font-bold tracking-tight flex items-center gap-3">
-          <SettingsIcon className="w-8 h-8 text-accent" />
+        <h1 className="page-title flex items-center gap-2">
+          <SettingsIcon className="w-6 h-6 text-primary" />
           {t('settings.title')}
         </h1>
-        <p className="text-muted-foreground mt-1">{t('settings.subtitle')}</p>
+        <p className="page-subtitle mt-0.5">{t('settings.subtitle')}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="w-5 h-5 text-accent" />
+          <CardTitle className="section-title">
+            <Database className="w-5 h-5 text-primary" />
             {t('settings.dbConnection')}
           </CardTitle>
           <CardDescription>
@@ -50,13 +50,13 @@ export default function Settings() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50 border border-border/50">
+          <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50 border border-border">
             <Database className="w-5 h-5 text-muted-foreground" />
             <div>
               <p className="text-sm font-medium">{t('settings.mysqlConnection')}</p>
               <p className="text-xs text-muted-foreground">{t('settings.mysqlConnectionDesc')}</p>
             </div>
-            <Badge variant="outline" className="ml-auto bg-[#9F121A]/15 text-[#9F121A] border-[#9F121A]/30">
+            <Badge variant="outline" className="ml-auto bg-primary/10 text-primary border-primary/20">
               MySQL
             </Badge>
           </div>
@@ -71,13 +71,13 @@ export default function Settings() {
 
           {testResult && (
             <div className={`flex items-center gap-2 p-3 rounded-lg text-sm ${
-              testResult.success 
-                ? 'bg-[#9F121A]/10 text-[#9F121A] border border-[#9F121A]/20' 
-                : 'bg-red-500/10 text-red-400 border border-red-500/20'
+              testResult.success
+                ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-200'
+                : 'bg-red-500/10 text-red-600 border border-red-200'
             }`}>
-              {testResult.success 
-                ? <CheckCircle2 className="w-4 h-4 text-[#9F121A] flex-shrink-0" /> 
-                : <XCircle className="w-4 h-4 text-red-600 flex-shrink-0" />}
+              {testResult.success
+                ? <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                : <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />}
               {testResult.message}
             </div>
           )}

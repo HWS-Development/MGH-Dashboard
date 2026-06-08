@@ -87,6 +87,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('partner.hotels.index');
     Route::get('/partner/hotels/{id}', [PartnerHotelController::class, 'show'])
         ->name('partner.hotels.show');
+    Route::get('/partner/hotels/{id}/content', [PartnerHotelController::class, 'content'])
+        ->name('partner.hotels.content');
 
     // ─── Experience Image Upload ──────────────────────────────────────────────
     Route::post('/experiences/upload-image', [ExperienceImageController::class, 'upload'])

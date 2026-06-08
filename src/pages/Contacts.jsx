@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from 'react-router-dom';
 
 const statusColors = {
-  active: 'bg-[#9F121A]/15 text-[#9F121A] border-[#9F121A]/30',
+  active: 'bg-primary/15 text-primary border-primary/30',
   suspended: 'bg-red-500/15 text-red-400 border-red-500/30',
   pending: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
   'ex-member': 'bg-muted text-muted-foreground border-border',

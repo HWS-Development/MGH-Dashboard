@@ -24,11 +24,11 @@ import { useTranslation } from '@/i18n';
 
 const container = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.06 } },
+  show: { opacity: 1, transition: { staggerChildren: 0.05 } },
 };
 const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 30 } },
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 280, damping: 28 } },
 };
 
 export default function Experiences() {
@@ -41,7 +41,6 @@ export default function Experiences() {
   const [sortField, setSortField] = useState('sort_order');
   const [sortDir, setSortDir] = useState('asc');
 
-  // ── Fetch ────────────────────────────────────────────────────────────────
   const { data, isLoading, error } = useQuery({
     queryKey: ['experiences', sortField, sortDir],
     queryFn: () => listExperiences({ order: `${sortField}.${sortDir}` }),
@@ -49,7 +48,6 @@ export default function Experiences() {
 
   const experiences = data?.data || [];
 
-  // ── Delete ───────────────────────────────────────────────────────────────
   const deleteMut = useMutation({
     mutationFn: (id) => deleteExperience(id),
     onSuccess: () => {
@@ -62,7 +60,6 @@ export default function Experiences() {
     },
   });
 
-  // ── Toggle publish ───────────────────────────────────────────────────────
   const togglePublish = useMutation({
     mutationFn: ({ id, is_published }) => updateExperience(id, { is_published: !is_published }),
     onSuccess: () => {
@@ -71,7 +68,6 @@ export default function Experiences() {
     },
   });
 
-  // ── Move up/down ────────────────────────────────────────────────────────
   const moveMut = useMutation({
     mutationFn: ({ id, direction }) => moveExperience(id, direction),
     onSuccess: (_, { direction }) => {
@@ -86,7 +82,6 @@ export default function Experiences() {
     },
   });
 
-  // ── Filter ───────────────────────────────────────────────────────────────
   const filtered = experiences.filter((exp) => {
     if (!search) return true;
     const s = search.toLowerCase();
@@ -112,23 +107,22 @@ export default function Experiences() {
     else { setSortField(field); setSortDir('asc'); }
   };
 
-  // ── Render ───────────────────────────────────────────────────────────────
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-      {/* ── Header ───────────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#02162A] via-[#0A3050] to-[#0D4A72] p-8 md:p-10">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djZoLTJ2LTZoMnptMC0xMHY2aC0ydi02aDJ6bTAtMTB2Nmgt MnYtNmgyem0wLTEwdjZoLTJWNGgyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+      {/* ── Hero Header ─────────────────────────────────────────────── */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-coral-50 via-white to-coral-50/50 p-8 md:p-10 border border-coral-100/50">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-coral-200/20 rounded-full blur-3xl" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-[#9F121A]/20 backdrop-blur-sm flex items-center justify-center">
-                <Compass className="w-6 h-6 text-[#9F121A]" />
+              <div className="w-14 h-14 rounded-xl bg-coral-100 flex items-center justify-center">
+                <Compass className="w-7 h-7 text-coral-500" />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-display font-bold text-white tracking-tight">
+                <h1 className="text-2xl md:text-3xl font-display font-bold text-coral-900 tracking-tight">
                   {t('experiences.title')}
                 </h1>
-                <p className="text-white/60 text-sm mt-0.5">
+                <p className="text-coral-400/80 text-sm mt-0.5 font-display italic">
                   {t('experiences.subtitle')}
                 </p>
               </div>
@@ -136,81 +130,89 @@ export default function Experiences() {
           </div>
           <Button
             onClick={() => navigate('/experiences/new')}
-            className="bg-[#9F121A] text-[#FFFFFF] hover:bg-[#7A0E14] shadow-lg shadow-black/20 font-semibold gap-2 h-11 px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            className="bg-coral-500 hover:bg-coral-600 text-white shadow-lg shadow-coral-500/20 font-semibold gap-2 h-11 px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
             <Plus className="w-4 h-4" />
             {t('experiences.newExperience')}
           </Button>
         </div>
-        {/* Stats bar */}
-        <div className="relative z-10 flex items-center gap-6 mt-8 pt-6 border-t border-white/10">
+        {/* ── Stats ──────────────────────────────────────────────────── */}
+        <div className="relative z-10 flex items-center gap-8 mt-8 pt-6 border-t border-coral-200/30">
           <div className="text-center">
-            <div className="text-2xl font-bold text-white">{experiences.length}</div>
-            <div className="text-xs text-white/50 uppercase tracking-wider">{t('common.total')}</div>
+            <div className="text-2xl font-display font-bold text-coral-900">{experiences.length}</div>
+            <div className="text-[10px] text-coral-400/60 uppercase tracking-[0.2em] font-medium">{t('common.total')}</div>
           </div>
-          <div className="w-px h-8 bg-white/10" />
+          <div className="w-px h-8 bg-coral-200/30" />
           <div className="text-center">
-            <div className="text-2xl font-bold text-[#9F121A]">
+            <div className="text-2xl font-display font-bold text-coral-500">
               {experiences.filter((e) => e.is_published).length}
             </div>
-            <div className="text-xs text-white/50 uppercase tracking-wider">{t('experiences.published')}</div>
+            <div className="text-[10px] text-coral-400/60 uppercase tracking-[0.2em] font-medium">{t('experiences.published')}</div>
           </div>
-          <div className="w-px h-8 bg-white/10" />
+          <div className="w-px h-8 bg-coral-200/30" />
           <div className="text-center">
-            <div className="text-2xl font-bold text-amber-400">
+            <div className="text-2xl font-display font-bold text-amber-400">
               {experiences.filter((e) => !e.is_published).length}
             </div>
-            <div className="text-xs text-white/50 uppercase tracking-wider">{t('experiences.drafts')}</div>
+            <div className="text-[10px] text-coral-400/60 uppercase tracking-[0.2em] font-medium">{t('experiences.drafts')}</div>
           </div>
         </div>
       </div>
 
-      {/* ── Search bar ───────────────────────────────────────────────────── */}
+      {/* ── Search ──────────────────────────────────────────────────── */}
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-coral-400/60" />
         <Input
           placeholder={t('experiences.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-11 h-12 rounded-xl bg-card border-border/50 shadow-sm focus-visible:ring-[#9F121A]/30 transition-shadow"
+          className="pl-11 h-12 rounded-xl bg-card/80 border-border/40 shadow-sm focus-visible:ring-coral-500/30 transition-all placeholder:text-muted-foreground/50"
         />
       </div>
 
-      {/* ── Table ────────────────────────────────────────────────────────── */}
+      {/* ── Content ─────────────────────────────────────────────────── */}
       {isLoading ? (
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-xl" />
+            <Skeleton key={i} className="h-24 w-full rounded-xl" />
           ))}
         </div>
       ) : error ? (
-        <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-8 text-center">
-          <p className="text-destructive font-medium">{t('common.error')}</p>
+        <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-10 text-center">
+          <div className="w-12 h-12 rounded-full bg-destructive/10 mx-auto mb-3 flex items-center justify-center">
+            <Compass className="w-5 h-5 text-destructive/60" />
+          </div>
+          <p className="font-display text-lg font-semibold text-destructive">{t('common.error')}</p>
           <p className="text-sm text-muted-foreground mt-1">{error.message}</p>
+          <Button variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['experiences'] })} className="mt-4">
+            Retry
+          </Button>
         </div>
       ) : filtered.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="rounded-2xl border-2 border-dashed border-border/50 p-16 text-center"
+          className="rounded-2xl border-2 border-dashed border-coral-200/50 p-16 text-center bg-gradient-to-b from-coral-50/30 to-transparent"
         >
-          <Compass className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground/70">{t('experiences.noExperiences')}</h3>
+          <div className="w-16 h-16 rounded-full bg-coral-100 mx-auto mb-4 flex items-center justify-center">
+            <Compass className="w-7 h-7 text-coral-400" />
+          </div>
+          <h3 className="font-display text-xl font-semibold text-coral-800/70">{t('experiences.noExperiences')}</h3>
           <p className="text-sm text-muted-foreground mt-1 mb-6">
             {search ? t('experiences.noResults') : t('experiences.noExperiencesDesc')}
           </p>
           {!search && (
-            <Button onClick={() => navigate('/experiences/new')} className="gap-2 bg-[#384252] hover:bg-[#2D3748]">
+            <Button onClick={() => navigate('/experiences/new')} className="gap-2 bg-coral-500 hover:bg-coral-600 text-white">
               <Plus className="w-4 h-4" /> {t('experiences.createExperience')}
             </Button>
           )}
         </motion.div>
       ) : (
         <motion.div variants={container} initial="hidden" animate="show" className="space-y-3">
-          {/* Sort header */}
-          <div className="flex items-center gap-4 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          {/* ── Column headers ─────────────────────────────────────── */}
+          <div className="flex items-center gap-4 px-4 text-[11px] font-medium text-coral-400/60 uppercase tracking-[0.15em]">
             <div className="w-16" />
-            <button onClick={() => toggleSort('sort_order')} className="w-16 flex items-center gap-1 hover:text-foreground transition-colors">
+            <button onClick={() => toggleSort('sort_order')} className="w-16 flex items-center gap-1 hover:text-coral-500 transition-colors">
               {t('experiences.order')} <ArrowUpDown className="w-3 h-3" />
             </button>
             <div className="flex-1">{t('experiences.titleCol')}</div>
@@ -227,36 +229,34 @@ export default function Experiences() {
                 variants={item}
                 layout
                 exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
-                className="group relative flex items-center gap-4 p-4 rounded-xl bg-card border border-border/50 shadow-sm hover:shadow-md hover:border-[#9F121A]/20 transition-all duration-300 cursor-pointer"
+                className="group relative flex items-center gap-4 p-4 rounded-xl bg-card border border-border/40 shadow-sm hover:shadow-lg hover:border-coral-300/50 transition-all duration-400 cursor-pointer"
                 onClick={() => navigate(`/experiences/${exp.id}`)}
               >
-                {/* Thumbnail */}
-                <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-coral-100/20 to-coral-200/10 ring-1 ring-coral-200/30">
                   {exp.hero_image_url ? (
                     <img
                       src={exp.hero_image_url}
                       alt={tr(exp.title_tr)}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Compass className="w-6 h-6 text-muted-foreground/30" />
+                      <Compass className="w-6 h-6 text-coral-300" />
                     </div>
                   )}
                 </div>
 
-                {/* Order with reorder controls */}
                 <div className="w-16 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                   <div className="flex flex-col gap-0.5">
                     <button
                       type="button"
                       onClick={() => moveMut.mutate({ id: exp.id, direction: 'up' })}
                       disabled={exp.sort_order <= 1 || moveMut.isPending}
-                      className={`w-5 h-5 rounded flex items-center justify-center transition-all duration-200
-                        ${exp.sort_order <= 1
+                      className={`w-5 h-5 rounded flex items-center justify-center transition-all duration-200 ${
+                        exp.sort_order <= 1
                           ? 'text-muted-foreground/20 cursor-not-allowed'
-                          : 'text-muted-foreground hover:text-[#9F121A] hover:bg-[#9F121A]/10 cursor-pointer'
-                        }`}
+                          : 'text-muted-foreground hover:text-coral-500 hover:bg-coral-100 cursor-pointer'
+                      }`}
                       title={t('experiences.moveUp')}
                     >
                       <ChevronUp className="w-3.5 h-3.5" />
@@ -265,62 +265,58 @@ export default function Experiences() {
                       type="button"
                       onClick={() => moveMut.mutate({ id: exp.id, direction: 'down' })}
                       disabled={exp.sort_order >= filtered.length || moveMut.isPending}
-                      className={`w-5 h-5 rounded flex items-center justify-center transition-all duration-200
-                        ${exp.sort_order >= filtered.length
+                      className={`w-5 h-5 rounded flex items-center justify-center transition-all duration-200 ${
+                        exp.sort_order >= filtered.length
                           ? 'text-muted-foreground/20 cursor-not-allowed'
-                          : 'text-muted-foreground hover:text-[#9F121A] hover:bg-[#9F121A]/10 cursor-pointer'
-                        }`}
+                          : 'text-muted-foreground hover:text-coral-500 hover:bg-coral-100 cursor-pointer'
+                      }`}
                       title={t('experiences.moveDown')}
                     >
                       <ChevronDown className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-muted text-xs font-bold text-muted-foreground">
+                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-coral-100 text-coral-600 text-xs font-bold">
                     {exp.sort_order}
                   </span>
                 </div>
 
-                {/* Title & slug */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-foreground truncate group-hover:text-[#9F121A] transition-colors">
+                  <h3 className="font-display text-base font-semibold text-foreground truncate group-hover:text-coral-600 transition-colors">
                     {tr(exp.title_tr)}
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5 truncate font-mono">
+                  <p className="text-xs text-muted-foreground/60 mt-0.5 truncate font-mono">
                     /{exp.slug}
                   </p>
                 </div>
 
-                {/* Destination */}
                 <div className="w-32 flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                  <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-coral-400" />
                   <span className="truncate">{tr(exp.destination_tr)}</span>
                 </div>
 
-                {/* Status */}
                 <div className="w-24 flex justify-center">
                   <Badge
                     variant={exp.is_published ? 'default' : 'secondary'}
-                    className={`text-[10px] uppercase tracking-wider font-semibold ${
+                    className={`text-[10px] uppercase tracking-[0.1em] font-semibold px-3 py-1 ${
                       exp.is_published
-                        ? 'bg-[#9F121A]/15 text-[#9F121A] border-[#9F121A]/30 hover:bg-[#9F121A]/25'
-                        : 'bg-amber-500/15 text-amber-400 border-amber-500/30 hover:bg-amber-500/25'
+                        ? 'bg-emerald-100 text-emerald-600 border-emerald-200 hover:bg-emerald-200'
+                        : 'bg-amber-100 text-amber-600 border-amber-200 hover:bg-amber-200'
                     }`}
                   >
                     {exp.is_published ? t('common.published') : t('common.draft')}
                   </Badge>
                 </div>
 
-                {/* Languages check */}
-                <div className="w-24 flex justify-center gap-1">
+                <div className="w-24 flex justify-center gap-1.5">
                   {['fr', 'en', 'es'].map((l) => {
                     const hasLang = exp.title_tr && typeof exp.title_tr === 'object' && exp.title_tr[l];
                     return (
                       <span
                         key={l}
-                        className={`text-[10px] font-bold uppercase w-6 h-5 rounded flex items-center justify-center ${
+                        className={`text-[10px] font-bold uppercase w-6 h-5 rounded flex items-center justify-center transition-colors ${
                           hasLang
-                            ? 'bg-[#9F121A]/15 text-[#9F121A]'
-                            : 'bg-red-500/15 text-red-400'
+                            ? 'bg-coral-100 text-coral-600'
+                            : 'bg-red-100 text-red-400'
                         }`}
                       >
                         {l}
@@ -329,15 +325,14 @@ export default function Experiences() {
                   })}
                 </div>
 
-                {/* Actions */}
                 <div className="w-20 flex justify-end" onClick={(e) => e.stopPropagation()}>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-coral-400 hover:text-coral-600 hover:bg-coral-100">
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuContent align="end" className="w-48 border-coral-200">
                       <DropdownMenuItem onClick={() => navigate(`/experiences/${exp.id}`)}>
                         <Pencil className="w-3.5 h-3.5 mr-2" /> {t('common.edit')}
                       </DropdownMenuItem>
@@ -359,21 +354,20 @@ export default function Experiences() {
                   </DropdownMenu>
                 </div>
 
-                {/* Hover accent line */}
-                <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-[#9F121A] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute left-0 top-1 bottom-1 w-0.5 rounded-r-full bg-gradient-to-b from-coral-400 to-coral-500 opacity-0 group-hover:opacity-100 transition-all duration-500" />
               </motion.div>
             ))}
           </AnimatePresence>
         </motion.div>
       )}
 
-      {/* ── Delete Dialog ────────────────────────────────────────────────── */}
+      {/* ── Delete Dialog ───────────────────────────────────────────── */}
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border-coral-200">
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('experiences.deleteConfirmTitle')}</AlertDialogTitle>
+            <AlertDialogTitle className="font-display">{t('experiences.deleteConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('experiences.deleteConfirmDesc', { name: deleteTarget && tr(deleteTarget.title_tr) }).split('<strong>').join('').split('</strong>').join('')}
+              {t('experiences.deleteConfirmDesc', { name: deleteTarget && tr(deleteTarget.title_tr) })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

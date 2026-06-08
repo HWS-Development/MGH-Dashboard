@@ -103,8 +103,8 @@ function DirectorLoginForm({ onSuccess }) {
 
   return (
     <form onSubmit={handleVerifyOtp} className="space-y-4">
-      <div className="bg-[#9F121A]/10 border border-[#9F121A]/20 rounded-lg px-4 py-3 text-center">
-        <p className="text-sm text-[#9F121A]">📨 Code envoyé à <strong>{email}</strong></p>
+      <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-3 text-center">
+        <p className="text-sm text-primary">📨 Code envoyé à <strong>{email}</strong></p>
         <p className="text-xs text-muted-foreground mt-1">Vérifiez votre boîte mail — valide 10 minutes</p>
       </div>
       <div>
@@ -214,8 +214,8 @@ function OwnerLoginForm({ onSuccess }) {
 
   return (
     <form onSubmit={handleVerifyOtp} className="space-y-4">
-      <div className="bg-[#9F121A]/10 border border-[#9F121A]/20 rounded-lg px-4 py-3 text-center">
-        <p className="text-sm text-[#9F121A]">📨 Code envoyé à <strong>{email}</strong></p>
+      <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-3 text-center">
+        <p className="text-sm text-primary">📨 Code envoyé à <strong>{email}</strong></p>
         <p className="text-xs text-muted-foreground mt-1">Vérifiez votre boîte mail — valide 10 minutes</p>
       </div>
       <div>
@@ -257,13 +257,13 @@ export default function Portal() {
       {/* Logo */}
       <div className="mb-8 text-center">
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4 overflow-hidden border border-border bg-muted shadow-sm">
-          <span className="font-bold text-2xl" style={{ color: '#9F121A' }}>MGH</span>
+          <span className="font-bold text-2xl text-primary">MGH</span>
         </div>
         <h1 className="text-xl font-bold text-foreground">Moroccan Guest Houses</h1>
         <p className="text-sm text-muted-foreground mt-0.5">Plateforme de gestion HWS</p>
       </div>
 
-      <div className="w-full max-w-md card-dark border border-border overflow-hidden">
+      <div className="w-full max-w-md bg-card border border-border overflow-hidden">
         {/* Tabs */}
         <div className="flex border-b border-border">
           {TABS.map(t => (
@@ -273,7 +273,7 @@ export default function Portal() {
               className={`flex-1 py-3 px-1 text-xs font-medium transition-all border-b-2 -mb-px flex flex-col items-center gap-0.5 ${
                 activeTab === t.key ? '' : 'border-transparent text-muted-foreground hover:text-muted-foreground'
               }`}
-              style={activeTab === t.key ? { borderColor: '#9F121A', color: '#9F121A' } : {}}
+              style={activeTab === t.key ? { borderColor: 'hsl(var(--primary))', color: 'hsl(var(--primary))' } : {}}
             >
               <t.icon className="w-3.5 h-3.5" />
               {t.label}
@@ -290,7 +290,7 @@ export default function Portal() {
 
       <p className="text-xs text-muted-foreground mt-6 text-center">
         Propulsé par{' '}
-        <a href="https://hospitalitywebservices.com" target="_blank" rel="noreferrer" className="underline" style={{ color: '#9F121A' }}>
+        <a href="https://hospitalitywebservices.com" target="_blank" rel="noreferrer" className="underline text-primary">
           Hospitality Web Services
         </a>
       </p>

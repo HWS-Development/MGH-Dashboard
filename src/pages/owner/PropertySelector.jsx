@@ -31,7 +31,7 @@ function PropertyCard({ contact, onSelect }) {
   }
 
   return (
-    <div className="card-dark rounded-2xl border border-white/10 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+    <div className="bg-card rounded-2xl border border-white/10 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
       <div>
         <p className="font-semibold text-white text-base leading-tight">{name}</p>
         {city !== '—' && (
@@ -44,12 +44,12 @@ function PropertyCard({ contact, onSelect }) {
       <div>
         <div className="flex items-center justify-between text-xs text-white/50 mb-1">
           <span>Complétion</span>
-          <span className="font-semibold" style={{ color: completion >= 80 ? '#16a34a' : '#9F121A' }}>{completion}%</span>
+          <span className="font-semibold" style={{ color: completion >= 80 ? '#16a34a' : 'hsl(var(--primary))' }}>{completion}%</span>
         </div>
         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all"
-            style={{ width: `${completion}%`, background: completion >= 80 ? '#16a34a' : '#9F121A' }}
+            style={{ width: `${completion}%`, background: completion >= 80 ? '#16a34a' : 'hsl(var(--primary))' }}
           />
         </div>
       </div>
