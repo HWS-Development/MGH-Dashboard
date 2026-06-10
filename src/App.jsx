@@ -10,6 +10,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import Dashboard from '@/pages/Dashboard';
 import Properties from '@/pages/Properties';
 import PropertyDetail from '@/pages/PropertyDetail';
+import PropertyDetailsPage from '@/pages/PropertyDetailsPage';
 import Contacts from '@/pages/Contacts';
 import PendingUpdates from '@/pages/PendingUpdates';
 import UsersManagement from '@/pages/UsersManagement';
@@ -60,6 +61,7 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Dashboard />} />
         <Route path="/properties" element={<Properties />} />
         <Route path="/properties/:id" element={<PropertyDetail />} />
+        <Route path="/properties/:id/details" element={<PropertyDetailsPage />} />
         <Route path="/contacts" element={<Contacts />} />
         <Route path="/pending-updates" element={<PendingUpdates />} />
         <Route path="/users" element={<UsersManagement />} />

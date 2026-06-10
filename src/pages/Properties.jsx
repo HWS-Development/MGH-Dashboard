@@ -7,10 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
-import { Search, Pencil, CheckCircle2, AlertTriangle, XCircle, ChevronLeft, ChevronRight, Filter, Building2 } from 'lucide-react';
+import { Search, Pencil, Eye, CheckCircle2, AlertTriangle, XCircle, ChevronLeft, ChevronRight, Filter, Building2, ArrowUpRight } from 'lucide-react';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const STATUS_BADGE = {
   active: 'bg-emerald-500/10 text-emerald-600 border-emerald-200',
@@ -251,15 +252,38 @@ export default function Properties() {
                         }
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-7 px-3 text-xs"
-                          onClick={() => navigate(`/properties/${p.id}`)}
-                        >
-                          <Pencil className="w-3 h-3 mr-1" />
-                          Éditer
-                        </Button>
+                        <div className="flex items-center justify-center gap-1.5">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  disabled
+                                  className="h-7 px-3 text-xs opacity-50 cursor-not-allowed"
+                                  onClick={() => navigate(`/properties/${p.id}`)}
+                                >
+                                  <Pencil className="w-3 h-3 mr-1" />
+                                  Éditer
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="text-xs">
+                                Édition désactivée — voir les détails
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <span
+                            onClick={() => navigate(`/properties/${p.id}/details`)}
+                            className="group inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-[0.15em] text-coral-500/50 hover:text-coral-500 cursor-pointer transition-all duration-300 hover:scale-105"
+                          >
+                            <Eye className="w-3 h-3" />
+                            <span className="relative">
+                              Détails
+                              <span className="absolute -bottom-px left-0 right-0 h-px bg-coral-500/40 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                            </span>
+                            <ArrowUpRight className="w-2.5 h-2.5 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300" />
+                          </span>
+                        </div>
                       </td>
                     </tr>
                   );
