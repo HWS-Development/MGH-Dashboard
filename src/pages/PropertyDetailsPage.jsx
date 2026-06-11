@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ChevronLeft, ChevronRight, MapPin, Phone, Mail,
-  Globe, Star, Users,
+  Globe, Star, Users, MessageCircle,
   ExternalLink, Maximize2, Minimize2,
   Building2, Sparkles, CheckCircle2, Navigation, Quote
 } from 'lucide-react';
@@ -95,6 +95,10 @@ export default function PropertyDetailsPage() {
   const reviews = property.reviewsCount || property.reviews_count;
   const address = tr(property.address) || '';
 
+  const whatsappNumber = property.whatsappNumber || '';
+  const beLink = property.beLink || '';
+  const extraInfoText = property.extraInfo ? tr(property.extraInfo) : '';
+
   const contactInfoItems = [
     ...((property.phone || property.reservation_phone)
       ? [{ icon: Phone, label: 'Téléphone', value: property.phone || property.reservation_phone, href: `tel:${(property.phone || property.reservation_phone).replace(/\s/g, '')}` }]
@@ -105,8 +109,17 @@ export default function PropertyDetailsPage() {
     ...(property.website
       ? [{ icon: Globe, label: 'Site web', value: property.website, href: property.website }]
       : []),
+    ...(whatsappNumber
+      ? [{ icon: MessageCircle, label: 'WhatsApp', value: whatsappNumber, href: `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}` }]
+      : []),
+    ...(beLink
+      ? [{ icon: ExternalLink, label: 'Booking.com Extranet', value: 'Accéder', href: beLink }]
+      : []),
     ...(property.simple_booking_link
       ? [{ icon: CheckCircle2, label: 'Simple Booking', value: 'Activé' }]
+      : []),
+    ...(extraInfoText
+      ? [{ icon: Sparkles, label: 'Info complémentaire', value: extraInfoText }]
       : []),
   ];
 
@@ -458,6 +471,22 @@ export default function PropertyDetailsPage() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* ── Floating WhatsApp button ──────────────────────────── */}
+          {whatsappNumber && (
+            <motion.a
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1, type: 'spring', stiffness: 260, damping: 20 }}
+              href={`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`}
+              target="_blank"
+              rel="noreferrer"
+              className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-emerald-500 text-white shadow-lg flex items-center justify-center hover:bg-emerald-600 hover:scale-110 active:scale-95 transition-all duration-300"
+              aria-label="WhatsApp"
+            >
+              <MessageCircle className="w-7 h-7" />
+            </motion.a>
+          )}
         </>
       )}
     </motion.div>
