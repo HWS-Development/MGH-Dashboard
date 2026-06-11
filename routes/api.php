@@ -44,10 +44,6 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
 // No authentication required. Only exposes published content from whitelisted
 // tables (experiences, destinations, etc.).
 Route::prefix('public')->group(function () {
-    // Partner hotel content (requires ?test_key= from .env for testing without login)
-    Route::get('/partner/hotels/{id}/content', [PartnerHotelController::class, 'publicContent'])
-        ->name('public.partner.hotels.content');
-
     Route::get('/experiences', [PublicDataController::class, 'listExperiences'])
         ->name('public.experiences.index');
     Route::get('/experiences/by-slugs', [PublicDataController::class, 'experiencesBySlugs'])
@@ -61,38 +57,17 @@ Route::prefix('public')->group(function () {
         ->name('public.destinations.show');
 });
 
+// ─── Partner Hotels (Centra API proxy — no DB access, no auth needed) ────
+Route::get('/partner/hotels', [PartnerHotelController::class, 'index'])
+    ->name('partner.hotels.index');
+Route::get('/partner/hotels/{id}', [PartnerHotelController::class, 'show'])
+    ->name('partner.hotels.show');
+Route::get('/partner/hotels/{id}/content', [PartnerHotelController::class, 'content'])
+    ->name('partner.hotels.content');
+
 // ─── Authenticated Routes ────────────────────────────────────────────────────
 
 Route::middleware('auth:sanctum')->group(function () {
-
-    // Current user info
-    Route::get('/user', function (Request $request) {
-        return response()->json($request->user());
-    })->name('user');
-
-    // Email verification
-    Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
-
-    Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
-
-    // Logout
-    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->name('logout');
-
-    // ─── Data API (generic CRUD for MGH tables) ────────────────────────────────
-    Route::post('/data/query', [DataController::class, 'query'])->name('data.query');
-
-    // ─── Partner Hotels (Centra API proxy) ────────────────────────────────────
-    Route::get('/partner/hotels', [PartnerHotelController::class, 'index'])
-        ->name('partner.hotels.index');
-    Route::get('/partner/hotels/{id}', [PartnerHotelController::class, 'show'])
-        ->name('partner.hotels.show');
-    Route::get('/partner/hotels/{id}/content', [PartnerHotelController::class, 'content'])
-        ->name('partner.hotels.content');
 
     // ─── Experience Image Upload ──────────────────────────────────────────────
     Route::post('/experiences/upload-image', [ExperienceImageController::class, 'upload'])

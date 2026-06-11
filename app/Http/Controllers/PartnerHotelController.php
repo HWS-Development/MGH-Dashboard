@@ -206,17 +206,7 @@ class PartnerHotelController extends Controller
 
     // ─── Public test route (bypasses Sanctum, requires ?test_key=) ──────
 
-    public function publicContent(string $id): JsonResponse
-    {
-        $key = request()->query('test_key');
-        $expected = config('services.centra.test_key');
 
-        if (!$key || !$expected || $key !== $expected) {
-            return response()->json(['success' => false, 'error' => 'Invalid or missing test_key'], 403);
-        }
-
-        return $this->content($id);
-    }
 
     /**
      * GET /api/partner/hotels/{id}/content
