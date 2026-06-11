@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ChevronLeft, ChevronRight, MapPin, Phone, Mail,
-  Globe, Star, Users, Calendar, Clock, Award, Shield,
-  ExternalLink, Loader2, ChevronDown, Maximize2, Minimize2,
+  Globe, Star, Users, Calendar, Award, Shield,
+  ExternalLink, Maximize2, Minimize2,
   Building2, Sparkles, CheckCircle2, Navigation, Quote
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePartnerHotelContent } from '@/lib/partnerHotelsApi';
-import { getProperty, getContact, listCities, listNeighborhoods, listPropertyTypes } from '@/lib/api';
 import { useTranslation } from '@/i18n';
 
 const FALLBACK_IMAGES = [
@@ -21,13 +18,6 @@ const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200',
   'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200',
 ];
-
-const STATUS_CONFIG = {
-  active: { label: 'Actif', class: 'bg-emerald-500/10 text-emerald-600 border-emerald-200' },
-  suspended: { label: 'Suspendu', class: 'bg-amber-500/10 text-amber-600 border-amber-200' },
-  pending: { label: 'En attente', class: 'bg-slate-500/10 text-slate-600 border-slate-200' },
-  'ex-member': { label: 'Ex-membre', class: 'bg-muted text-muted-foreground border-border' },
-};
 
 const container = {
   hidden: { opacity: 0 },
@@ -52,51 +42,12 @@ export default function PropertyDetailsPage() {
   const [isPaused, setIsPaused] = useState(false);
   const [expandedImage, setExpandedImage] = useState(null);
 
-  // Reference catalogs for label resolution
-  const citiesResult = useQuery({
-    queryKey: ['cities'],
-    queryFn: listCities,
-  });
-  const neighborhoodsResult = useQuery({
-    queryKey: ['neighborhoods'],
-    queryFn: () => listNeighborhoods(),
-  });
-  const propertyTypesResult = useQuery({
-    queryKey: ['property-types'],
-    queryFn: listPropertyTypes,
-  });
-
-  const citiesArr = citiesResult.data?.data ?? [];
-  const neighborhoodsArr = neighborhoodsResult.data?.data ?? [];
-  const propertyTypesArr = propertyTypesResult.data?.data ?? [];
-
-  const citiesIndex = useMemo(() => Object.fromEntries(citiesArr.map((c) => [c.id, c.label?.fr || c.name || c.id])), [citiesArr]);
-  const neighborhoodsIndex = useMemo(() => Object.fromEntries(neighborhoodsArr.map((n) => [n.id, n.label?.fr || n.name || n.id])), [neighborhoodsArr]);
-  const propertyTypesIndex = useMemo(() => Object.fromEntries(propertyTypesArr.map((p) => [p.id, p.label?.fr || p.name || p.id])), [propertyTypesArr]);
-
-  const isCentraId = /^HT-/i.test(propertyId);
-
-  const { data: dbResult } = useQuery({
-    queryKey: ['property-db', propertyId],
-    queryFn: () => getProperty(propertyId),
-    enabled: !!propertyId && !isCentraId,
-  });
-  const { data: contactResult } = useQuery({
-    queryKey: ['contact-by-property', propertyId],
-    queryFn: () => getContact(propertyId),
-    enabled: !!propertyId && !isCentraId,
-  });
-
-  // Fetch content from Centra detail endpoint
   const {
     data: propertyContent,
     isLoading: loadingContent,
-    error: contentError,
   } = usePartnerHotelContent(propertyId);
 
   const property = propertyContent || {};
-  const dbProperty = dbResult?.data;
-  const contact = contactResult?.data || {};
 
   const tr = (obj) => {
     if (!obj || typeof obj !== 'object') return String(obj || '');
@@ -124,10 +75,10 @@ export default function PropertyDetailsPage() {
   }, [isPaused, nextSlide, totalSlides]);
 
   const gps = useMemo(() => {
-    const lat = property.latitude || dbProperty?.latitude || contact?.latitude;
-    const lng = property.longitude || dbProperty?.longitude || contact?.longitude;
+    const lat = property.latitude;
+    const lng = property.longitude;
     return lat && lng ? { lat: parseFloat(lat), lng: parseFloat(lng) } : null;
-  }, [property, dbProperty, contact]);
+  }, [property.latitude, property.longitude]);
 
   const googleMapsUrl = gps
     ? `https://www.google.com/maps?q=${gps.lat},${gps.lng}`
@@ -137,47 +88,26 @@ export default function PropertyDetailsPage() {
   const services = property?.services ?? [];
   const facilities = property?.facilities ?? [];
 
-  const name = tr(property.name) || dbProperty?.name?.fr || '';
-  const description = tr(property.description) || dbProperty?.description?.fr || '';
-  const cityName = citiesIndex[property.cityId || property.city_id] || property.city || property.city_id || '';
-  const neighborhoodName = neighborhoodsIndex[property.neighborhoodId || property.neighborhood_id] || '';
-  const typeName = propertyTypesIndex[property.propertyTypeId || property.property_type_id] || property.propertyTypeId || property.property_type || dbProperty?.property_type || '';
-  const status = contact?.membershipstatus || null;
-  const statusCfg = STATUS_CONFIG[status] || null;
-  const rating = property.ratingAvg || property.rating_avg || dbProperty?.rating_avg;
-  const reviews = property.reviewsCount || property.reviews_count || dbProperty?.reviews_count;
-  const address = tr(property.address) || dbProperty?.address?.fr || '';
-
-  const hasSimpleBooking = !!(property.simple_booking_link || dbProperty?.simple_booking_link);
-  const hasCM = !!(contact?.CM);
+  const name = tr(property.name) || '';
+  const description = tr(property.description) || '';
+  const cityName = property.city || property.cityId || property.city_id || '';
+  const typeName = property.propertyType || property.propertyTypeId || property.property_type || property.property_type_id || '';
+  const rating = property.ratingAvg || property.rating_avg;
+  const reviews = property.reviewsCount || property.reviews_count;
+  const address = tr(property.address) || '';
 
   const contactInfoItems = [
-    ...((property.phone || property.reservation_phone || contact?.phone)
-      ? [{ icon: Phone, label: 'Téléphone', value: property.phone || property.reservation_phone || contact?.phone, href: `tel:${(property.phone || property.reservation_phone || contact?.phone).replace(/\s/g, '')}` }]
+    ...((property.phone || property.reservation_phone)
+      ? [{ icon: Phone, label: 'Téléphone', value: property.phone || property.reservation_phone, href: `tel:${(property.phone || property.reservation_phone).replace(/\s/g, '')}` }]
       : []),
     ...((property.email || property.reservation_email)
-      ? [{ icon: Mail, label: 'Email réservation', value: property.email || property.reservation_email, href: `mailto:${property.email || property.reservation_email}` }]
+      ? [{ icon: Mail, label: 'Email', value: property.email || property.reservation_email, href: `mailto:${property.email || property.reservation_email}` }]
       : []),
     ...(property.website
       ? [{ icon: Globe, label: 'Site web', value: property.website, href: property.website }]
       : []),
-    ...(property.whatsappNumber
-      ? [{ icon: Phone, label: 'WhatsApp', value: property.whatsappNumber, href: `https://wa.me/${property.whatsappNumber.replace(/[^0-9]/g, '')}` }]
-      : []),
-    ...(contact?.email
-      ? [{ icon: Shield, label: 'Email accès', value: contact.email }]
-      : []),
-    ...(hasSimpleBooking
+    ...(property.simple_booking_link
       ? [{ icon: CheckCircle2, label: 'Simple Booking', value: 'Activé' }]
-      : []),
-    ...(hasCM
-      ? [{ icon: Award, label: 'Channel Manager', value: contact.CM }]
-      : []),
-    ...(property.beLink
-      ? [{ icon: ExternalLink, label: 'Booking.com Extranet', value: 'Accéder', href: property.beLink }]
-      : []),
-    ...(property.extraInfo && tr(property.extraInfo)
-      ? [{ icon: Sparkles, label: 'Info complémentaire', value: tr(property.extraInfo) }]
       : []),
   ];
 
@@ -358,9 +288,9 @@ export default function PropertyDetailsPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-px rounded-2xl overflow-hidden border border-border/50 bg-border/20">
                 {[
                   rating && { icon: Star, label: 'Note moyenne', value: rating, color: 'text-amber-500', bg: 'bg-amber-500/5' },
-                  dbProperty?.capacity && { icon: Users, label: 'Capacité', value: dbProperty.capacity, color: 'text-coral-500', bg: 'bg-coral-500/5' },
                   typeName && { icon: Building2, label: 'Type', value: typeName, color: 'text-sky-500', bg: 'bg-sky-500/5' },
-                  contact?.member_since && { icon: Calendar, label: 'Membre depuis', value: contact.member_since, color: 'text-emerald-500', bg: 'bg-emerald-500/5' },
+                  cityName && { icon: MapPin, label: 'Ville', value: cityName, color: 'text-coral-500', bg: 'bg-coral-500/5' },
+                  { icon: Users, label: 'Photos', value: images.length, color: 'text-emerald-500', bg: 'bg-emerald-500/5' },
                 ].filter(Boolean).map((stat) => (
                   <div key={stat.label} className={`${stat.bg} p-5 md:p-6 text-center`}>
                     <stat.icon className={`w-5 h-5 ${stat.color} mx-auto mb-1.5`} />
