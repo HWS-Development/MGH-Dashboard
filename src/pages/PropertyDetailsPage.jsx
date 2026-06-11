@@ -3,10 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ChevronLeft, ChevronRight, MapPin, Phone, Mail,
-  Globe, Star, Users, MessageCircle,
-  ExternalLink, Maximize2, Minimize2,
+  Globe, Star, Users,
+  ExternalLink, Maximize2, X,
   Building2, Sparkles, CheckCircle2, Navigation, Quote
 } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePartnerHotelContent } from '@/lib/partnerHotelsApi';
 import { useTranslation } from '@/i18n';
@@ -110,7 +111,7 @@ export default function PropertyDetailsPage() {
       ? [{ icon: Globe, label: 'Site web', value: property.website, href: property.website }]
       : []),
     ...(whatsappNumber
-      ? [{ icon: MessageCircle, label: 'WhatsApp', value: whatsappNumber, href: `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}` }]
+      ? [{ icon: FaWhatsapp, label: 'WhatsApp', value: whatsappNumber, href: `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}` }]
       : []),
     ...(beLink
       ? [{ icon: ExternalLink, label: 'Booking.com Extranet', value: 'Accéder', href: beLink }]
@@ -333,6 +334,22 @@ export default function PropertyDetailsPage() {
               </motion.div>
             )}
 
+            {/* ── Book Now CTA ──────────────────────────────────────── */}
+            {(beLink || property.simple_booking_link || property.website) && (
+              <motion.div variants={item} className="text-center">
+                <a
+                  href={beLink || property.simple_booking_link || property.website}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-coral-500 text-white font-semibold text-sm uppercase tracking-[0.1em] hover:bg-coral-600 hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  Réserver
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </motion.div>
+            )}
+
             {/* ── Map ──────────────────────────────────────────────── */}
             {gps && (
               <motion.div variants={item}>
@@ -441,31 +458,33 @@ export default function PropertyDetailsPage() {
             )}
           </motion.div>
 
-          {/* ── Lightbox ──────────────────────────────────────────────── */}
+          {/* ── Full-screen Lightbox ─────────────────────────────────── */}
           <AnimatePresence>
             {expandedImage && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 onClick={() => setExpandedImage(null)}
-                className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-lg flex items-center justify-center p-4 md:p-10 cursor-pointer"
+                className="fixed inset-0 z-[100] bg-black flex items-center justify-center cursor-pointer"
               >
                 <button
                   onClick={() => setExpandedImage(null)}
-                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all z-10"
+                  className="absolute top-6 right-6 z-10 w-12 h-12 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                  aria-label="Fermer"
                 >
-                  <Minimize2 className="w-4 h-4" />
+                  <X className="w-8 h-8" />
                 </button>
                 <motion.img
                   key={expandedImage}
-                  initial={{ scale: 0.9, opacity: 0 }}
+                  initial={{ scale: 0.92, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+                  exit={{ scale: 0.92, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
                   src={expandedImage}
                   alt=""
-                  className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl"
+                  className="w-full h-full object-contain"
                   onClick={(e) => e.stopPropagation()}
                 />
               </motion.div>
@@ -484,7 +503,7 @@ export default function PropertyDetailsPage() {
               className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-emerald-500 text-white shadow-lg flex items-center justify-center hover:bg-emerald-600 hover:scale-110 active:scale-95 transition-all duration-300"
               aria-label="WhatsApp"
             >
-              <MessageCircle className="w-7 h-7" />
+              <FaWhatsapp className="w-7 h-7" />
             </motion.a>
           )}
         </>
