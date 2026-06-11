@@ -18,7 +18,16 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Send ALL non-index.php requests through Laravel (no direct file serving)
-    RewriteCond %{REQUEST_URI} !^/index\.php
-    RewriteRule ^(.*)$ index.php [QSA,L]
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
 </IfModule>
+
+# Correct MIME types for Vite built assets
+AddType application/javascript .js .mjs
+AddType text/css .css
+AddType application/json .json
+AddType image/svg+xml .svg
+AddType image/webp .webp
+AddType image/avif .avif
