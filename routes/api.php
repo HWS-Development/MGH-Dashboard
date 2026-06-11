@@ -44,6 +44,10 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
 // No authentication required. Only exposes published content from whitelisted
 // tables (experiences, destinations, etc.).
 Route::prefix('public')->group(function () {
+    // Partner hotel content (requires ?test_key= from .env for testing without login)
+    Route::get('/partner/hotels/{id}/content', [PartnerHotelController::class, 'publicContent'])
+        ->name('public.partner.hotels.content');
+
     Route::get('/experiences', [PublicDataController::class, 'listExperiences'])
         ->name('public.experiences.index');
     Route::get('/experiences/by-slugs', [PublicDataController::class, 'experiencesBySlugs'])
