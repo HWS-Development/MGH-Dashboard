@@ -233,53 +233,16 @@ class PartnerHotelController extends Controller
     public function content(string $id): JsonResponse
     {
         try {
-            $organizationId = request()->header('x-partner-organization-id');
+            // Use the partner app's own org ID from login — ignore frontend header
+            $organizationId = Cache::get(self::CACHE_ORG_ID_KEY);
 
             if (!$organizationId) {
-                $organizationId = Cache::get(self::CACHE_ORG_ID_KEY);
-            }
-
-            if (!$organizationId) {
-                // Force a fresh login to extract org ID from payload
                 $this->invalidateToken();
                 $this->getValidToken();
                 $organizationId = Cache::get(self::CACHE_ORG_ID_KEY);
             }
 
-            try {
-                $hotel = $this->fetchHotelByIdFromCentra($id, $organizationId);
-            } catch (\Exception $e) {
-                // If the first attempt fails (likely 403 — wrong org),
-                // scan the listing for this hotel's image URL to extract its org ID.
-                $msg = $e->getMessage();
-                Log::warning("[PartnerHotelController] content({$id}) first attempt failed — scanning listing for hotel's org ID. Error: {$msg}");
-
-                $hotels = $this->fetchHotelsFromCentra();
-                $matchedOrgId = null;
-                foreach ($hotels as $hotel) {
-                    $urls = $hotel['image_urls'] ?? [];
-                    if (!is_array($urls)) continue;
-
-                    $matchesId = ($hotel['hotelId'] ?? null) === $id
-                        || ($hotel['id'] ?? null) === $id;
-                    if (!$matchesId) continue;
-
-                    foreach ($urls as $url) {
-                        if (preg_match('#/(ORG-[A-Z0-9]+)/#i', (string)$url, $m)) {
-                            $matchedOrgId = $m[1];
-                            break 2;
-                        }
-                    }
-                }
-
-                if ($matchedOrgId && $matchedOrgId !== $organizationId) {
-                    Log::info("[PartnerHotelController] content({$id}) — retrying with hotel's own org ID: {$matchedOrgId}");
-                    $hotel = $this->fetchHotelByIdFromCentra($id, $matchedOrgId);
-                } else {
-                    // No different org ID found — propagate the original error
-                    throw $e;
-                }
-            }
+            $hotel = $this->fetchHotelByIdFromCentra($id, $organizationId);
 
             return response()->json([
                 'success' => true,
