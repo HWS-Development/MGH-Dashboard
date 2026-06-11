@@ -16,3 +16,8 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+/dist
+bootstrap/cache/*
+/public/assets
+/public/index.html
