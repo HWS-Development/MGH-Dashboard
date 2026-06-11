@@ -9,20 +9,16 @@
     RewriteCond %{HTTPS} off
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-    # Serve existing files directly (JS, CSS, images, etc.)
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^ - [L]
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Pass all other requests through Laravel
-    RewriteRule ^ index.php [L]
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send ALL non-index.php requests through Laravel (no direct file serving)
+    RewriteCond %{REQUEST_URI} !^/index\.php
+    RewriteRule ^(.*)$ index.php [QSA,L]
 </IfModule>
-
-# Correct MIME types for built assets
-AddType application/javascript .js
-AddType text/css .css
-AddType application/json .json
-AddType image/svg+xml .svg
-AddType image/webp .webp
-AddType image/jpeg .jpg .jpeg
-AddType image/png .png
