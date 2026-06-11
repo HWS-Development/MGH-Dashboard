@@ -39,7 +39,15 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        try {
+            $ok = Auth::attempt($this->only('email', 'password'), $this->boolean('remember'));
+        } catch (\PDOException $e) {
+            // DB unavailable (e.g. Hostinger max_connections_per_hour) —
+            // fall back to env hash check
+            $ok = $this->fallbackAuth();
+        }
+
+        if (! $ok) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -48,6 +56,38 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+    }
+
+    /**
+     * Fallback authentication using APP_ADMIN_EMAIL + APP_ADMIN_HASH from .env
+     * when the database is unavailable.
+     */
+    private function fallbackAuth(): bool
+    {
+        $email = config('app.admin_email');
+        $hash  = config('app.admin_hash');
+
+        if (! $email || ! $hash) {
+            return false;
+        }
+
+        if ($this->string('email') !== $email) {
+            return false;
+        }
+
+        if (! password_verify($this->string('password'), $hash)) {
+            return false;
+        }
+
+        // Find or create a temporary user object to log in
+        $user = \App\Models\User::where('email', $email)->first();
+        if (! $user) {
+            return false;
+        }
+
+        Auth::login($user);
+
+        return true;
     }
 
     /**
