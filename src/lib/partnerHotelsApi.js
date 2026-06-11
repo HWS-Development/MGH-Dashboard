@@ -114,23 +114,55 @@ async function fetchHotelById(id) {
 // ── Raw fetch: hotel content (amenities / services / facilities) ─────
 
 async function fetchContentByHotelId(id) {
+  // Resolve org ID from localStorage cache (populated from listing image_urls)
   let orgId = resolveOrganizationId(id);
 
   if (!orgId) {
-    console.warn('[partnerHotelsApi] No org ID available for', id, '— fetching list to populate...');
+    console.warn('[partnerHotelsApi] No org ID for', id, '— fetching list...');
     await fetchAllHotels();
     orgId = resolveOrganizationId(id);
   }
 
-  const res = await api.get(`/partner/hotels/${encodeURIComponent(id)}/content`, {
-    headers: orgId ? { 'x-partner-organization-id': orgId } : {},
-  });
+  const doFetch = (org) =>
+    api.get(`/partner/hotels/${encodeURIComponent(id)}/content`, {
+      headers: org ? { 'x-partner-organization-id': org } : {},
+    });
+
+  let res = await doFetch(orgId);
+
+  // If 403/502, re-scan listing to find the correct org ID for this hotel
+  if (!res.data?.success && orgId) {
+    const msg = (res.data?.error || res.data?.message || '').toLowerCase();
+    if (msg.includes('403') || msg.includes('access_denied') || msg.includes('access denied')) {
+      console.warn('[partnerHotelsApi] Content 403 for', id, '— re-scanning listing for correct org...');
+      await fetchAllHotels();
+
+      // Find this hotel in the listing and extract its org ID from image_urls
+      const { data: list } = await api.get('/partner/hotels');
+      const hotels = list?.data ?? [];
+      const found = hotels.find(
+        (h) => h?.id === id || h?.hotelId === id || h?.hotel_id === id ||
+               extractCentraHotelId(h?.image_urls) === id
+      );
+
+      if (found) {
+        const correctOrg = extractCentraOrganizationId(found.image_urls);
+        if (correctOrg && correctOrg !== orgId) {
+          console.log('[partnerHotelsApi] Retrying with correct org:', correctOrg);
+          res = await doFetch(correctOrg);
+        }
+      }
+    }
+  }
 
   if (!res.data?.success) {
     throw new Error(
       res.data?.error || res.data?.message || `Unknown error fetching content for hotel ${id}`
     );
   }
+
+  // Cache org ID from response (matches amh-website)
+  cacheHotelOrganizations([res.data.data]);
 
   return res.data.data;
 }

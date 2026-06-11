@@ -11,7 +11,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { usePartnerHotelContent, usePartnerHotels, extractCentraHotelId } from '@/lib/partnerHotelsApi';
+import { usePartnerHotelContent } from '@/lib/partnerHotelsApi';
 import { getProperty, getContact, listCities, listNeighborhoods, listPropertyTypes } from '@/lib/api';
 import { useTranslation } from '@/i18n';
 
@@ -94,24 +94,7 @@ export default function PropertyDetailsPage() {
     error: contentError,
   } = usePartnerHotelContent(propertyId);
 
-  // Fallback to listing data when detail endpoint fails
-  const { data: hotelList = [], isLoading: listLoading } = usePartnerHotels();
-
-  const matchedHotel = useMemo(() => {
-    if (!Array.isArray(hotelList) || !propertyId) return null;
-    return hotelList.find(
-      (h) =>
-        h?.id === propertyId ||
-        h?.hotel_id === propertyId ||
-        h?.hotelId === propertyId ||
-        extractCentraHotelId(h?.image_urls) === propertyId
-    ) || null;
-  }, [hotelList, propertyId]);
-
-  // Use content from detail endpoint, fall back to listing data on error
-  const resolvedContent = contentError && matchedHotel ? matchedHotel : propertyContent;
-
-  const property = resolvedContent || {};
+  const property = propertyContent || {};
   const dbProperty = dbResult?.data;
   const contact = contactResult?.data || {};
 
@@ -198,7 +181,7 @@ export default function PropertyDetailsPage() {
       : []),
   ];
 
-  const isLoading = (loadingContent || listLoading) && !propertyContent && !matchedHotel;
+  const isLoading = loadingContent && !propertyContent;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-background">

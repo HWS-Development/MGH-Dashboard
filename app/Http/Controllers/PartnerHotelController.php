@@ -260,12 +260,10 @@ class PartnerHotelController extends Controller
                     $urls = $hotel['image_urls'] ?? [];
                     if (!is_array($urls)) continue;
 
-                    // Check if this hotel matches the requested ID
                     $matchesId = ($hotel['hotelId'] ?? null) === $id
                         || ($hotel['id'] ?? null) === $id;
                     if (!$matchesId) continue;
 
-                    // Extract org ID from its image URLs
                     foreach ($urls as $url) {
                         if (preg_match('#/(ORG-[A-Z0-9]+)/#i', (string)$url, $m)) {
                             $matchedOrgId = $m[1];
@@ -277,14 +275,8 @@ class PartnerHotelController extends Controller
                 if ($matchedOrgId && $matchedOrgId !== $organizationId) {
                     Log::info("[PartnerHotelController] content({$id}) — retrying with hotel's own org ID: {$matchedOrgId}");
                     $hotel = $this->fetchHotelByIdFromCentra($id, $matchedOrgId);
-                } elseif ($matchedOrgId) {
-                    // Same org ID already tried — use listing data as fallback
-                    Log::info("[PartnerHotelController] content({$id}) — same org ID already tried, returning listing data");
-                    $hotel = collect($hotels)->first(function ($h) use ($id) {
-                        return ($h['hotelId'] ?? null) === $id || ($h['id'] ?? null) === $id;
-                    });
-                    if (!$hotel) throw $e;
                 } else {
+                    // No different org ID found — propagate the original error
                     throw $e;
                 }
             }
