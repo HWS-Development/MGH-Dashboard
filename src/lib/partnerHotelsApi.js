@@ -11,7 +11,6 @@ import { useQuery } from '@tanstack/react-query';
 import api from '@/api/base44Client';
 
 const PARTNER_ORG_CACHE_KEY = 'partnerHotelOrganizations';
-let _fallbackOrgId = null;
 
 export function extractCentraHotelId(imageUrls = []) {
   const urls = Array.isArray(imageUrls) ? imageUrls : [];
@@ -59,8 +58,6 @@ function cacheHotelOrganizations(hotels = []) {
     const organizationId = extractCentraOrganizationId(hotel?.image_urls);
     if (!organizationId) continue;
 
-    if (!_fallbackOrgId) _fallbackOrgId = organizationId;
-
     const ids = [
       hotel?.id,
       hotel?.hotelId,
@@ -84,7 +81,7 @@ function getCachedOrganizationId(hotelId) {
 }
 
 function resolveOrganizationId(hotelId) {
-  return getCachedOrganizationId(hotelId) || _fallbackOrgId;
+  return getCachedOrganizationId(hotelId);
 }
 
 // ── Raw fetch functions (throw on error) ────────────────────────────
