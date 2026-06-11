@@ -17,6 +17,7 @@ return [
         'api_base_url'  => env('CENTRA_API_BASE_URL', 'https://api.centra.global/api'),
         'client_id'     => env('PARTNER_APP_CLIENT_ID'),
         'client_secret' => env('PARTNER_APP_CLIENT_SECRET'),
+        'test_key'      => env('CENTRA_TEST_KEY'),
     ],
 
 ];
