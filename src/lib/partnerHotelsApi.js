@@ -10,6 +10,17 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '@/api/base44Client';
 
+// ── Helpers ───────────────────────────────────────────────────────────
+
+export function extractCentraHotelId(imageUrls = []) {
+  const urls = Array.isArray(imageUrls) ? imageUrls : [];
+  for (const url of urls) {
+    const match = String(url).match(/\/(HT-[A-Z0-9]+)\//i);
+    if (match) return match[1];
+  }
+  return null;
+}
+
 // ── Raw fetch functions (throw on error) ────────────────────────────
 
 async function fetchAllHotels() {
