@@ -3,11 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ChevronLeft, ChevronRight, MapPin, Phone, Mail,
-  Globe, Star, Users, Calendar, Award, Shield,
+  Globe, Star, Users,
   ExternalLink, Maximize2, Minimize2,
   Building2, Sparkles, CheckCircle2, Navigation, Quote
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePartnerHotelContent } from '@/lib/partnerHotelsApi';
 import { useTranslation } from '@/i18n';
@@ -133,11 +132,6 @@ export default function PropertyDetailsPage() {
             <span className="hidden sm:inline">Retour aux propriétés</span>
           </button>
           <div className="flex items-center gap-3">
-            {statusCfg && (
-              <span className={`text-[10px] font-semibold uppercase tracking-[0.1em] px-2.5 py-1 rounded-full border ${statusCfg.class}`}>
-                {statusCfg.label}
-              </span>
-            )}
             <span className="text-[10px] text-muted-foreground font-mono">#{property?.hotelId || property?.id || propertyId}</span>
           </div>
         </div>
