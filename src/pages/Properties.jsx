@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { listContacts, listCities } from '@/lib/api';
+import { listContacts, listCities, listPropertyTypes } from '@/lib/api';
 import { usePartnerHotels, extractCentraHotelId } from '@/lib/partnerHotelsApi';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -48,6 +48,10 @@ export default function Properties() {
     queryKey: ['cities'],
     queryFn: listCities,
   });
+  const { data: propertyTypesResult } = useQuery({
+    queryKey: ['property-types'],
+    queryFn: listPropertyTypes,
+  });
 
   const properties = rawProperties.map(p => ({
     ...p,
@@ -58,6 +62,8 @@ export default function Properties() {
   }));
   const contacts = contactsResult?.data || [];
   const cities = citiesResult?.data || [];
+
+  const propertyTypes = propertyTypesResult?.data || [];
 
   const contactsMap = useMemo(() => {
     const m = {};
@@ -70,6 +76,12 @@ export default function Properties() {
     cities.forEach(c => { m[c.id] = c.label?.fr || c.name || c.id; });
     return m;
   }, [cities]);
+
+  const propertyTypesMap = useMemo(() => {
+    const m = {};
+    propertyTypes.forEach(t => { m[t.id] = t.label?.fr || t.name || t.id; });
+    return m;
+  }, [propertyTypes]);
 
   const filtered = useMemo(() => {
     return properties.filter(p => {
@@ -110,7 +122,7 @@ export default function Properties() {
       {/* Search + Filters */}
       <Card>
         <CardContent className="p-4 space-y-3">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -120,38 +132,40 @@ export default function Properties() {
                 className="pl-9"
               />
             </div>
-            <Select value={filterCity} onValueChange={(v) => { setFilterCity(v); setCurrentPage(1); }}>
-              <SelectTrigger className="w-44">
-                <SelectValue placeholder="Toutes les villes" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Toutes les villes</SelectItem>
-                {cities.map(c => (
-                  <SelectItem key={c.id} value={String(c.id)}>{c.label?.fr || c.name || c.id}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={filterStatus} onValueChange={(v) => { setFilterStatus(v); setCurrentPage(1); }}>
-              <SelectTrigger className="w-44">
-                <SelectValue placeholder="Tous les statuts" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="active">Actif</SelectItem>
-                <SelectItem value="suspended">Suspendu</SelectItem>
-                <SelectItem value="pending">En attente</SelectItem>
-                <SelectItem value="ex-member">Ex-membre</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-              className={showFilters ? 'border-primary text-primary' : ''}
-            >
-              <Filter className="w-4 h-4 mr-1" />
-              Filtres
-            </Button>
+            <div className="flex items-center gap-2">
+              <Select value={filterCity} onValueChange={(v) => { setFilterCity(v); setCurrentPage(1); }}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Toutes les villes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toutes les villes</SelectItem>
+                  {cities.map(c => (
+                    <SelectItem key={c.id} value={String(c.id)}>{c.label?.fr || c.name || c.id}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={filterStatus} onValueChange={(v) => { setFilterStatus(v); setCurrentPage(1); }}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Tous les statuts" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="active">Actif</SelectItem>
+                  <SelectItem value="suspended">Suspendu</SelectItem>
+                  <SelectItem value="pending">En attente</SelectItem>
+                  <SelectItem value="ex-member">Ex-membre</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+                className={showFilters ? 'border-primary text-primary' : ''}
+              >
+                <Filter className="w-4 h-4 mr-1" />
+                Filtres
+              </Button>
+            </div>
           </div>
 
           {showFilters && (
@@ -182,32 +196,33 @@ export default function Properties() {
       {/* Table */}
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs md:text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/30">
-                <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Nom</th>
-                <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Ville</th>
-                <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Contact</th>
-                <th className="text-center px-4 py-3 font-semibold text-muted-foreground">Email accès</th>
-                <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Channel Manager</th>
-                <th className="text-center px-4 py-3 font-semibold text-muted-foreground">Statut</th>
-                <th className="text-center px-4 py-3 font-semibold text-muted-foreground">Photos</th>
-                <th className="text-center px-4 py-3 font-semibold text-muted-foreground">Description</th>
-                <th className="text-center px-4 py-3 font-semibold text-muted-foreground">Action</th>
+                <th className="text-left px-2 md:px-4 py-2 md:py-3 font-semibold text-muted-foreground">Nom</th>
+                <th className="text-left px-2 md:px-4 py-2 md:py-3 font-semibold text-muted-foreground">Ville</th>
+                <th className="hidden sm:table-cell text-left px-2 md:px-4 py-2 md:py-3 font-semibold text-muted-foreground">Contact</th>
+                <th className="hidden sm:table-cell text-center px-2 md:px-4 py-2 md:py-3 font-semibold text-muted-foreground">Email</th>
+                <th className="hidden md:table-cell text-left px-2 md:px-4 py-2 md:py-3 font-semibold text-muted-foreground">CM</th>
+                <th className="text-center px-2 md:px-4 py-2 md:py-3 font-semibold text-muted-foreground">Statut</th>
+                <th className="hidden md:table-cell text-center px-2 md:px-4 py-2 md:py-3 font-semibold text-muted-foreground">Photos</th>
+                <th className="hidden lg:table-cell text-center px-2 md:px-4 py-2 md:py-3 font-semibold text-muted-foreground">Description</th>
+                <th className="hidden lg:table-cell text-left px-2 md:px-4 py-2 md:py-3 font-semibold text-muted-foreground">Type</th>
+                <th className="text-center px-2 md:px-4 py-2 md:py-3 font-semibold text-muted-foreground">Action</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <tr key={i} className="border-b border-border/50">
-                    {Array.from({ length: 9 }).map((_, j) => (
+                    {Array.from({ length: 10 }).map((_, j) => (
                       <td key={j} className="px-4 py-3"><Skeleton className="h-4 w-full" /></td>
                     ))}
                   </tr>
                 ))
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center text-muted-foreground">
+                  <td colSpan={10} className="px-4 py-12 text-center text-muted-foreground">
                     Aucune propriété trouvée
                   </td>
                 </tr>
@@ -224,37 +239,38 @@ export default function Properties() {
                       <tr
                         className="border-b border-border/50 hover:bg-muted/30 transition-colors"
                       >
-                      <td className="px-4 py-3 font-medium text-foreground max-w-[160px] truncate">{nameFr}</td>
-                      <td className="px-4 py-3 text-muted-foreground capitalize">{citiesMap[p.city_id] || p.city_id || '—'}</td>
-                      <td className="px-4 py-3 text-muted-foreground max-w-[120px] truncate">{c.contactname || '—'}</td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-2 md:px-4 py-2 md:py-3 font-medium text-foreground truncate max-w-[120px] md:max-w-[160px]">{nameFr}</td>
+                      <td className="px-2 md:px-4 py-2 md:py-3 text-muted-foreground capitalize truncate max-w-[80px] md:max-w-none">{citiesMap[p.city_id] || p.city_id || '—'}</td>
+                      <td className="hidden sm:table-cell px-2 md:px-4 py-2 md:py-3 text-muted-foreground truncate max-w-[120px]">{c.contactname || '—'}</td>
+                      <td className="hidden sm:table-cell px-2 md:px-4 py-2 md:py-3 text-center">
                         {hasEmail
                           ? <CheckCircle2 className="w-4 h-4 text-emerald-500 mx-auto" />
                           : <AlertTriangle className="w-4 h-4 text-amber-400 mx-auto" />
                         }
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground max-w-[100px] truncate">{c.CM || '—'}</td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="hidden md:table-cell px-2 md:px-4 py-2 md:py-3 text-muted-foreground truncate max-w-[100px]">{c.CM || '—'}</td>
+                      <td className="px-2 md:px-4 py-2 md:py-3 text-center">
                         {status ? (
-                          <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${STATUS_BADGE[status] || 'bg-muted text-muted-foreground border-border'}`}>
+                          <span className={`text-[10px] md:text-xs px-2 py-0.5 md:px-2.5 md:py-0.5 rounded-full border font-medium ${STATUS_BADGE[status] || 'bg-muted text-muted-foreground border-border'}`}>
                             {STATUS_LABEL[status] || status}
                           </span>
-                        ) : <span className="text-muted-foreground/60 text-xs">—</span>}
+                        ) : <span className="text-muted-foreground/60 text-[10px] md:text-xs">—</span>}
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="hidden md:table-cell px-2 md:px-4 py-2 md:py-3 text-center">
                         {hasPhotos
-                          ? <CheckCircle2 className="w-4 h-4 text-emerald-500 mx-auto" />
-                          : <XCircle className="w-4 h-4 text-muted-foreground/40 mx-auto" />
+                          ? <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4 text-emerald-500 mx-auto" />
+                          : <XCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-muted-foreground/40 mx-auto" />
                         }
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="hidden lg:table-cell px-2 md:px-4 py-2 md:py-3 text-center">
                         {hasDesc
-                          ? <CheckCircle2 className="w-4 h-4 text-emerald-500 mx-auto" />
-                          : <XCircle className="w-4 h-4 text-muted-foreground/40 mx-auto" />
+                          ? <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4 text-emerald-500 mx-auto" />
+                          : <XCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-muted-foreground/40 mx-auto" />
                         }
                       </td>
-                      <td className="px-4 py-3 text-center">
-                        <div className="flex items-center justify-center gap-1.5">
+                      <td className="hidden lg:table-cell px-2 md:px-4 py-2 md:py-3 text-muted-foreground truncate max-w-[120px]">{propertyTypesMap[p.property_type_id] || p.property_type || '—'}</td>
+                      <td className="px-2 md:px-4 py-2 md:py-3 text-center">
+                        <div className="flex items-center justify-center gap-1 md:gap-1.5">
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -262,11 +278,11 @@ export default function Properties() {
                                   size="sm"
                                   variant="outline"
                                   disabled
-                                  className="h-7 px-3 text-xs opacity-50 cursor-not-allowed"
+                                  className="h-6 md:h-7 px-1.5 md:px-3 text-[10px] md:text-xs opacity-50 cursor-not-allowed"
                                   onClick={() => navigate(`/properties/${p.id}`)}
                                 >
-                                  <Pencil className="w-3 h-3 mr-1" />
-                                  Éditer
+                                  <Pencil className="w-2.5 h-2.5 md:w-3 md:h-3 mr-0.5 md:mr-1" />
+                                  <span className="hidden sm:inline">Éditer</span>
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent side="top" className="text-xs">
@@ -278,27 +294,13 @@ export default function Properties() {
                             onClick={() => navigate(`/properties/${p.centraHotelId || p.id}/details`)}
                             className="group inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-[0.15em] text-coral-500/50 hover:text-coral-500 cursor-pointer transition-all duration-300 hover:scale-105"
                           >
-                            <Eye className="w-3 h-3" />
-                            <span className="relative">
+                            <Eye className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                            <span className="relative hidden sm:inline">
                               Détails
                               <span className="absolute -bottom-px left-0 right-0 h-px bg-coral-500/40 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
                             </span>
-                            <ArrowUpRight className="w-2.5 h-2.5 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300" />
+                            <ArrowUpRight className="w-2 h-2 md:w-2.5 md:h-2.5 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hidden sm:block" />
                           </span>
-                          <button
-                            onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
-                            className="group inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-[0.15em] text-muted-foreground/50 hover:text-foreground cursor-pointer transition-all duration-300"
-                          >
-                            {expandedId === p.id ? (
-                              <ChevronUp className="w-3 h-3" />
-                            ) : (
-                              <ChevronDown className="w-3 h-3" />
-                            )}
-                            <span className="relative">
-                              Riad
-                              <span className="absolute -bottom-px left-0 right-0 h-px bg-foreground/40 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-                            </span>
-                          </button>
                         </div>
                       </td>
                     </tr>
