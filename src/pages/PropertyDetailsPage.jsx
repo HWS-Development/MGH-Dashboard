@@ -11,8 +11,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { usePartnerHotelById, usePartnerHotelContent } from '@/lib/partnerHotelsApi';
-import { getProperty, getContact, listCities } from '@/lib/api';
+import { usePartnerHotelContent, usePartnerHotels, extractCentraHotelId } from '@/lib/partnerHotelsApi';
+import { getProperty, getContact, listCities, listNeighborhoods, listPropertyTypes } from '@/lib/api';
 import { useTranslation } from '@/i18n';
 
 const FALLBACK_IMAGES = [
@@ -46,40 +46,74 @@ export default function PropertyDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang } = useTranslation();
-  const propertyId = parseInt(id);
+  const propertyId = id;
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [expandedImage, setExpandedImage] = useState(null);
 
-  const { data: centraHotel, isLoading: loadingCentra } = usePartnerHotelById(propertyId);
-  const { data: hotelContent, isLoading: loadingContent } = usePartnerHotelContent(propertyId);
+  // Reference catalogs for label resolution
+  const citiesResult = useQuery({
+    queryKey: ['cities'],
+    queryFn: listCities,
+  });
+  const neighborhoodsResult = useQuery({
+    queryKey: ['neighborhoods'],
+    queryFn: () => listNeighborhoods(),
+  });
+  const propertyTypesResult = useQuery({
+    queryKey: ['property-types'],
+    queryFn: listPropertyTypes,
+  });
+
+  const citiesArr = citiesResult.data?.data ?? [];
+  const neighborhoodsArr = neighborhoodsResult.data?.data ?? [];
+  const propertyTypesArr = propertyTypesResult.data?.data ?? [];
+
+  const citiesIndex = useMemo(() => Object.fromEntries(citiesArr.map((c) => [c.id, c.label?.fr || c.name || c.id])), [citiesArr]);
+  const neighborhoodsIndex = useMemo(() => Object.fromEntries(neighborhoodsArr.map((n) => [n.id, n.label?.fr || n.name || n.id])), [neighborhoodsArr]);
+  const propertyTypesIndex = useMemo(() => Object.fromEntries(propertyTypesArr.map((p) => [p.id, p.label?.fr || p.name || p.id])), [propertyTypesArr]);
+
+  const isCentraId = /^HT-/i.test(propertyId);
 
   const { data: dbResult } = useQuery({
     queryKey: ['property-db', propertyId],
     queryFn: () => getProperty(propertyId),
-    enabled: !!propertyId,
+    enabled: !!propertyId && !isCentraId,
   });
   const { data: contactResult } = useQuery({
     queryKey: ['contact-by-property', propertyId],
     queryFn: () => getContact(propertyId),
-    enabled: !!propertyId,
-  });
-  const { data: citiesResult } = useQuery({
-    queryKey: ['cities'],
-    queryFn: listCities,
-    staleTime: 60000,
+    enabled: !!propertyId && !isCentraId,
   });
 
-  const property = centraHotel || {};
+  // Fetch content from Centra detail endpoint
+  const {
+    data: propertyContent,
+    isLoading: loadingContent,
+    error: contentError,
+  } = usePartnerHotelContent(propertyId);
+
+  // Fallback to listing data when detail endpoint fails
+  const { data: hotelList = [], isLoading: listLoading } = usePartnerHotels();
+
+  const matchedHotel = useMemo(() => {
+    if (!Array.isArray(hotelList) || !propertyId) return null;
+    return hotelList.find(
+      (h) =>
+        h?.id === propertyId ||
+        h?.hotel_id === propertyId ||
+        h?.hotelId === propertyId ||
+        extractCentraHotelId(h?.image_urls) === propertyId
+    ) || null;
+  }, [hotelList, propertyId]);
+
+  // Use content from detail endpoint, fall back to listing data on error
+  const resolvedContent = contentError && matchedHotel ? matchedHotel : propertyContent;
+
+  const property = resolvedContent || {};
   const dbProperty = dbResult?.data;
   const contact = contactResult?.data || {};
-  const cities = useMemo(() => {
-    if (!citiesResult?.data) return {};
-    const m = {};
-    citiesResult.data.forEach((c) => { m[c.id] = c.label?.fr || c.name || c.id; });
-    return m;
-  }, [citiesResult]);
 
   const tr = (obj) => {
     if (!obj || typeof obj !== 'object') return String(obj || '');
@@ -87,9 +121,9 @@ export default function PropertyDetailsPage() {
   };
 
   const images = useMemo(() => {
-    const imgs = property.image_urls || [];
+    const imgs = property.imageUrls || property.image_urls || [];
     return imgs.length > 0 ? imgs : FALLBACK_IMAGES;
-  }, [property.image_urls]);
+  }, [property.imageUrls, property.image_urls]);
 
   const totalSlides = images.length;
 
@@ -116,24 +150,55 @@ export default function PropertyDetailsPage() {
     ? `https://www.google.com/maps?q=${gps.lat},${gps.lng}`
     : null;
 
-  const amenities = hotelContent?.amenities ?? [];
-  const services = hotelContent?.services ?? [];
-  const facilities = hotelContent?.facilities ?? [];
+  const amenities = property?.amenities ?? [];
+  const services = property?.services ?? [];
+  const facilities = property?.facilities ?? [];
 
-  const name = tr(property.name) || dbProperty?.name?.fr || '—';
+  const name = tr(property.name) || dbProperty?.name?.fr || '';
   const description = tr(property.description) || dbProperty?.description?.fr || '';
-  const cityName = cities[property.city_id || dbProperty?.city_id] || '—';
+  const cityName = citiesIndex[property.cityId || property.city_id] || property.city || property.city_id || '';
+  const neighborhoodName = neighborhoodsIndex[property.neighborhoodId || property.neighborhood_id] || '';
+  const typeName = propertyTypesIndex[property.propertyTypeId || property.property_type_id] || property.propertyTypeId || property.property_type || dbProperty?.property_type || '';
   const status = contact?.membershipstatus || null;
   const statusCfg = STATUS_CONFIG[status] || null;
-  const rating = property.rating_avg || dbProperty?.rating_avg;
-  const reviews = property.reviews_count || dbProperty?.reviews_count;
+  const rating = property.ratingAvg || property.rating_avg || dbProperty?.rating_avg;
+  const reviews = property.reviewsCount || property.reviews_count || dbProperty?.reviews_count;
   const address = tr(property.address) || dbProperty?.address?.fr || '';
-  const propertyType = property.property_type || dbProperty?.property_type || '';
 
   const hasSimpleBooking = !!(property.simple_booking_link || dbProperty?.simple_booking_link);
   const hasCM = !!(contact?.CM);
 
-  const isLoading = loadingCentra || loadingContent;
+  const contactInfoItems = [
+    ...((property.phone || property.reservation_phone || contact?.phone)
+      ? [{ icon: Phone, label: 'Téléphone', value: property.phone || property.reservation_phone || contact?.phone, href: `tel:${(property.phone || property.reservation_phone || contact?.phone).replace(/\s/g, '')}` }]
+      : []),
+    ...((property.email || property.reservation_email)
+      ? [{ icon: Mail, label: 'Email réservation', value: property.email || property.reservation_email, href: `mailto:${property.email || property.reservation_email}` }]
+      : []),
+    ...(property.website
+      ? [{ icon: Globe, label: 'Site web', value: property.website, href: property.website }]
+      : []),
+    ...(property.whatsappNumber
+      ? [{ icon: Phone, label: 'WhatsApp', value: property.whatsappNumber, href: `https://wa.me/${property.whatsappNumber.replace(/[^0-9]/g, '')}` }]
+      : []),
+    ...(contact?.email
+      ? [{ icon: Shield, label: 'Email accès', value: contact.email }]
+      : []),
+    ...(hasSimpleBooking
+      ? [{ icon: CheckCircle2, label: 'Simple Booking', value: 'Activé' }]
+      : []),
+    ...(hasCM
+      ? [{ icon: Award, label: 'Channel Manager', value: contact.CM }]
+      : []),
+    ...(property.beLink
+      ? [{ icon: ExternalLink, label: 'Booking.com Extranet', value: 'Accéder', href: property.beLink }]
+      : []),
+    ...(property.extraInfo && tr(property.extraInfo)
+      ? [{ icon: Sparkles, label: 'Info complémentaire', value: tr(property.extraInfo) }]
+      : []),
+  ];
+
+  const isLoading = (loadingContent || listLoading) && !propertyContent && !matchedHotel;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-background">
@@ -160,7 +225,7 @@ export default function PropertyDetailsPage() {
                 {statusCfg.label}
               </span>
             )}
-            <span className="text-[10px] text-muted-foreground font-mono">#{propertyId}</span>
+            <span className="text-[10px] text-muted-foreground font-mono">#{property?.hotelId || property?.id || propertyId}</span>
           </div>
         </div>
       </motion.div>
@@ -229,14 +294,16 @@ export default function PropertyDetailsPage() {
                 className="max-w-[1440px] mx-auto"
               >
                 <div className="flex flex-wrap items-center gap-2 mb-3">
-                  {propertyType && (
+                  {typeName && (
                     <span className="text-[10px] font-semibold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-sm text-white/80 border border-white/20">
-                      {propertyType}
+                      {typeName}
                     </span>
                   )}
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full bg-coral-500/20 backdrop-blur-sm text-coral-300 border border-coral-500/30 flex items-center gap-1">
-                    <MapPin className="w-2.5 h-2.5" /> {cityName}
-                  </span>
+                  {cityName && (
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full bg-coral-500/20 backdrop-blur-sm text-coral-300 border border-coral-500/30 flex items-center gap-1">
+                      <MapPin className="w-2.5 h-2.5" /> {cityName}
+                    </span>
+                  )}
                   {rating && (
                     <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-amber-500/20 backdrop-blur-sm text-amber-300 border border-amber-500/30 flex items-center gap-1">
                       <Star className="w-2.5 h-2.5 fill-amber-300" /> {rating}
@@ -245,7 +312,7 @@ export default function PropertyDetailsPage() {
                   )}
                 </div>
                 <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-white tracking-tight leading-tight max-w-3xl">
-                  {name}
+                  {name || 'Propriété'}
                 </h1>
                 {address && (
                   <p className="text-white/60 text-sm md:text-base mt-2 max-w-xl flex items-center gap-1.5">
@@ -307,11 +374,11 @@ export default function PropertyDetailsPage() {
             <motion.div variants={item}>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-px rounded-2xl overflow-hidden border border-border/50 bg-border/20">
                 {[
-                  { icon: Star, label: 'Note moyenne', value: rating || '—', color: 'text-amber-500', bg: 'bg-amber-500/5' },
-                  { icon: Users, label: 'Capacité', value: dbProperty?.capacity || '—', color: 'text-coral-500', bg: 'bg-coral-500/5' },
-                  { icon: Building2, label: 'Type', value: propertyType || '—', color: 'text-sky-500', bg: 'bg-sky-500/5' },
-                  { icon: Calendar, label: 'Membre depuis', value: contact?.member_since || '—', color: 'text-emerald-500', bg: 'bg-emerald-500/5' },
-                ].map((stat) => (
+                  rating && { icon: Star, label: 'Note moyenne', value: rating, color: 'text-amber-500', bg: 'bg-amber-500/5' },
+                  dbProperty?.capacity && { icon: Users, label: 'Capacité', value: dbProperty.capacity, color: 'text-coral-500', bg: 'bg-coral-500/5' },
+                  typeName && { icon: Building2, label: 'Type', value: typeName, color: 'text-sky-500', bg: 'bg-sky-500/5' },
+                  contact?.member_since && { icon: Calendar, label: 'Membre depuis', value: contact.member_since, color: 'text-emerald-500', bg: 'bg-emerald-500/5' },
+                ].filter(Boolean).map((stat) => (
                   <div key={stat.label} className={`${stat.bg} p-5 md:p-6 text-center`}>
                     <stat.icon className={`w-5 h-5 ${stat.color} mx-auto mb-1.5`} />
                     <div className="text-lg md:text-xl font-display font-bold text-foreground">{stat.value}</div>
@@ -322,34 +389,29 @@ export default function PropertyDetailsPage() {
             </motion.div>
 
             {/* ── Contact & Info Grid ──────────────────────────────── */}
-            <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { icon: Phone, label: 'Téléphone', value: property.phone || property.reservation_phone || contact?.phone || '—', href: property.phone ? `tel:${property.phone}` : null },
-                { icon: Mail, label: 'Email réservation', value: property.email || property.reservation_email || '—', href: property.email ? `mailto:${property.email}` : null },
-                { icon: Globe, label: 'Site web', value: property.website || dbProperty?.website || '—', href: property.website || null },
-                { icon: Shield, label: 'Email accès', value: contact?.email || '—', color: contact?.email ? 'text-emerald-500' : 'text-muted-foreground' },
-                { icon: CheckCircle2, label: 'Simple Booking', value: hasSimpleBooking ? 'Activé' : 'Non', color: hasSimpleBooking ? 'text-emerald-500' : 'text-muted-foreground' },
-                { icon: Award, label: 'Channel Manager', value: hasCM ? contact.CM : 'Non', color: hasCM ? 'text-emerald-500' : 'text-muted-foreground' },
-              ].map((info) => (
-                <div key={info.label} className="group relative rounded-xl border border-border/40 bg-card p-4 hover:shadow-md hover:border-coral-200/40 transition-all duration-300">
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center flex-shrink-0 group-hover:bg-coral-100 transition-colors">
-                      <info.icon className={`w-4 h-4 ${info.color || 'text-muted-foreground'} group-hover:text-coral-600 transition-colors`} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-[0.1em] font-semibold">{info.label}</p>
-                      {info.href ? (
-                        <a href={info.href} target="_blank" rel="noreferrer" className="text-sm font-medium text-foreground hover:text-coral-600 truncate block transition-colors mt-0.5">
-                          {info.value}
-                        </a>
-                      ) : (
-                        <p className={`text-sm font-medium truncate mt-0.5 ${info.color || 'text-foreground'}`}>{info.value}</p>
-                      )}
+            {contactInfoItems.length > 0 && (
+              <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {contactInfoItems.map((info) => (
+                  <div key={info.label} className="group relative rounded-xl border border-border/40 bg-card p-4 hover:shadow-md hover:border-coral-200/40 transition-all duration-300">
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center flex-shrink-0 group-hover:bg-coral-100 transition-colors">
+                        <info.icon className={`w-4 h-4 ${info.color || 'text-muted-foreground'} group-hover:text-coral-600 transition-colors`} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-[0.1em] font-semibold">{info.label}</p>
+                        {info.href ? (
+                          <a href={info.href} target="_blank" rel="noreferrer" className="text-sm font-medium text-foreground hover:text-coral-600 truncate block transition-colors mt-0.5">
+                            {info.value}
+                          </a>
+                        ) : (
+                          <p className={`text-sm font-medium truncate mt-0.5 ${info.color || 'text-foreground'}`}>{info.value}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </motion.div>
+                ))}
+              </motion.div>
+            )}
 
             {/* ── Map ──────────────────────────────────────────────── */}
             {gps && (

@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, RefreshCw, AlertTriangle, X, Plus, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Save, RefreshCw, AlertTriangle, X, Plus, GripVertical, ChevronUp, ChevronDown, Eye, ArrowUpRight, ExternalLink } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const DEFAULT_AMENITIES = [
@@ -238,18 +238,32 @@ ${frText}`,
           </Button>
           <div>
             <h1 className="text-xl font-bold text-foreground">{form.name?.fr || form.name || 'Propriété'}</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">ID: {propertyId}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              ID: <span className="font-mono text-foreground/80">{property?.hotelId || property?.id || propertyId}</span>
+            </p>
           </div>
         </div>
-        <Button
-          onClick={() => saveMutation.mutate()}
-          disabled={saveMutation.isPending}
-          className="text-white flex items-center gap-2"
-          style={{ background: '#384252' }}
-        >
-          <Save className="w-4 h-4" />
-          {saveMutation.isPending ? 'Sauvegarde…' : 'Sauvegarder'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/properties/${property?.hotelId || property?.id || propertyId}/details`)}
+            className="flex items-center gap-1.5 text-xs"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            Voir détails
+            <ArrowUpRight className="w-3 h-3 opacity-60" />
+          </Button>
+          <Button
+            onClick={() => saveMutation.mutate()}
+            disabled={saveMutation.isPending}
+            className="text-white flex items-center gap-2"
+            style={{ background: '#384252' }}
+          >
+            <Save className="w-4 h-4" />
+            {saveMutation.isPending ? 'Sauvegarde…' : 'Sauvegarder'}
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="general">

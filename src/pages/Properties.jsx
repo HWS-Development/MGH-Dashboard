@@ -2,12 +2,12 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { listContacts, listCities } from '@/lib/api';
-import { usePartnerHotels } from '@/lib/partnerHotelsApi';
+import { usePartnerHotels, extractCentraHotelId } from '@/lib/partnerHotelsApi';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
-import { Search, Pencil, Eye, CheckCircle2, AlertTriangle, XCircle, ChevronLeft, ChevronRight, Filter, Building2, ArrowUpRight } from 'lucide-react';
+import { Search, Pencil, Eye, CheckCircle2, AlertTriangle, XCircle, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Filter, Building2, ArrowUpRight } from 'lucide-react';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
@@ -36,6 +36,7 @@ export default function Properties() {
   const [filterNoPhotos, setFilterNoPhotos] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [expandedId, setExpandedId] = useState(null);
   const ITEMS_PER_PAGE = 6;
 
   const { data: rawProperties = [], isLoading: loadingProps } = usePartnerHotels();
@@ -53,6 +54,7 @@ export default function Properties() {
     name: typeof p.name === 'string' ? (() => { try { return JSON.parse(p.name); } catch { return {}; } })() : (p.name || {}),
     description: typeof p.description === 'string' ? (() => { try { return JSON.parse(p.description); } catch { return {}; } })() : (p.description || {}),
     image_urls: typeof p.image_urls === 'string' ? (() => { try { return JSON.parse(p.image_urls); } catch { return []; } })() : (p.image_urls || []),
+    centraHotelId: p.hotelId || extractCentraHotelId(p.image_urls),
   }));
   const contacts = contactsResult?.data || [];
   const cities = citiesResult?.data || [];
@@ -210,18 +212,18 @@ export default function Properties() {
                   </td>
                 </tr>
               ) : (
-                paginatedItems.map(p => {
-                  const c = contactsMap[p.id] || {};
-                  const nameFr = p.name?.fr || p.name || '—';
-                  const status = c.membershipstatus || null;
-                  const hasPhotos = p.image_urls && p.image_urls.length > 0;
-                  const hasDesc = p.description?.fr && p.description.fr.trim() !== '';
-                  const hasEmail = c.email && c.email.trim() !== '';
-                  return (
-                    <tr
-                      key={p.id}
-                      className="border-b border-border/50 hover:bg-muted/30 transition-colors"
-                    >
+                  paginatedItems.map(p => {
+                    const c = contactsMap[p.id] || {};
+                    const nameFr = p.name?.fr || p.name || '—';
+                    const status = c.membershipstatus || null;
+                    const hasPhotos = p.image_urls && p.image_urls.length > 0;
+                    const hasDesc = p.description?.fr && p.description.fr.trim() !== '';
+                    const hasEmail = c.email && c.email.trim() !== '';
+                    return (
+                      <React.Fragment key={p.id}>
+                      <tr
+                        className="border-b border-border/50 hover:bg-muted/30 transition-colors"
+                      >
                       <td className="px-4 py-3 font-medium text-foreground max-w-[160px] truncate">{nameFr}</td>
                       <td className="px-4 py-3 text-muted-foreground capitalize">{citiesMap[p.city_id] || p.city_id || '—'}</td>
                       <td className="px-4 py-3 text-muted-foreground max-w-[120px] truncate">{c.contactname || '—'}</td>
@@ -273,7 +275,7 @@ export default function Properties() {
                             </Tooltip>
                           </TooltipProvider>
                           <span
-                            onClick={() => navigate(`/properties/${p.id}/details`)}
+                            onClick={() => navigate(`/properties/${p.centraHotelId || p.id}/details`)}
                             className="group inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-[0.15em] text-coral-500/50 hover:text-coral-500 cursor-pointer transition-all duration-300 hover:scale-105"
                           >
                             <Eye className="w-3 h-3" />
@@ -283,9 +285,24 @@ export default function Properties() {
                             </span>
                             <ArrowUpRight className="w-2.5 h-2.5 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300" />
                           </span>
+                          <button
+                            onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
+                            className="group inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-[0.15em] text-muted-foreground/50 hover:text-foreground cursor-pointer transition-all duration-300"
+                          >
+                            {expandedId === p.id ? (
+                              <ChevronUp className="w-3 h-3" />
+                            ) : (
+                              <ChevronDown className="w-3 h-3" />
+                            )}
+                            <span className="relative">
+                              Riad
+                              <span className="absolute -bottom-px left-0 right-0 h-px bg-foreground/40 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                            </span>
+                          </button>
                         </div>
                       </td>
                     </tr>
+                  </React.Fragment>
                   );
                 })
               )}

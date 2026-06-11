@@ -18,6 +18,7 @@ class PartnerHotelController extends Controller
 {
     private const CACHE_TOKEN_KEY = 'centra_partner_token';
     private const CACHE_HOTELS_KEY = 'centra_partner_hotels';
+    private const CACHE_ORG_ID_KEY = 'centra_partner_org_id';
     private const HOTELS_CACHE_TTL = 300; // 5 minutes
 
     /**
@@ -137,6 +138,23 @@ class PartnerHotelController extends Controller
             );
         }
 
+        // Extract organization ID from login payload (cached for fallback)
+        $orgId = $payload['organizationId']
+            ?? $payload['organization_id']
+            ?? $payload['orgId']
+            ?? $payload['org_id']
+            ?? $payload['app']['orgId'] ?? null
+            ?? $payload['app']['organizationId'] ?? null
+            ?? $payload['app']['org_id'] ?? null
+            ?? $payload['organization']['id'] ?? null
+            ?? $payload['org']['id'] ?? null
+            ?? $payload['user']['organizationId'] ?? null
+            ?? $payload['account']['organizationId'] ?? null;
+        if ($orgId) {
+            Cache::put(self::CACHE_ORG_ID_KEY, $orgId, 86400); // 24h cache
+            Log::info("[PartnerHotelController] Cached org ID: {$orgId}");
+        }
+
         // Cache token for (expiresIn - 60) seconds (proactive refresh)
         $cacheTtl = max($expiresIn - 60, 60);
         Cache::put(self::CACHE_TOKEN_KEY, $accessToken, $cacheTtl);
@@ -207,26 +225,32 @@ class PartnerHotelController extends Controller
     /**
      * GET /api/partner/hotels/{id}/content
      * Returns structured amenities, services, and facilities from Centra.
+     *
+     * Accepts an optional X-Partner-Organization-Id header passed from
+     * the frontend (cached from listing data) which is forwarded to
+     * Centra as X-Organization-Id for multi-org access.
      */
     public function content(string $id): JsonResponse
     {
         try {
-            $hotel = $this->fetchHotelByIdFromCentra($id);
+            $organizationId = request()->header('x-partner-organization-id');
 
-            $amenities  = $hotel['amenities']  ?? [];
-            $services   = $hotel['services']   ?? [];
-            $facilities = $hotel['facilities']  ?? [];
-            $content    = $hotel['content']     ?? $hotel;
+            if (!$organizationId) {
+                $organizationId = Cache::get(self::CACHE_ORG_ID_KEY);
+            }
+
+            if (!$organizationId) {
+                // Force a fresh login to extract org ID from payload
+                $this->invalidateToken();
+                $this->getValidToken();
+                $organizationId = Cache::get(self::CACHE_ORG_ID_KEY);
+            }
+
+            $hotel = $this->fetchHotelByIdFromCentra($id, $organizationId);
 
             return response()->json([
                 'success' => true,
-                'data'    => [
-                    'hotel_id'   => $id,
-                    'hotel_name' => $hotel['name'] ?? ($content['name'] ?? ''),
-                    'amenities'  => $amenities,
-                    'services'   => $services,
-                    'facilities' => $facilities,
-                ],
+                'data'    => $hotel,
             ]);
         } catch (\Exception $e) {
             Log::error("[PartnerHotelController] content({$id}) error: " . $e->getMessage());
@@ -243,17 +267,27 @@ class PartnerHotelController extends Controller
     /**
      * Fetch a single partner hotel by ID from the Centra API.
      * Handles token acquisition and single retry on 401.
+     *
+     * @param  string      $hotelId
+     * @param  string|null $organizationId  Forwarded as X-Organization-Id
+     *                                       for multi-org access.
      */
-    private function fetchHotelByIdFromCentra(string $hotelId): mixed
+    private function fetchHotelByIdFromCentra(string $hotelId, ?string $organizationId = null): mixed
     {
         $baseUrl  = rtrim(config('services.centra.api_base_url'), '/');
-        $hotelUrl = $baseUrl . '/partner/hotels/content/' . urlencode($hotelId);
+        $hotelUrl = $baseUrl . '/partner/hotels/' . urlencode($hotelId) . '/content';
 
         $token    = $this->getValidToken();
-        $response = Http::timeout(30)
+
+        $request = Http::timeout(30)
             ->acceptJson()
-            ->withToken($token)
-            ->get($hotelUrl);
+            ->withToken($token);
+
+        if ($organizationId) {
+            $request->withHeader('X-Organization-Id', $organizationId);
+        }
+
+        $response = $request->get($hotelUrl);
 
         // If 401, refresh token and retry once
         if ($response->status() === 401) {
@@ -261,10 +295,15 @@ class PartnerHotelController extends Controller
             $this->invalidateToken();
 
             $token    = $this->appLogin();
-            $response = Http::timeout(30)
+            $request  = Http::timeout(30)
                 ->acceptJson()
-                ->withToken($token)
-                ->get($hotelUrl);
+                ->withToken($token);
+
+            if ($organizationId) {
+                $request->withHeader('X-Organization-Id', $organizationId);
+            }
+
+            $response = $request->get($hotelUrl);
         }
 
         if ($response->status() === 404) {

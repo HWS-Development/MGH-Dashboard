@@ -10,6 +10,83 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '@/api/base44Client';
 
+const PARTNER_ORG_CACHE_KEY = 'partnerHotelOrganizations';
+let _fallbackOrgId = null;
+
+export function extractCentraHotelId(imageUrls = []) {
+  const urls = Array.isArray(imageUrls) ? imageUrls : [];
+  for (const url of urls) {
+    const match = String(url).match(/\/(HT-[A-Z0-9]+)\//i);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+export function extractCentraOrganizationId(imageUrls = []) {
+  const urls = Array.isArray(imageUrls) ? imageUrls : [];
+  for (const url of urls) {
+    const match = String(url).match(/\/(ORG-[A-Z0-9]+)\//i);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+function readOrganizationCache() {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = window.localStorage.getItem(PARTNER_ORG_CACHE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeOrganizationCache(cache) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(PARTNER_ORG_CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    // Ignore storage failures
+  }
+}
+
+function cacheHotelOrganizations(hotels = []) {
+  const nextCache = { ...readOrganizationCache() };
+  let changed = false;
+  for (const hotel of Array.isArray(hotels) ? hotels : []) {
+    const organizationId = extractCentraOrganizationId(hotel?.image_urls);
+    if (!organizationId) continue;
+
+    if (!_fallbackOrgId) _fallbackOrgId = organizationId;
+
+    const ids = [
+      hotel?.id,
+      hotel?.hotelId,
+      extractCentraHotelId(hotel?.image_urls),
+    ];
+
+    for (const id of ids) {
+      if (id && nextCache[id] !== organizationId) {
+        nextCache[id] = organizationId;
+        changed = true;
+      }
+    }
+  }
+  if (changed) {
+    writeOrganizationCache(nextCache);
+  }
+}
+
+function getCachedOrganizationId(hotelId) {
+  return readOrganizationCache()[hotelId];
+}
+
+function resolveOrganizationId(hotelId) {
+  return getCachedOrganizationId(hotelId) || _fallbackOrgId;
+}
+
 // ── Raw fetch functions (throw on error) ────────────────────────────
 
 async function fetchAllHotels() {
@@ -21,6 +98,7 @@ async function fetchAllHotels() {
     );
   }
 
+  cacheHotelOrganizations(res.data.data);
   return res.data.data;
 }
 
@@ -39,7 +117,17 @@ async function fetchHotelById(id) {
 // ── Raw fetch: hotel content (amenities / services / facilities) ─────
 
 async function fetchContentByHotelId(id) {
-  const res = await api.get(`/partner/hotels/${encodeURIComponent(id)}/content`);
+  let orgId = resolveOrganizationId(id);
+
+  if (!orgId) {
+    console.warn('[partnerHotelsApi] No org ID available for', id, '— fetching list to populate...');
+    await fetchAllHotels();
+    orgId = resolveOrganizationId(id);
+  }
+
+  const res = await api.get(`/partner/hotels/${encodeURIComponent(id)}/content`, {
+    headers: orgId ? { 'x-partner-organization-id': orgId } : {},
+  });
 
   if (!res.data?.success) {
     throw new Error(
@@ -121,5 +209,12 @@ export function usePartnerHotelContent(id) {
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    retry: (failureCount, error) => {
+      if (error?.message?.includes('403') || error?.message?.includes('404')) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+    retryDelay: 800,
   });
 }

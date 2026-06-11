@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Building2, Settings,
-  ChevronRight, LogOut, ExternalLink, Compass, MapPin
+  ChevronRight, LogOut, Compass, MapPin
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
@@ -137,19 +137,8 @@ export default function Sidebar({ collapsed, onToggle, propertiesCount }) {
 
       {/* Bottom */}
       <div className="p-2 space-y-1">
-        <a
-          href="/portal"
-          target="_blank"
-          rel="noreferrer"
-          className={`group flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium w-full
-            text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all duration-200
-            ${collapsed ? 'justify-center' : ''}`}
-        >
-          <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
-          {!collapsed && <span>{t('sidebar.ownerPortal')}</span>}
-        </a>
         <button
-          onClick={() => base44.auth.logout()}
+          onClick={() => base44.auth.logout('/login')}
           className={`group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium w-full
             text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all duration-200
             ${collapsed ? 'justify-center' : ''}`}
