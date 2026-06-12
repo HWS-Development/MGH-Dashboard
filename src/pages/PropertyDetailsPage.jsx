@@ -7,10 +7,17 @@ import {
   ExternalLink, Maximize2, X,
   Building2, Sparkles, CheckCircle2, Navigation, Quote
 } from 'lucide-react';
-import { FaWhatsapp } from 'react-icons/fa';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePartnerHotelContent } from '@/lib/partnerHotelsApi';
 import { useTranslation } from '@/i18n';
+
+function FaWhatsapp({ className = '' }) {
+  return (
+    <svg className={className} viewBox="0 0 448 512" fill="currentColor" aria-hidden="true" focusable="false">
+      <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32 101.8 32 2.4 131.4 2.4 253.5c0 39.1 10.2 77.3 29.6 111L0 480l118.3-31.1c32.4 17.7 68.9 27 105.6 27h.1c122.1 0 221.5-99.4 221.5-221.5 0-59.3-23.1-115-64.6-157.3zM224 438.7h-.1c-32.7 0-64.8-8.8-92.8-25.4l-6.7-4-70.2 18.4 18.7-68.4-4.4-7C50.3 323.5 40.7 289 40.7 253.5c0-101 82.2-183.2 183.3-183.2 48.9 0 94.9 19.1 129.5 53.7 34.6 34.7 53.6 80.7 53.6 129.6 0 101-82.2 183.1-183.1 183.1zm100.4-137.3c-5.5-2.8-32.6-16.1-37.7-17.9-5.1-1.9-8.8-2.8-12.5 2.8s-14.3 17.9-17.6 21.6c-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2s-9.7 1.4-14.8 6.9c-5.1 5.6-19.4 19-19.4 46.3s19.9 53.7 22.6 57.4c2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.6-13.3 37.2-26.2 4.6-12.9 4.6-24 3.2-26.2-1.3-2.5-5-3.9-10.5-6.9z" />
+    </svg>
+  );
+}
 
 const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200',
