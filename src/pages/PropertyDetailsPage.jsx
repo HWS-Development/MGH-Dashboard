@@ -121,7 +121,7 @@ export default function PropertyDetailsPage() {
       ? [{ icon: FaWhatsapp, label: 'WhatsApp', value: whatsappNumber, href: `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}` }]
       : []),
     ...(beLink
-      ? [{ icon: ExternalLink, label: 'BE Link', value: 'Accéder', href: beLink }]
+      ? [{ icon: ExternalLink, label: 'Lien réservation', value: 'Renseigné dans Centra' }]
       : []),
     ...(extraInfoText
       ? [{ icon: Sparkles, label: 'Info complémentaire', value: extraInfoText }]
@@ -335,22 +335,6 @@ export default function PropertyDetailsPage() {
                     </div>
                   </div>
                 ))}
-              </motion.div>
-            )}
-
-            {/* ── Book Now CTA ──────────────────────────────────────── */}
-            {beLink && (
-              <motion.div variants={item} className="text-center">
-                <a
-                  href={beLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-coral-500 text-white font-semibold text-sm uppercase tracking-[0.1em] hover:bg-coral-600 hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg"
-                >
-                  <Sparkles className="w-5 h-5" />
-                  Réserver
-                  <ExternalLink className="w-4 h-4" />
-                </a>
               </motion.div>
             )}
 

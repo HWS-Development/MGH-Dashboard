@@ -174,7 +174,7 @@ function normalizeHotel(hotel) {
     { label: 'Photos', ok: images.length > 0 },
     { label: 'Galerie riche', ok: images.length >= 5 },
     { label: 'Contact', ok: contactReady },
-    { label: 'BE Link', ok: isPresent(beLink) },
+    { label: 'Lien réservation', ok: isPresent(beLink) },
     { label: 'Géolocalisation', ok: isPresent(lat) && isPresent(lng) },
     { label: 'Services', ok: servicesCount > 0 || isPresent(website) },
   ];
@@ -281,6 +281,49 @@ function KpiCard({ title, value, suffix = '', sub, icon: Icon, color, index, loa
   );
 }
 
+function ReadingGuide() {
+  const items = [
+    {
+      icon: BarChart3,
+      title: 'Comment lire les pourcentages',
+      text: 'Un pourcentage indique la part des fiches concernées sur le total des riads Centra. Exemple : 80% = 8 fiches sur 10.',
+      color: ACCENT_COLORS.sapphire,
+    },
+    {
+      icon: ShieldCheck,
+      title: 'Score de complétude',
+      text: 'Chaque fiche est notée selon 10 informations attendues : nom, description, ville, type, photos, contact, lien réservation, GPS et services.',
+      color: ACCENT_COLORS.emerald,
+    },
+    {
+      icon: CircleDollarSign,
+      title: 'Lien réservation renseigné',
+      text: 'Cela veut seulement dire que le champ Centra beLink existe. Le dashboard ne sert pas à réserver, il sert à contrôler la qualité des fiches.',
+      color: ACCENT_COLORS.gold,
+    },
+  ];
+
+  return (
+    <motion.div custom={6} variants={cardVariants} initial="hidden" animate="visible" className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
+      <div className="mb-4">
+        <h2 className="font-display text-xl font-semibold text-foreground">Guide de lecture des statistiques</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Chaque bloc explique une information simple et vérifiable depuis les données Centra.</p>
+      </div>
+      <div className="grid gap-3 md:grid-cols-3">
+        {items.map((item) => (
+          <div key={item.title} className="rounded-2xl border border-border/45 bg-muted/25 p-4">
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-sm">
+              <item.icon className="h-5 w-5" style={{ color: item.color }} />
+            </div>
+            <div className="text-sm font-semibold text-foreground">{item.title}</div>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 function DonutCard({ title, subtitle, data, centerValue, centerLabel, index }) {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   const safeData = total > 0 ? data : [{ name: 'Aucune donnée', value: 1, color: ACCENT_COLORS.slate }];
@@ -382,20 +425,20 @@ export default function Dashboard() {
     { name: 'Type', value: percent(hotels.filter((h) => h.hasType).length, total), color: ACCENT_COLORS.violet },
     { name: 'Photos', value: percent(hotels.filter((h) => h.hasPhotos).length, total), color: ACCENT_COLORS.rose },
     { name: 'Contact', value: percent(directContact, total), color: ACCENT_COLORS.amber },
-    { name: 'BE Link', value: percent(beReady, total), color: ACCENT_COLORS.gold },
+    { name: 'Lien résa.', value: percent(beReady, total), color: ACCENT_COLORS.gold },
     { name: 'Geo', value: percent(geoReady, total), color: ACCENT_COLORS.emerald },
   ];
 
   const beLinkData = [
-    { name: 'BE Link actif', value: beReady, color: ACCENT_COLORS.gold },
-    { name: 'Contact sans BE Link', value: hotels.filter((h) => !h.hasBeLink && h.hasContact).length, color: ACCENT_COLORS.sapphire },
-    { name: 'À compléter', value: hotels.filter((h) => !h.hasBeLink && !h.hasContact).length, color: ACCENT_COLORS.rose },
+    { name: 'Lien renseigné', value: beReady, color: ACCENT_COLORS.gold },
+    { name: 'Contact présent, lien manquant', value: hotels.filter((h) => !h.hasBeLink && h.hasContact).length, color: ACCENT_COLORS.sapphire },
+    { name: 'Contact et lien manquants', value: hotels.filter((h) => !h.hasBeLink && !h.hasContact).length, color: ACCENT_COLORS.rose },
   ];
 
   const mediaData = [
-    { name: 'Galerie premium', value: richMedia, color: ACCENT_COLORS.emerald },
-    { name: 'Galerie basique', value: hotels.filter((h) => h.hasPhotos && !h.hasRichPhotos).length, color: ACCENT_COLORS.gold },
-    { name: 'Sans photos', value: hotels.filter((h) => !h.hasPhotos).length, color: ACCENT_COLORS.rose },
+    { name: '5 photos ou plus', value: richMedia, color: ACCENT_COLORS.emerald },
+    { name: '1 à 4 photos', value: hotels.filter((h) => h.hasPhotos && !h.hasRichPhotos).length, color: ACCENT_COLORS.gold },
+    { name: 'Aucune photo', value: hotels.filter((h) => !h.hasPhotos).length, color: ACCENT_COLORS.rose },
   ];
 
   const scoreHistogram = [
@@ -411,12 +454,12 @@ export default function Dashboard() {
   const excellentHotels = hotels.filter((hotel) => hotel.score >= 80).length;
 
   const kpis = [
-    { title: 'Riads Centra', value: total, sub: 'Volume total analysé', icon: Building2, color: ACCENT_COLORS.gold },
-    { title: 'Qualité moyenne', value: avgScore, suffix: '%', sub: `${excellentHotels} fiches ≥ 80%`, icon: ShieldCheck, color: ACCENT_COLORS.emerald },
-    { title: 'BE Link actif', value: percent(beReady, total), suffix: '%', sub: `${beReady} riads avec beLink`, icon: CircleDollarSign, color: ACCENT_COLORS.sapphire },
-    { title: 'Contact direct', value: percent(directContact, total), suffix: '%', sub: `${directContact} fiches avec email ou téléphone`, icon: Phone, color: ACCENT_COLORS.violet },
-    { title: 'Média premium', value: percent(richMedia, total), suffix: '%', sub: `${averageImages} photos en moyenne`, icon: Camera, color: ACCENT_COLORS.rose },
-    { title: 'Géolocalisés', value: percent(geoReady, total), suffix: '%', sub: `${geoReady} fiches prêtes pour la carte`, icon: MapPinned, color: ACCENT_COLORS.amber },
+    { title: 'Nombre de riads', value: total, sub: 'Total des fiches Centra analysées', icon: Building2, color: ACCENT_COLORS.gold },
+    { title: 'Complétude moyenne', value: avgScore, suffix: '%', sub: `Score moyen sur 10 informations (${excellentHotels} fiches ≥ 80%)`, icon: ShieldCheck, color: ACCENT_COLORS.emerald },
+    { title: 'Lien réservation renseigné', value: percent(beReady, total), suffix: '%', sub: `${beReady} fiches ont ce lien dans Centra`, icon: CircleDollarSign, color: ACCENT_COLORS.sapphire },
+    { title: 'Contact disponible', value: percent(directContact, total), suffix: '%', sub: `${directContact} fiches avec email ou téléphone`, icon: Phone, color: ACCENT_COLORS.violet },
+    { title: 'Photos suffisantes', value: percent(richMedia, total), suffix: '%', sub: `${averageImages} photos en moyenne; objectif: 5+`, icon: Camera, color: ACCENT_COLORS.rose },
+    { title: 'Position GPS renseignée', value: percent(geoReady, total), suffix: '%', sub: `${geoReady} fiches avec latitude + longitude`, icon: MapPinned, color: ACCENT_COLORS.amber },
   ];
 
   return (
@@ -427,6 +470,8 @@ export default function Dashboard() {
         ))}
       </div>
 
+      <ReadingGuide />
+
       {isLoading ? (
         <div className="grid gap-5 lg:grid-cols-2">
           <SkeletonPanel className="h-[420px]" />
@@ -436,24 +481,24 @@ export default function Dashboard() {
         <>
           <div className="grid gap-5 xl:grid-cols-3">
             <DonutCard
-              title="Readiness commerciale"
-              subtitle="Niveau de préparation à la réservation directe via beLink."
+              title="Lien de réservation dans Centra"
+              subtitle="Combien de fiches ont un lien de réservation renseigné dans Centra. Ce n'est pas un bouton pour réserver."
               data={beLinkData}
               centerValue={`${percent(beReady, total)}%`}
-              centerLabel="beLink"
+              centerLabel="avec lien"
               index={0}
             />
             <DonutCard
-              title="Qualité média"
-              subtitle="Répartition des fiches selon la richesse photo."
+              title="Photos des riads"
+              subtitle="Une fiche est considérée bien illustrée à partir de 5 photos."
               data={mediaData}
               centerValue={`${percent(richMedia, total)}%`}
-              centerLabel="premium"
+              centerLabel="5+ photos"
               index={1}
             />
             <BarPanel
-              title="Distribution qualité"
-              subtitle="Histogramme des scores de complétude par riad."
+              title="Niveau de complétude des fiches"
+              subtitle="Nombre de fiches dans chaque tranche de score. Plus le score est haut, plus la fiche est complète."
               data={scoreHistogram}
               index={2}
             />
@@ -461,8 +506,8 @@ export default function Dashboard() {
 
           <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
             <BarPanel
-              title="Complétude par champ"
-              subtitle="Pourcentage des fiches avec les informations clés renseignées."
+              title="Informations présentes dans Centra"
+              subtitle="Pour chaque champ, le pourcentage indique combien de fiches ont cette information renseignée."
               data={fieldCoverage}
               index={3}
             />
@@ -470,8 +515,8 @@ export default function Dashboard() {
             <motion.div custom={4} variants={cardVariants} initial="hidden" animate="visible" className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="font-display text-lg font-semibold text-foreground">Répartition par type</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Segments les plus représentés dans le portefeuille.</p>
+                  <h3 className="font-display text-lg font-semibold text-foreground">Types de propriétés</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">Nombre de fiches par type retourné par Centra.</p>
                 </div>
                 <div className="rounded-2xl bg-sky-500/10 p-2 text-sky-600">
                   <BadgeCheck className="h-5 w-5" />
@@ -498,7 +543,7 @@ export default function Dashboard() {
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
                   <h3 className="font-display text-lg font-semibold text-foreground">Comparaison par ville</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Volume, score moyen et taux beLink par marché.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Par ville : nombre de riads, complétude moyenne et part des fiches avec lien de réservation renseigné.</p>
                 </div>
                 <div className="rounded-2xl bg-emerald-500/10 p-2 text-emerald-600">
                   <MapPinned className="h-5 w-5" />
@@ -510,8 +555,8 @@ export default function Dashboard() {
                     <tr>
                       <th className="px-4 py-3 text-left">Ville</th>
                       <th className="px-4 py-3 text-right">Riads</th>
-                      <th className="px-4 py-3 text-right">Score</th>
-                      <th className="hidden px-4 py-3 text-right sm:table-cell">BE Link</th>
+                      <th className="px-4 py-3 text-right">Complétude</th>
+                      <th className="hidden px-4 py-3 text-right sm:table-cell">Lien résa.</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/50">
@@ -531,8 +576,8 @@ export default function Dashboard() {
             <motion.div custom={6} variants={cardVariants} initial="hidden" animate="visible" className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="font-display text-lg font-semibold text-foreground">Priorités d'amélioration</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Les fiches les plus importantes à compléter en premier.</p>
+                  <h3 className="font-display text-lg font-semibold text-foreground">Fiches à compléter en priorité</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">Les fiches avec le plus d'informations manquantes apparaissent en premier.</p>
                 </div>
                 <div className="rounded-2xl bg-rose-500/10 p-2 text-rose-600">
                   <Target className="h-5 w-5" />
