@@ -55,8 +55,8 @@ export default function Properties() {
 
   const properties = rawProperties.map(p => ({
     ...p,
-    name: typeof p.name === 'string' ? (() => { try { return JSON.parse(p.name); } catch { return {}; } })() : (p.name || {}),
-    description: typeof p.description === 'string' ? (() => { try { return JSON.parse(p.description); } catch { return {}; } })() : (p.description || {}),
+    name: typeof p.name === 'string' ? (() => { try { return JSON.parse(p.name); } catch { return null; } })() : (p.name || null),
+    description: typeof p.description === 'string' ? (() => { try { return JSON.parse(p.description); } catch { return null; } })() : (p.description || null),
     image_urls: typeof p.image_urls === 'string' ? (() => { try { return JSON.parse(p.image_urls); } catch { return []; } })() : (p.image_urls || []),
     centraHotelId: p.hotelId || extractCentraHotelId(p.image_urls),
   }));
@@ -229,7 +229,7 @@ export default function Properties() {
               ) : (
                   paginatedItems.map(p => {
                     const c = contactsMap[p.id] || {};
-                    const nameFr = p.name?.fr || p.name || '—';
+                    const nameFr = p.name?.fr || p.name?.en || p.name?.es || '—';
                     const status = c.membershipstatus || null;
                     const hasPhotos = p.image_urls && p.image_urls.length > 0;
                     const hasDesc = p.description?.fr && p.description.fr.trim() !== '';
