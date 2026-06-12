@@ -11,8 +11,6 @@ import {
   MapPinned,
   Phone,
   ShieldCheck,
-  Sparkles,
-  Star,
   Target,
   TrendingUp,
 } from 'lucide-react';
@@ -29,7 +27,6 @@ import {
   YAxis,
 } from 'recharts';
 import { usePartnerHotels, extractCentraHotelId } from '@/lib/partnerHotelsApi';
-import { useTranslation } from '@/i18n';
 
 const ACCENT_COLORS = {
   gold: 'hsl(38 92% 55%)',
@@ -236,9 +233,9 @@ function ChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   const item = payload[0];
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-950/95 px-3 py-2 shadow-2xl backdrop-blur text-xs text-white">
+    <div className="rounded-xl border border-border/70 bg-card px-3 py-2 text-xs text-foreground shadow-xl backdrop-blur">
       <div className="font-semibold">{label || item.name}</div>
-      <div className="mt-1 text-slate-300">{item.name}: <span className="text-white font-semibold">{item.value}</span></div>
+      <div className="mt-1 text-muted-foreground">{item.name}: <span className="font-semibold text-foreground">{item.value}</span></div>
     </div>
   );
 }
@@ -252,29 +249,29 @@ function KpiCard({ title, value, suffix = '', sub, icon: Icon, color, index, loa
 
   return (
     <motion.div custom={index} variants={cardVariants} initial="hidden" animate="visible" className="group">
-      <div className="relative h-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-5 shadow-xl shadow-slate-950/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
-        <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-20 blur-2xl" style={{ background: color }} />
-        <div className="absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+      <div className="relative h-full overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-card via-card to-muted/35 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-amber-300/45 hover:shadow-xl hover:shadow-amber-500/10">
+        <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-15 blur-2xl" style={{ background: color }} />
+        <div className="absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-amber-300/60 to-transparent" />
 
         <div className="flex items-start justify-between gap-4">
-          <div className="rounded-2xl border border-white/10 bg-white/8 p-3 shadow-inner">
+          <div className="rounded-2xl border border-border/70 bg-background/80 p-3 shadow-inner">
             <Icon className="h-5 w-5" style={{ color }} />
           </div>
-          <div className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/60">
+          <div className="rounded-full border border-border/70 bg-muted/45 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             KPI
           </div>
         </div>
 
         <div className="mt-6">
           {loading ? (
-            <div className="h-9 w-20 rounded-lg bg-white/10 animate-pulse" />
+            <div className="h-9 w-20 rounded-lg bg-muted animate-pulse" />
           ) : (
-            <div className="font-display text-3xl font-bold tracking-tight text-white">
+            <div className="font-display text-3xl font-bold tracking-tight text-foreground">
               {formatNumber(displayValue)}{suffix}
             </div>
           )}
-          <div className="mt-1 text-sm font-semibold text-white/82">{title}</div>
-          <div className="mt-3 flex items-center gap-2 text-xs text-white/55">
+          <div className="mt-1 text-sm font-semibold text-foreground/85">{title}</div>
+          <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
             {sub}
           </div>
@@ -367,7 +364,6 @@ function BarPanel({ title, subtitle, data, dataKey = 'value', index }) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const { data: rawHotels = [], isLoading } = usePartnerHotels();
 
   const hotels = useMemo(() => rawHotels.map(normalizeHotel), [rawHotels]);
@@ -378,11 +374,6 @@ export default function Dashboard() {
   const richMedia = hotels.filter((hotel) => hotel.hasRichPhotos).length;
   const geoReady = hotels.filter((hotel) => hotel.hasGeo).length;
   const averageImages = total ? (hotels.reduce((sum, hotel) => sum + hotel.images.length, 0) / total).toFixed(1) : '0.0';
-  const ratedHotels = hotels.filter((hotel) => hotel.rating !== null);
-  const avgRating = ratedHotels.length
-    ? (ratedHotels.reduce((sum, hotel) => sum + hotel.rating, 0) / ratedHotels.length).toFixed(2)
-    : '0.00';
-  const totalReviews = hotels.reduce((sum, hotel) => sum + hotel.reviews, 0);
 
   const fieldCoverage = [
     { name: 'Nom', value: percent(hotels.filter((h) => h.hasName).length, total), color: ACCENT_COLORS.gold },
@@ -430,49 +421,6 @@ export default function Dashboard() {
 
   return (
     <motion.div className="space-y-8 pb-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-      <motion.section
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-stone-900 p-6 text-white shadow-2xl shadow-slate-950/20 md:p-8"
-      >
-        <div className="absolute -right-16 -top-20 h-72 w-72 rounded-full bg-amber-400/20 blur-3xl" />
-        <div className="absolute -bottom-24 left-10 h-72 w-72 rounded-full bg-violet-500/15 blur-3xl" />
-        <div className="relative grid gap-6 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.22em] text-amber-200">
-              <Sparkles className="h-3.5 w-3.5" />
-              Intelligence portfolio
-            </div>
-            <h1 className="mt-5 max-w-3xl font-display text-3xl font-bold leading-tight tracking-tight md:text-5xl">
-              {t('dashboard.title')} premium des riads
-            </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-white/68 md:text-base">
-              KPIs calculés uniquement depuis les données Centra : contenu, photos, beLink, contact, réputation, géolocalisation et qualité commerciale des fiches.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2">
-            <div className="rounded-3xl border border-white/10 bg-white/8 p-4 backdrop-blur">
-              <div className="text-xs uppercase tracking-[0.18em] text-white/45">Score moyen</div>
-              <div className="mt-2 font-display text-3xl font-bold">{isLoading ? '...' : `${avgScore}%`}</div>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-white/8 p-4 backdrop-blur">
-              <div className="text-xs uppercase tracking-[0.18em] text-white/45">Note moyenne</div>
-              <div className="mt-2 font-display text-3xl font-bold">{isLoading ? '...' : `${avgRating}/5`}</div>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-white/8 p-4 backdrop-blur">
-              <div className="text-xs uppercase tracking-[0.18em] text-white/45">Avis cumulés</div>
-              <div className="mt-2 font-display text-3xl font-bold">{isLoading ? '...' : formatNumber(totalReviews)}</div>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-white/8 p-4 backdrop-blur">
-              <div className="text-xs uppercase tracking-[0.18em] text-white/45">Top ville</div>
-              <div className="mt-2 truncate font-display text-lg font-semibold">{cityStats[0]?.label || '...'}</div>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-6">
         {kpis.map((kpi, index) => (
           <KpiCard key={kpi.title} {...kpi} index={index} loading={isLoading} />
