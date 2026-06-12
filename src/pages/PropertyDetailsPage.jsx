@@ -5,7 +5,7 @@ import {
   ArrowLeft, ChevronLeft, ChevronRight, MapPin, Phone, Mail,
   Globe, Star, Users,
   ExternalLink, Maximize2, X,
-  Building2, Sparkles, CheckCircle2, Navigation, Quote
+  Building2, Sparkles, Navigation, Quote
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePartnerHotelContent } from '@/lib/partnerHotelsApi';
@@ -121,10 +121,7 @@ export default function PropertyDetailsPage() {
       ? [{ icon: FaWhatsapp, label: 'WhatsApp', value: whatsappNumber, href: `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}` }]
       : []),
     ...(beLink
-      ? [{ icon: ExternalLink, label: 'Booking.com Extranet', value: 'Accéder', href: beLink }]
-      : []),
-    ...(property.simple_booking_link
-      ? [{ icon: CheckCircle2, label: 'Simple Booking', value: 'Activé' }]
+      ? [{ icon: ExternalLink, label: 'BE Link', value: 'Accéder', href: beLink }]
       : []),
     ...(extraInfoText
       ? [{ icon: Sparkles, label: 'Info complémentaire', value: extraInfoText }]
@@ -342,10 +339,10 @@ export default function PropertyDetailsPage() {
             )}
 
             {/* ── Book Now CTA ──────────────────────────────────────── */}
-            {(beLink || property.simple_booking_link || property.website) && (
+            {beLink && (
               <motion.div variants={item} className="text-center">
                 <a
-                  href={beLink || property.simple_booking_link || property.website}
+                  href={beLink}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-coral-500 text-white font-semibold text-sm uppercase tracking-[0.1em] hover:bg-coral-600 hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg"

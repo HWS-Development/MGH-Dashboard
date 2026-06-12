@@ -7,10 +7,7 @@ import {
   BarChart3,
   Building2,
   Camera,
-  CheckCircle2,
   CircleDollarSign,
-  Image,
-  Mail,
   MapPinned,
   Phone,
   ShieldCheck,
@@ -109,6 +106,12 @@ function percent(part, total) {
   return Math.round((part / total) * 100);
 }
 
+function toNumber(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
 function formatNumber(value) {
   return new Intl.NumberFormat('fr-FR').format(value || 0);
 }
@@ -145,7 +148,7 @@ function normalizeHotel(hotel) {
   const descriptionValue = localized(hotel.description);
   const phone = pick(hotel, ['phone', 'phone_number', 'phoneNumber', 'reservation_phone', 'reservationPhone']);
   const email = pick(hotel, ['email', 'reservation_email', 'reservationEmail']);
-  const bookingLink = pick(hotel, ['simple_booking_link', 'simpleBookingLink', 'booking_link', 'bookingLink']);
+  const beLink = pick(hotel, ['beLink']);
   const website = pick(hotel, ['website', 'website_url', 'websiteUrl']);
   const city = localized(pick(hotel, ['city', 'city_name', 'cityName', 'city_id', 'cityId'])) || 'Non renseignée';
   const type = localized(pick(hotel, ['property_type', 'propertyType', 'property_type_id', 'propertyTypeId', 'type'])) || 'Non renseigné';
@@ -154,6 +157,8 @@ function normalizeHotel(hotel) {
   const servicesCount = asArray(hotel.amenities).length + asArray(hotel.services).length + asArray(hotel.facilities).length;
   const hotelId = hotel.hotelId || hotel.hotel_id || extractCentraHotelId(images) || hotel.id;
   const contactReady = isPresent(phone) || isPresent(email);
+  const rating = toNumber(hotel.ratingAvg || hotel.rating_avg);
+  const reviews = toNumber(hotel.reviewsCount || hotel.reviews_count) || 0;
 
   const checks = [
     { label: 'Nom', ok: isPresent(nameValue) },
@@ -163,7 +168,7 @@ function normalizeHotel(hotel) {
     { label: 'Photos', ok: images.length > 0 },
     { label: 'Galerie riche', ok: images.length >= 5 },
     { label: 'Contact', ok: contactReady },
-    { label: 'Booking link', ok: isPresent(bookingLink) },
+    { label: 'BE Link', ok: isPresent(beLink) },
     { label: 'Géolocalisation', ok: isPresent(lat) && isPresent(lng) },
     { label: 'Services', ok: servicesCount > 0 || isPresent(website) },
   ];
@@ -177,6 +182,8 @@ function normalizeHotel(hotel) {
     name: nameValue || hotelId || 'Riad sans nom',
     city,
     type,
+    rating,
+    reviews,
     images,
     score,
     missing: checks.filter((check) => !check.ok).map((check) => check.label),
@@ -187,7 +194,7 @@ function normalizeHotel(hotel) {
     hasPhotos: images.length > 0,
     hasRichPhotos: images.length >= 5,
     hasContact: contactReady,
-    hasBooking: isPresent(bookingLink),
+    hasBeLink: isPresent(beLink),
     hasGeo: isPresent(lat) && isPresent(lng),
     hasServices: servicesCount > 0 || isPresent(website),
   };
@@ -201,7 +208,7 @@ function buildGroupStats(hotels, key) {
     const current = map.get(label) || { label, count: 0, score: 0, booking: 0, media: 0 };
     current.count += 1;
     current.score += hotel.score;
-    current.booking += hotel.hasBooking ? 1 : 0;
+    current.booking += hotel.hasBeLink ? 1 : 0;
     current.media += hotel.hasRichPhotos ? 1 : 0;
     map.set(label, current);
   });
@@ -357,11 +364,16 @@ export default function Dashboard() {
   const hotels = useMemo(() => rawHotels.map(normalizeHotel), [rawHotels]);
   const total = hotels.length;
   const avgScore = total ? Math.round(hotels.reduce((sum, hotel) => sum + hotel.score, 0) / total) : 0;
-  const readyBooking = hotels.filter((hotel) => hotel.hasBooking).length;
+  const beReady = hotels.filter((hotel) => hotel.hasBeLink).length;
   const directContact = hotels.filter((hotel) => hotel.hasContact).length;
   const richMedia = hotels.filter((hotel) => hotel.hasRichPhotos).length;
   const geoReady = hotels.filter((hotel) => hotel.hasGeo).length;
   const averageImages = total ? (hotels.reduce((sum, hotel) => sum + hotel.images.length, 0) / total).toFixed(1) : '0.0';
+  const ratedHotels = hotels.filter((hotel) => hotel.rating !== null);
+  const avgRating = ratedHotels.length
+    ? (ratedHotels.reduce((sum, hotel) => sum + hotel.rating, 0) / ratedHotels.length).toFixed(2)
+    : '0.00';
+  const totalReviews = hotels.reduce((sum, hotel) => sum + hotel.reviews, 0);
 
   const fieldCoverage = [
     { name: 'Nom', value: percent(hotels.filter((h) => h.hasName).length, total), color: ACCENT_COLORS.gold },
@@ -370,14 +382,14 @@ export default function Dashboard() {
     { name: 'Type', value: percent(hotels.filter((h) => h.hasType).length, total), color: ACCENT_COLORS.violet },
     { name: 'Photos', value: percent(hotels.filter((h) => h.hasPhotos).length, total), color: ACCENT_COLORS.rose },
     { name: 'Contact', value: percent(directContact, total), color: ACCENT_COLORS.amber },
-    { name: 'Booking', value: percent(readyBooking, total), color: ACCENT_COLORS.gold },
+    { name: 'BE Link', value: percent(beReady, total), color: ACCENT_COLORS.gold },
     { name: 'Geo', value: percent(geoReady, total), color: ACCENT_COLORS.emerald },
   ];
 
-  const bookingData = [
-    { name: 'Booking direct', value: readyBooking, color: ACCENT_COLORS.gold },
-    { name: 'Contact sans booking', value: hotels.filter((h) => !h.hasBooking && h.hasContact).length, color: ACCENT_COLORS.sapphire },
-    { name: 'À compléter', value: hotels.filter((h) => !h.hasBooking && !h.hasContact).length, color: ACCENT_COLORS.rose },
+  const beLinkData = [
+    { name: 'BE Link actif', value: beReady, color: ACCENT_COLORS.gold },
+    { name: 'Contact sans BE Link', value: hotels.filter((h) => !h.hasBeLink && h.hasContact).length, color: ACCENT_COLORS.sapphire },
+    { name: 'À compléter', value: hotels.filter((h) => !h.hasBeLink && !h.hasContact).length, color: ACCENT_COLORS.rose },
   ];
 
   const mediaData = [
@@ -401,7 +413,7 @@ export default function Dashboard() {
   const kpis = [
     { title: 'Riads Centra', value: total, sub: 'Volume total analysé', icon: Building2, color: ACCENT_COLORS.gold },
     { title: 'Qualité moyenne', value: avgScore, suffix: '%', sub: `${excellentHotels} fiches ≥ 80%`, icon: ShieldCheck, color: ACCENT_COLORS.emerald },
-    { title: 'Prêts à réserver', value: percent(readyBooking, total), suffix: '%', sub: `${readyBooking} riads avec lien booking`, icon: CircleDollarSign, color: ACCENT_COLORS.sapphire },
+    { title: 'BE Link actif', value: percent(beReady, total), suffix: '%', sub: `${beReady} riads avec beLink`, icon: CircleDollarSign, color: ACCENT_COLORS.sapphire },
     { title: 'Contact direct', value: percent(directContact, total), suffix: '%', sub: `${directContact} fiches avec email ou téléphone`, icon: Phone, color: ACCENT_COLORS.violet },
     { title: 'Média premium', value: percent(richMedia, total), suffix: '%', sub: `${averageImages} photos en moyenne`, icon: Camera, color: ACCENT_COLORS.rose },
     { title: 'Géolocalisés', value: percent(geoReady, total), suffix: '%', sub: `${geoReady} fiches prêtes pour la carte`, icon: MapPinned, color: ACCENT_COLORS.amber },
@@ -427,7 +439,7 @@ export default function Dashboard() {
               {t('dashboard.title')} premium des riads
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-white/68 md:text-base">
-              KPIs calculés uniquement depuis les données Centra : contenu, photos, booking, contact, géolocalisation et qualité commerciale des fiches.
+              KPIs calculés uniquement depuis les données Centra : contenu, photos, beLink, contact, réputation, géolocalisation et qualité commerciale des fiches.
             </p>
           </div>
 
@@ -435,6 +447,14 @@ export default function Dashboard() {
             <div className="rounded-3xl border border-white/10 bg-white/8 p-4 backdrop-blur">
               <div className="text-xs uppercase tracking-[0.18em] text-white/45">Score moyen</div>
               <div className="mt-2 font-display text-3xl font-bold">{isLoading ? '...' : `${avgScore}%`}</div>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-white/8 p-4 backdrop-blur">
+              <div className="text-xs uppercase tracking-[0.18em] text-white/45">Note moyenne</div>
+              <div className="mt-2 font-display text-3xl font-bold">{isLoading ? '...' : `${avgRating}/5`}</div>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-white/8 p-4 backdrop-blur">
+              <div className="text-xs uppercase tracking-[0.18em] text-white/45">Avis cumulés</div>
+              <div className="mt-2 font-display text-3xl font-bold">{isLoading ? '...' : formatNumber(totalReviews)}</div>
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/8 p-4 backdrop-blur">
               <div className="text-xs uppercase tracking-[0.18em] text-white/45">Top ville</div>
@@ -460,10 +480,10 @@ export default function Dashboard() {
           <div className="grid gap-5 xl:grid-cols-3">
             <DonutCard
               title="Readiness commerciale"
-              subtitle="Niveau de préparation à la conversion directe."
-              data={bookingData}
-              centerValue={`${percent(readyBooking, total)}%`}
-              centerLabel="booking"
+              subtitle="Niveau de préparation à la réservation directe via beLink."
+              data={beLinkData}
+              centerValue={`${percent(beReady, total)}%`}
+              centerLabel="beLink"
               index={0}
             />
             <DonutCard
@@ -521,7 +541,7 @@ export default function Dashboard() {
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
                   <h3 className="font-display text-lg font-semibold text-foreground">Comparaison par ville</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Volume, score moyen et capacité booking par marché.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Volume, score moyen et taux beLink par marché.</p>
                 </div>
                 <div className="rounded-2xl bg-emerald-500/10 p-2 text-emerald-600">
                   <MapPinned className="h-5 w-5" />
@@ -534,7 +554,7 @@ export default function Dashboard() {
                       <th className="px-4 py-3 text-left">Ville</th>
                       <th className="px-4 py-3 text-right">Riads</th>
                       <th className="px-4 py-3 text-right">Score</th>
-                      <th className="hidden px-4 py-3 text-right sm:table-cell">Booking</th>
+                      <th className="hidden px-4 py-3 text-right sm:table-cell">BE Link</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/50">
