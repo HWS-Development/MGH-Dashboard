@@ -26,7 +26,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { usePartnerHotels, extractCentraHotelId } from '@/lib/partnerHotelsApi';
+import { usePartnerHotelsStats } from '@/lib/partnerHotelsApi';
 
 const ACCENT_COLORS = {
   gold: 'hsl(38 92% 55%)',
@@ -145,7 +145,7 @@ function normalizeHotel(hotel) {
   const descriptionValue = localized(hotel.description);
   const phone = pick(hotel, ['phone', 'phone_number', 'phoneNumber', 'reservation_phone', 'reservationPhone']);
   const email = pick(hotel, ['email', 'reservation_email', 'reservationEmail']);
-  const beLink = pick(hotel, ['beLink']);
+  const beLink = pick(hotel, ['beLink', 'be_link', 'be_link_url']);
   const website = pick(hotel, ['website', 'website_url', 'websiteUrl']);
   const city = localized(pick(hotel, ['city', 'city_name', 'cityName', 'city_id', 'cityId'])) || 'Non renseignée';
   const type = localized(pick(hotel, ['property_type', 'propertyType', 'property_type_id', 'propertyTypeId', 'type'])) || 'Non renseigné';
@@ -161,7 +161,7 @@ function normalizeHotel(hotel) {
     asArray(hotel.facilities).length +
     asArray(hotel.bookingConditionIds).length +
     asArray(hotel.booking_condition_ids).length;
-  const hotelId = hotel.hotelId || hotel.hotel_id || extractCentraHotelId(images) || hotel.id;
+  const hotelId = hotel.hotelId || hotel.hotel_id || hotel.id;
   const contactReady = isPresent(phone) || isPresent(email);
   const rating = toNumber(hotel.ratingAvg || hotel.rating_avg);
   const reviews = toNumber(hotel.reviewsCount || hotel.reviews_count) || 0;
@@ -174,7 +174,7 @@ function normalizeHotel(hotel) {
     { label: 'Photos', ok: images.length > 0 },
     { label: 'Galerie riche', ok: images.length >= 5 },
     { label: 'Contact', ok: contactReady },
-    { label: 'Lien réservation', ok: isPresent(beLink) },
+    { label: 'Champ beLink', ok: isPresent(beLink) },
     { label: 'Géolocalisation', ok: isPresent(lat) && isPresent(lng) },
     { label: 'Services', ok: servicesCount > 0 || isPresent(website) },
   ];
@@ -286,7 +286,7 @@ function ReadingGuide() {
     {
       icon: BarChart3,
       title: 'Comment lire les pourcentages',
-      text: 'Un pourcentage indique la part des fiches concernées sur le total des riads Centra. Exemple : 80% = 8 fiches sur 10.',
+      text: 'Un pourcentage indique la part des fiches concernées sur le total des riads. Exemple : 80% = 8 fiches sur 10.',
       color: ACCENT_COLORS.sapphire,
     },
     {
@@ -297,8 +297,8 @@ function ReadingGuide() {
     },
     {
       icon: CircleDollarSign,
-      title: 'Lien réservation renseigné',
-      text: 'Cela veut seulement dire que le champ Centra beLink existe. Le dashboard ne sert pas à réserver, il sert à contrôler la qualité des fiches.',
+      title: 'Champ beLink renseigné',
+      text: 'Cela veut seulement dire que le champ beLink est renseigné dans MGH. Le dashboard ne sert pas à réserver, il sert à contrôler la qualité des fiches.',
       color: ACCENT_COLORS.gold,
     },
   ];
@@ -307,7 +307,7 @@ function ReadingGuide() {
     <motion.div custom={6} variants={cardVariants} initial="hidden" animate="visible" className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
       <div className="mb-4">
         <h2 className="font-display text-xl font-semibold text-foreground">Guide de lecture des statistiques</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Chaque bloc explique une information simple et vérifiable depuis les données Centra.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Chaque bloc explique une information simple et vérifiable depuis les données MGH.</p>
       </div>
       <div className="grid gap-3 md:grid-cols-3">
         {items.map((item) => (
@@ -407,7 +407,7 @@ function BarPanel({ title, subtitle, data, dataKey = 'value', index }) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { data: rawHotels = [], isLoading } = usePartnerHotels();
+  const { data: rawHotels = [], isLoading } = usePartnerHotelsStats();
 
   const hotels = useMemo(() => rawHotels.map(normalizeHotel), [rawHotels]);
   const total = hotels.length;
@@ -425,14 +425,14 @@ export default function Dashboard() {
     { name: 'Type', value: percent(hotels.filter((h) => h.hasType).length, total), color: ACCENT_COLORS.violet },
     { name: 'Photos', value: percent(hotels.filter((h) => h.hasPhotos).length, total), color: ACCENT_COLORS.rose },
     { name: 'Contact', value: percent(directContact, total), color: ACCENT_COLORS.amber },
-    { name: 'Lien résa.', value: percent(beReady, total), color: ACCENT_COLORS.gold },
+    { name: 'Champ beLink', value: percent(beReady, total), color: ACCENT_COLORS.gold },
     { name: 'Geo', value: percent(geoReady, total), color: ACCENT_COLORS.emerald },
   ];
 
   const beLinkData = [
-    { name: 'Lien renseigné', value: beReady, color: ACCENT_COLORS.gold },
-    { name: 'Contact présent, lien manquant', value: hotels.filter((h) => !h.hasBeLink && h.hasContact).length, color: ACCENT_COLORS.sapphire },
-    { name: 'Contact et lien manquants', value: hotels.filter((h) => !h.hasBeLink && !h.hasContact).length, color: ACCENT_COLORS.rose },
+    { name: 'beLink renseigné', value: beReady, color: ACCENT_COLORS.gold },
+    { name: 'Contact présent, beLink manquant', value: hotels.filter((h) => !h.hasBeLink && h.hasContact).length, color: ACCENT_COLORS.sapphire },
+    { name: 'Contact et beLink manquants', value: hotels.filter((h) => !h.hasBeLink && !h.hasContact).length, color: ACCENT_COLORS.rose },
   ];
 
   const mediaData = [
@@ -454,9 +454,9 @@ export default function Dashboard() {
   const excellentHotels = hotels.filter((hotel) => hotel.score >= 80).length;
 
   const kpis = [
-    { title: 'Nombre de riads', value: total, sub: 'Total des fiches Centra analysées', icon: Building2, color: ACCENT_COLORS.gold },
+    { title: 'Nombre de riads', value: total, sub: 'Total des fiches analysées', icon: Building2, color: ACCENT_COLORS.gold },
     { title: 'Complétude moyenne', value: avgScore, suffix: '%', sub: `Score moyen sur 10 informations (${excellentHotels} fiches ≥ 80%)`, icon: ShieldCheck, color: ACCENT_COLORS.emerald },
-    { title: 'Lien réservation renseigné', value: percent(beReady, total), suffix: '%', sub: `${beReady} fiches ont ce lien dans Centra`, icon: CircleDollarSign, color: ACCENT_COLORS.sapphire },
+    { title: 'Champ beLink renseigné', value: percent(beReady, total), suffix: '%', sub: `${beReady} fiches ont beLink rempli dans MGH`, icon: CircleDollarSign, color: ACCENT_COLORS.sapphire },
     { title: 'Contact disponible', value: percent(directContact, total), suffix: '%', sub: `${directContact} fiches avec email ou téléphone`, icon: Phone, color: ACCENT_COLORS.violet },
     { title: 'Photos suffisantes', value: percent(richMedia, total), suffix: '%', sub: `${averageImages} photos en moyenne; objectif: 5+`, icon: Camera, color: ACCENT_COLORS.rose },
     { title: 'Position GPS renseignée', value: percent(geoReady, total), suffix: '%', sub: `${geoReady} fiches avec latitude + longitude`, icon: MapPinned, color: ACCENT_COLORS.amber },
@@ -481,8 +481,8 @@ export default function Dashboard() {
         <>
           <div className="grid gap-5 xl:grid-cols-3">
             <DonutCard
-              title="Lien de réservation dans Centra"
-              subtitle="Combien de fiches ont un lien de réservation renseigné dans Centra. Ce n'est pas un bouton pour réserver."
+              title="Champ beLink dans MGH"
+              subtitle="Combien de fiches ont le champ beLink rempli. Ce n'est pas un bouton pour réserver."
               data={beLinkData}
               centerValue={`${percent(beReady, total)}%`}
               centerLabel="avec lien"
@@ -506,7 +506,7 @@ export default function Dashboard() {
 
           <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
             <BarPanel
-              title="Informations présentes dans Centra"
+              title="Informations présentes"
               subtitle="Pour chaque champ, le pourcentage indique combien de fiches ont cette information renseignée."
               data={fieldCoverage}
               index={3}
@@ -516,7 +516,7 @@ export default function Dashboard() {
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
                   <h3 className="font-display text-lg font-semibold text-foreground">Types de propriétés</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Nombre de fiches par type retourné par Centra.</p>
+                   <p className="mt-1 text-sm text-muted-foreground">Nombre de fiches par type de propriété.</p>
                 </div>
                 <div className="rounded-2xl bg-sky-500/10 p-2 text-sky-600">
                   <BadgeCheck className="h-5 w-5" />
@@ -543,7 +543,7 @@ export default function Dashboard() {
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div>
                   <h3 className="font-display text-lg font-semibold text-foreground">Comparaison par ville</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Par ville : nombre de riads, complétude moyenne et part des fiches avec lien de réservation renseigné.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Par ville : nombre de riads, complétude moyenne et part des fiches avec beLink rempli.</p>
                 </div>
                 <div className="rounded-2xl bg-emerald-500/10 p-2 text-emerald-600">
                   <MapPinned className="h-5 w-5" />
@@ -556,7 +556,7 @@ export default function Dashboard() {
                       <th className="px-4 py-3 text-left">Ville</th>
                       <th className="px-4 py-3 text-right">Riads</th>
                       <th className="px-4 py-3 text-right">Complétude</th>
-                      <th className="hidden px-4 py-3 text-right sm:table-cell">Lien résa.</th>
+                      <th className="hidden px-4 py-3 text-right sm:table-cell">beLink</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/50">

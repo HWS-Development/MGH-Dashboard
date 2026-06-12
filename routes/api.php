@@ -85,6 +85,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // ─── Partner Hotels (Centra API proxy) ────────────────────────────────────
     Route::get('/partner/hotels', [PartnerHotelController::class, 'index'])
         ->name('partner.hotels.index');
+    Route::get('/partner/hotels/stats', [PartnerHotelController::class, 'stats'])
+        ->name('partner.hotels.stats');
     Route::get('/partner/hotels/{id}', [PartnerHotelController::class, 'show'])
         ->name('partner.hotels.show');
     Route::get('/partner/hotels/{id}/content', [PartnerHotelController::class, 'content'])

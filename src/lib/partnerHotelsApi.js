@@ -1,5 +1,5 @@
 /**
- * Frontend helper — fetches partner hotels from our own backend API route.
+ * Frontend helper — fetches partner hotels from our own backend API route (MGH).
  *
  * The backend handles authentication with the Centra partner API;
  * credentials never reach the browser.
@@ -120,7 +120,7 @@ export function usePartnerHotelById(id) {
 
 /**
  * Hook to fetch a hotel's content (amenities / services / facilities)
- * from the Centra API via our backend proxy.
+ * from the MGH API via our backend proxy.
  *
  * - enabled: only fires when `id` is truthy
  * - staleTime: 5 min
@@ -139,5 +139,30 @@ export function usePartnerHotelContent(id) {
       return failureCount < 2;
     },
     retryDelay: 800,
+  });
+}
+
+async function fetchHotelsStats() {
+  const res = await api.get('/partner/hotels/stats');
+
+  if (!res.data?.success) {
+    throw new Error(
+      res.data?.error || res.data?.message || 'Unknown error fetching hotel stats'
+    );
+  }
+
+  return res.data.data;
+}
+
+/**
+ * Hook to fetch all partner hotels enriched with detail data
+ * (beLink, email, phone, whatsappNumber, etc.) for dashboard metrics.
+ */
+export function usePartnerHotelsStats() {
+  return useQuery({
+    queryKey: ['partner-hotels-stats'],
+    queryFn: fetchHotelsStats,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }

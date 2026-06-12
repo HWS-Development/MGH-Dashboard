@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Client\Pool;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -18,6 +19,7 @@ class PartnerHotelController extends Controller
 {
     private const CACHE_TOKEN_KEY = 'centra_partner_token';
     private const CACHE_HOTELS_KEY = 'centra_partner_hotels';
+    private const CACHE_STATS_KEY = 'partner_hotels_stats';
     private const HOTELS_CACHE_TTL = 300; // 5 minutes
 
     /**
@@ -68,6 +70,80 @@ class PartnerHotelController extends Controller
                 'success' => false,
                 'error'   => $e->getMessage(),
             ], $status);
+        }
+    }
+
+    /**
+     * GET /api/partner/hotels/stats
+     * Returns all partner hotels enriched with detail data
+     * (beLink, email, phone, whatsappNumber, etc.) from the content endpoint.
+     * Cached 5 min server-side.
+     */
+    public function stats(): JsonResponse
+    {
+        try {
+            $enriched = Cache::remember(self::CACHE_STATS_KEY, self::HOTELS_CACHE_TTL, function () {
+                $hotels = $this->fetchHotelsFromCentra();
+                if (empty($hotels)) return [];
+
+                $baseUrl  = rtrim(config('services.centra.api_base_url'), '/');
+                $token    = $this->getValidToken();
+                $detailBase = $baseUrl . '/partner/hotels';
+
+                $hotelIds = [];
+                foreach ($hotels as $h) {
+                    $id = $h['hotelId'] ?? $h['hotel_id'] ?? null;
+                    if ($id) $hotelIds[] = $id;
+                }
+
+                if (empty($hotelIds)) return $hotels;
+
+                // Fetch all details concurrently
+                $responses = Http::pool(function (Pool $pool) use ($detailBase, $token, $hotelIds) {
+                    $requests = [];
+                    foreach ($hotelIds as $id) {
+                        $requests[] = $pool
+                            ->withToken($token)
+                            ->acceptJson()
+                            ->timeout(15)
+                            ->get($detailBase . '/' . urlencode($id) . '/content');
+                    }
+                    return $requests;
+                });
+
+                // Build detail map from successful responses
+                $detailMap = [];
+                foreach ($responses as $i => $response) {
+                    if ($response instanceof \Illuminate\Http\Client\Response
+                        && $response->successful()
+                        && ($response->json()['success'] ?? false)
+                    ) {
+                        $detail = $response->json()['data'] ?? [];
+                        if (!empty($detail)) {
+                            $detailMap[$hotelIds[$i]] = $detail;
+                        }
+                    }
+                }
+
+                // Merge details into listing
+                return array_map(function ($hotel) use ($detailMap) {
+                    $id = $hotel['hotelId'] ?? $hotel['hotel_id'] ?? null;
+                    return $id && isset($detailMap[$id])
+                        ? array_merge($hotel, $detailMap[$id])
+                        : $hotel;
+                }, $hotels);
+            });
+
+            return response()->json([
+                'success' => true,
+                'data'    => $enriched,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('[PartnerHotelController] stats error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error'   => $e->getMessage(),
+            ], 502);
         }
     }
 

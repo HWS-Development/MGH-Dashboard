@@ -121,7 +121,7 @@ export default function PropertyDetailsPage() {
       ? [{ icon: FaWhatsapp, label: 'WhatsApp', value: whatsappNumber, href: `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}` }]
       : []),
     ...(beLink
-      ? [{ icon: ExternalLink, label: 'Lien réservation', value: 'Renseigné dans Centra' }]
+      ? [{ icon: ExternalLink, label: 'Lien réservation', value: 'Renseigné dans MGH' }]
       : []),
     ...(extraInfoText
       ? [{ icon: Sparkles, label: 'Info complémentaire', value: extraInfoText }]
@@ -373,13 +373,13 @@ export default function PropertyDetailsPage() {
               </motion.div>
             )}
 
-            {/* ── Centra Content: Amenities / Services / Facilities ── */}
+            {/* ── MGH Content: Amenities / Services / Facilities ── */}
             {(amenities.length > 0 || services.length > 0 || facilities.length > 0) && (
               <motion.div variants={item}>
                 <div className="flex items-center gap-2 mb-6">
                   <Sparkles className="w-4 h-4 text-coral-400" />
                   <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-coral-400">
-                    Centra — Équipements & services
+                    MGH — Équipements & services
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
