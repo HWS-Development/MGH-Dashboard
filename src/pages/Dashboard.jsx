@@ -154,7 +154,16 @@ function normalizeHotel(hotel) {
   const type = localized(pick(hotel, ['property_type', 'propertyType', 'property_type_id', 'propertyTypeId', 'type'])) || 'Non renseigné';
   const lat = pick(hotel, ['latitude', 'lat']);
   const lng = pick(hotel, ['longitude', 'lng']);
-  const servicesCount = asArray(hotel.amenities).length + asArray(hotel.services).length + asArray(hotel.facilities).length;
+  const servicesCount =
+    asArray(hotel.amenities).length +
+    asArray(hotel.amenityIds).length +
+    asArray(hotel.amenity_ids).length +
+    asArray(hotel.services).length +
+    asArray(hotel.serviceIds).length +
+    asArray(hotel.service_ids).length +
+    asArray(hotel.facilities).length +
+    asArray(hotel.bookingConditionIds).length +
+    asArray(hotel.booking_condition_ids).length;
   const hotelId = hotel.hotelId || hotel.hotel_id || extractCentraHotelId(images) || hotel.id;
   const contactReady = isPresent(phone) || isPresent(email);
   const rating = toNumber(hotel.ratingAvg || hotel.rating_avg);
