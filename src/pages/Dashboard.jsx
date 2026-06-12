@@ -556,7 +556,7 @@ export default function Dashboard() {
                       <th className="px-4 py-3 text-left">Ville</th>
                       <th className="px-4 py-3 text-right">Riads</th>
                       <th className="px-4 py-3 text-right">Complétude</th>
-                      <th className="hidden px-4 py-3 text-right sm:table-cell">beLink</th>
+                      <th className="hidden px-4 py-3 text-right sm:table-cell">beLink %</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/50">
