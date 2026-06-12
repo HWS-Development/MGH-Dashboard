@@ -297,8 +297,8 @@ function ReadingGuide() {
     },
     {
       icon: CircleDollarSign,
-      title: 'Champ beLink renseigné',
-      text: 'Cela veut seulement dire que le champ beLink est renseigné dans MGH. Le dashboard ne sert pas à réserver, il sert à contrôler la qualité des fiches.',
+      title: 'Lien de réservation (beLink)',
+      text: 'Indique si le champ beLink est rempli dans MGH, c\'est-à-dire si un lien de réservation a été configuré pour ce riad.',
       color: ACCENT_COLORS.gold,
     },
   ];
